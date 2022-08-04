@@ -1,0 +1,113 @@
+// Copyright © 2022 Attestant Limited.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package http
+
+import (
+	"context"
+	"fmt"
+	"net"
+	"net/http"
+	"net/url"
+	"strings"
+	"time"
+
+	eth2client "github.com/attestantio/go-eth2-client"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
+	zerologger "github.com/rs/zerolog/log"
+)
+
+// Service is an Ethereum 2 client service.
+type Service struct {
+	base    *url.URL
+	address string
+	client  *http.Client
+	timeout time.Duration
+}
+
+// log is a service-wide logger.
+var log zerolog.Logger
+
+// New creates a new builder client service, connecting with HTTP.
+func New(ctx context.Context, params ...Parameter) (eth2client.Service, error) {
+	parameters, err := parseAndCheckParameters(params...)
+	if err != nil {
+		return nil, errors.Wrap(err, "problem with parameters")
+	}
+
+	// Set logging.
+	log = zerologger.With().Str("service", "client").Str("impl", "http").Logger()
+	if parameters.logLevel != log.GetLevel() {
+		log = log.Level(parameters.logLevel)
+	}
+
+	if parameters.monitor != nil {
+		if err := registerMetrics(ctx, parameters.monitor); err != nil {
+			return nil, errors.Wrap(err, "problem registering metrics")
+		}
+	}
+
+	client := &http.Client{
+		Timeout: parameters.timeout,
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout:   parameters.timeout,
+				KeepAlive: 30 * time.Second,
+				DualStack: true,
+			}).DialContext,
+			MaxIdleConns:        64,
+			MaxConnsPerHost:     64,
+			MaxIdleConnsPerHost: 64,
+			IdleConnTimeout:     600 * time.Second,
+		},
+	}
+
+	address := parameters.address
+	if !strings.HasPrefix(address, "http") {
+		address = fmt.Sprintf("http://%s", parameters.address)
+	}
+	base, err := url.Parse(address)
+	if err != nil {
+		return nil, errors.Wrap(err, "invalid URL")
+	}
+
+	s := &Service{
+		base:    base,
+		address: parameters.address,
+		client:  client,
+		timeout: parameters.timeout,
+	}
+
+	// Close the service on context done.
+	go func(s *Service) {
+		<-ctx.Done()
+		log.Trace().Msg("Context done; closing connection")
+		s.close()
+	}(s)
+
+	return s, nil
+}
+
+// Name provides the name of the service.
+func (s *Service) Name() string {
+	return s.address
+}
+
+// Address provides the address for the connection.
+func (s *Service) Address() string {
+	return s.address
+}
+
+// close closes the service, freeing up resources.
+func (s *Service) close() {}

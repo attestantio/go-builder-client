@@ -3,7 +3,7 @@ module github.com/attestantio/go-builder-client
 go 1.18
 
 require (
-	github.com/attestantio/go-eth2-client v0.12.0
+	github.com/attestantio/go-eth2-client v0.13.1
 	github.com/ferranbt/fastssz v0.1.1
 	github.com/goccy/go-yaml v1.9.5
 	github.com/holiman/uint256 v1.2.0
@@ -38,7 +38,3 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
-
-replace github.com/ferranbt/fastssz => ../../ferranbt/fastssz
-
-replace github.com/attestantio/go-eth2-client => ../go-eth2-client

@@ -14,8 +14,11 @@
 package spec
 
 import (
+	"errors"
+
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
+	"github.com/attestantio/go-eth2-client/spec/phase0"
 )
 
 // VersionedSignedBuilderBid contains a versioned signed builder bid.
@@ -27,6 +30,25 @@ type VersionedSignedBuilderBid struct {
 // IsEmpty returns true if there is no bid.
 func (v *VersionedSignedBuilderBid) IsEmpty() bool {
 	return v.Data == nil
+}
+
+// TransactionsRoot returns the transactions root of the bid.
+func (v *VersionedSignedBuilderBid) TransactionsRoot() (phase0.Root, error) {
+	switch v.Version {
+	case consensusspec.DataVersionBellatrix:
+		if v.Data == nil {
+			return phase0.Root{}, errors.New("no data")
+		}
+		if v.Data.Message == nil {
+			return phase0.Root{}, errors.New("no data message")
+		}
+		if v.Data.Message.Header == nil {
+			return phase0.Root{}, errors.New("no data message header")
+		}
+		return v.Data.Message.Header.TransactionsRoot, nil
+	default:
+		return phase0.Root{}, errors.New("unsupported version")
+	}
 }
 
 // String returns a string version of the structure.

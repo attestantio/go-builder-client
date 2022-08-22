@@ -75,7 +75,7 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to read GET response")
 	}
 
-	if e := log.Warn(); e.Enabled() {
+	if e := log.Trace(); e.Enabled() {
 		e.Str("endpoint", endpoint).RawJSON("response", data).Msg("GET response")
 	}
 

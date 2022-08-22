@@ -36,17 +36,31 @@ func (s *Service) SubmitValidatorRegistrations(ctx context.Context,
 		return errors.New("no registrations supplied")
 	}
 
-	if len(registrations) > submitValidatorRegistrationsChunkSize {
-		return s.chunkedSubmitValidatorRegistrations(ctx, registrations)
+	var err error
+	if len(registrations) <= submitValidatorRegistrationsChunkSize {
+		err = s.submitValidatorRegistrations(ctx, registrations)
+	} else {
+		err = s.submitChunkedValidatorRegistrations(ctx, registrations)
 	}
 
+	if err != nil {
+		monitorOperation(s.Address(), "submitvalidatorregistrations", false, time.Since(started))
+		return err
+	}
+	monitorOperation(s.Address(), "submitvalidatorregistrations", true, time.Since(started))
+
+	return nil
+}
+
+func (s *Service) submitValidatorRegistrations(ctx context.Context,
+	registrations []*api.VersionedSignedValidatorRegistration,
+) error {
 	// Unwrap versioned registrations.
 	var version *spec.BuilderVersion
 	var unversionedRegistrations []interface{}
 
 	for _, registration := range registrations {
 		if registration == nil {
-			monitorOperation(s.Address(), "submitvalidatorregistrations", false, time.Since(started))
 			return errors.New("nil registration supplied")
 		}
 
@@ -54,7 +68,6 @@ func (s *Service) SubmitValidatorRegistrations(ctx context.Context,
 		if version == nil {
 			version = &registration.Version
 		} else if *version != registration.Version {
-			monitorOperation(s.Address(), "submitvalidatorregistrations", false, time.Since(started))
 			return errors.New("registrations must all be of the same version")
 		}
 
@@ -63,28 +76,24 @@ func (s *Service) SubmitValidatorRegistrations(ctx context.Context,
 		case spec.BuilderVersionV1:
 			unversionedRegistrations = append(unversionedRegistrations, registration.V1)
 		default:
-			monitorOperation(s.Address(), "submitvalidatorregistrations", false, time.Since(started))
 			return errors.New("unknown validator registration version")
 		}
 	}
 
 	specJSON, err := json.Marshal(unversionedRegistrations)
 	if err != nil {
-		monitorOperation(s.Address(), "submitvalidatorregistrations", false, time.Since(started))
 		return errors.Wrap(err, "failed to marshal JSON")
 	}
 	_, _, err = s.post(ctx, "/eth/v1/builder/validators", ContentTypeJSON, bytes.NewBuffer(specJSON))
 	if err != nil {
-		monitorOperation(s.Address(), "submitvalidatorregistrations", false, time.Since(started))
 		return errors.Wrap(err, "failed to submit validator registration")
 	}
 
-	monitorOperation(s.Address(), "submitvalidatorregistrations", true, time.Since(started))
 	return nil
 }
 
-// chunkedSubmitValidatorRegistrations submits validator registrations in chunks.
-func (s *Service) chunkedSubmitValidatorRegistrations(ctx context.Context,
+// submitChunkedValidatorRegistrations submits validator registrations in chunks.
+func (s *Service) submitChunkedValidatorRegistrations(ctx context.Context,
 	registrations []*api.VersionedSignedValidatorRegistration,
 ) error {
 	chunkSize := submitValidatorRegistrationsChunkSize
@@ -95,7 +104,7 @@ func (s *Service) chunkedSubmitValidatorRegistrations(ctx context.Context,
 			chunkEnd = len(registrations)
 		}
 		chunk := registrations[chunkStart:chunkEnd]
-		err := s.SubmitValidatorRegistrations(ctx, chunk)
+		err := s.submitValidatorRegistrations(ctx, chunk)
 		if err != nil {
 			return errors.Wrap(err, "failed to submit chunk")
 		}

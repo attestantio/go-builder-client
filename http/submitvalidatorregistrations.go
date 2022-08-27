@@ -44,10 +44,10 @@ func (s *Service) SubmitValidatorRegistrations(ctx context.Context,
 	}
 
 	if err != nil {
-		monitorOperation(s.Address(), "submitvalidatorregistrations", false, time.Since(started))
+		monitorOperation(s.Address(), "submit validator registrations", false, time.Since(started))
 		return err
 	}
-	monitorOperation(s.Address(), "submitvalidatorregistrations", true, time.Since(started))
+	monitorOperation(s.Address(), "submit validator registrations", true, time.Since(started))
 
 	return nil
 }

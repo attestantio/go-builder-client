@@ -76,7 +76,7 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 	}
 
 	if e := log.Trace(); e.Enabled() {
-		e.Str("endpoint", endpoint).RawJSON("response", data).Msg("GET response")
+		e.Str("endpoint", endpoint).RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("GET response")
 	}
 
 	statusFamily := resp.StatusCode / 100
@@ -144,7 +144,7 @@ func (s *Service) post(ctx context.Context, endpoint string, contentType Content
 	}
 	cancel()
 
-	log.Trace().Str("response", string(data)).Msg("POST response")
+	log.Trace().Str("response", strings.TrimSuffix(string(data), "\n")).Msg("POST response")
 
 	return contentType, bytes.NewReader(data), nil
 }

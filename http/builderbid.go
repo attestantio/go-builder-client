@@ -47,11 +47,11 @@ func (s *Service) BuilderBid(ctx context.Context,
 	contentType, respBodyReader, err := s.get(ctx, url)
 	if err != nil {
 		log.Trace().Str("url", url).Err(err).Msg("Request failed")
-		monitorOperation(s.Address(), "builderbid", false, time.Since(started))
+		monitorOperation(s.Address(), "builder bid", false, time.Since(started))
 		return nil, errors.Wrap(err, "failed to request execution payload header")
 	}
 	if respBodyReader == nil {
-		monitorOperation(s.Address(), "builderbid", false, time.Since(started))
+		monitorOperation(s.Address(), "builder bid", false, time.Since(started))
 		return nil, errors.New("failed to obtain execution payload header")
 	}
 
@@ -59,7 +59,7 @@ func (s *Service) BuilderBid(ctx context.Context,
 	metadataReader := io.TeeReader(respBodyReader, &dataBodyReader)
 	var metadata responseMetadata
 	if err := json.NewDecoder(metadataReader).Decode(&metadata); err != nil {
-		monitorOperation(s.Address(), "builderbid", false, time.Since(started))
+		monitorOperation(s.Address(), "builder bid", false, time.Since(started))
 		return nil, errors.Wrap(err, "failed to parse response")
 	}
 	res := &spec.VersionedSignedBuilderBid{
@@ -85,6 +85,6 @@ func (s *Service) BuilderBid(ctx context.Context,
 		return nil, fmt.Errorf("unsupported content type %v", contentType)
 	}
 
-	monitorOperation(s.Address(), "builderbid", true, time.Since(started))
+	monitorOperation(s.Address(), "builder bid", true, time.Since(started))
 	return res, nil
 }

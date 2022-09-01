@@ -24,7 +24,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var submitValidatorRegistrationsChunkSize = 1000
+var submitValidatorRegistrationsChunkSize = 500
 
 // SubmitValidatorRegistrations submits a validator registration.
 func (s *Service) SubmitValidatorRegistrations(ctx context.Context,

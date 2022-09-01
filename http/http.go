@@ -40,8 +40,8 @@ func init() {
 // If the response from the server is a 404 this will return nil for both the reader and the error.
 func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Reader, error) {
 	// #nosec G404
-	log := log.With().Str("id", fmt.Sprintf("%02x", rand.Int31())).Str("address", s.address).Logger()
-	log.Trace().Str("endpoint", endpoint).Msg("GET request")
+	log := log.With().Str("id", fmt.Sprintf("%02x", rand.Int31())).Str("endpoint", endpoint).Str("address", s.address).Logger()
+	log.Trace().Msg("GET request")
 
 	url, err := url.Parse(fmt.Sprintf("%s%s", strings.TrimSuffix(s.base.String(), "/"), endpoint))
 	if err != nil {
@@ -75,21 +75,22 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to read GET response")
 	}
 
-	if e := log.Trace(); e.Enabled() {
-		e.Str("endpoint", endpoint).RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("GET response")
-	}
+	log.Trace().RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("GET response")
 
 	statusFamily := resp.StatusCode / 100
 	if statusFamily != 2 {
 		cancel()
-		log.Trace().Str("endpoint", endpoint).Int("status_code", resp.StatusCode).Str("data", string(data)).Msg("GET failed")
+		log.Trace().Int("status_code", resp.StatusCode).RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("GET failed")
 		return ContentTypeUnknown, nil, fmt.Errorf("GET failed with status %d: %s", resp.StatusCode, string(data))
 	}
 	cancel()
 
 	contentType, err := contentTypeFromResp(resp)
 	if err != nil {
-		return ContentTypeUnknown, nil, err
+		// For now, assume that unknown type is JSON.
+		log.Debug().Err(err).Msg("Failed to obtain content type; assuming JSON")
+		contentType = ContentTypeJSON
+		// return ContentTypeUnknown, nil, err
 	}
 
 	return contentType, bytes.NewReader(data), nil
@@ -98,7 +99,7 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 // post sends an HTTP post request and returns the body.
 func (s *Service) post(ctx context.Context, endpoint string, contentType ContentType, body io.Reader) (ContentType, io.Reader, error) {
 	// #nosec G404
-	log := log.With().Str("id", fmt.Sprintf("%02x", rand.Int31())).Str("address", s.address).Logger()
+	log := log.With().Str("id", fmt.Sprintf("%02x", rand.Int31())).Str("endpoint", endpoint).Str("address", s.address).Logger()
 	if e := log.Trace(); e.Enabled() {
 		bodyBytes, err := ioutil.ReadAll(body)
 		if err != nil {
@@ -106,7 +107,7 @@ func (s *Service) post(ctx context.Context, endpoint string, contentType Content
 		}
 		body = bytes.NewReader(bodyBytes)
 
-		e.Str("endpoint", endpoint).RawJSON("body", bodyBytes).Msg("POST request")
+		e.RawJSON("body", bodyBytes).Msg("POST request")
 	}
 
 	url, err := url.Parse(fmt.Sprintf("%s%s", strings.TrimSuffix(s.base.String(), "/"), endpoint))
@@ -138,13 +139,13 @@ func (s *Service) post(ctx context.Context, endpoint string, contentType Content
 
 	statusFamily := resp.StatusCode / 100
 	if statusFamily != 2 {
-		log.Trace().Str("endpoint", endpoint).Int("status_code", resp.StatusCode).Str("data", string(data)).Msg("POST failed")
+		log.Trace().Int("status_code", resp.StatusCode).RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("POST failed")
 		cancel()
 		return ContentTypeUnknown, nil, fmt.Errorf("POST failed with status %d: %s", resp.StatusCode, string(data))
 	}
 	cancel()
 
-	log.Trace().Str("response", strings.TrimSuffix(string(data), "\n")).Msg("POST response")
+	log.Trace().RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("POST response")
 
 	return contentType, bytes.NewReader(data), nil
 }

@@ -23,13 +23,16 @@ import (
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 )
 
-// Service is the service providing a connection to an builder client.
+// Service is the service providing a connection to an MEV relay.
 type Service interface {
-	// Name returns the name of the client implementation.
+	// Name returns the name of the builder implementation.
 	Name() string
 
-	// Address returns the address of the client.
+	// Address returns the address of the builder.
 	Address() string
+
+	// Pubkey returns the public key of the builder (if any).
+	Pubkey() *phase0.BLSPubKey
 }
 
 // BuilderBidProvider is the interface for a provider of builder bids.

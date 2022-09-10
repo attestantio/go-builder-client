@@ -15,6 +15,7 @@ package http
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"net"
 	"net/http"
@@ -22,7 +23,8 @@ import (
 	"strings"
 	"time"
 
-	eth2client "github.com/attestantio/go-eth2-client"
+	builderclient "github.com/attestantio/go-builder-client"
+	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	zerologger "github.com/rs/zerolog/log"
@@ -34,13 +36,14 @@ type Service struct {
 	address string
 	client  *http.Client
 	timeout time.Duration
+	pubkey  *phase0.BLSPubKey
 }
 
 // log is a service-wide logger.
 var log zerolog.Logger
 
 // New creates a new builder client service, connecting with HTTP.
-func New(ctx context.Context, params ...Parameter) (eth2client.Service, error) {
+func New(ctx context.Context, params ...Parameter) (builderclient.Service, error) {
 	parameters, err := parseAndCheckParameters(params...)
 	if err != nil {
 		return nil, errors.Wrap(err, "problem with parameters")
@@ -82,11 +85,26 @@ func New(ctx context.Context, params ...Parameter) (eth2client.Service, error) {
 		return nil, errors.Wrap(err, "invalid URL")
 	}
 
+	// Obtain the public key from the URL's user.
+	var pubkey *phase0.BLSPubKey
+	if base.User != nil && base.User.Username() != "" {
+		key := phase0.BLSPubKey{}
+		data, err := hex.DecodeString(strings.TrimPrefix(base.User.Username(), "0x"))
+		if err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("failed to parse public key %s", base.User.Username()))
+		}
+		copy(key[:], data)
+		pubkey = &key
+
+		// Remove the user from the URL.
+		base.User = nil
+	}
 	s := &Service{
 		base:    base,
-		address: parameters.address,
+		address: base.String(),
 		client:  client,
 		timeout: parameters.timeout,
+		pubkey:  pubkey,
 	}
 
 	// Close the service on context done.
@@ -111,3 +129,8 @@ func (s *Service) Address() string {
 
 // close closes the service, freeing up resources.
 func (s *Service) close() {}
+
+// Pubkey returns the public key of the builder (if any).
+func (s *Service) Pubkey() *phase0.BLSPubKey {
+	return s.pubkey
+}

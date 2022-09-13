@@ -119,6 +119,7 @@ func (s *Service) post(ctx context.Context, endpoint string, contentType Content
 	req, err := http.NewRequestWithContext(opCtx, http.MethodPost, url.String(), body)
 	if err != nil {
 		cancel()
+		log.Trace().Err(err).Msg("Failed to create POST endpoint")
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to create POST request")
 	}
 
@@ -128,12 +129,14 @@ func (s *Service) post(ctx context.Context, endpoint string, contentType Content
 	resp, err := s.client.Do(req)
 	if err != nil {
 		cancel()
+		log.Trace().Err(err).Msg("Failed to call POST endpoint")
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to call POST endpoint")
 	}
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		cancel()
+		log.Trace().Err(err).Msg("Failed to read POST response")
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to read POST response")
 	}
 
@@ -141,6 +144,7 @@ func (s *Service) post(ctx context.Context, endpoint string, contentType Content
 	if statusFamily != 2 {
 		log.Trace().Int("status_code", resp.StatusCode).RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("POST failed")
 		cancel()
+		log.Trace().Err(err).Msg("POST failed with status")
 		return ContentTypeUnknown, nil, fmt.Errorf("POST failed with status %d: %s", resp.StatusCode, string(data))
 	}
 	cancel()

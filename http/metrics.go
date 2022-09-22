@@ -66,16 +66,17 @@ func registerPrometheusMetrics(ctx context.Context) error {
 }
 
 // monitorOperation monitors an operation.
-func monitorOperation(server string, operation string, succeeded bool, duration time.Duration) {
+func monitorOperation(server string, operation string, result string, duration time.Duration) {
 	if operationsCounter == nil {
 		// Not registered.
 		return
 	}
 
-	if succeeded {
-		operationsCounter.WithLabelValues(server, operation, "succeeded").Add(1)
-		operationsTimer.WithLabelValues(server, operation).Observe(duration.Seconds())
-	} else {
-		operationsCounter.WithLabelValues(server, operation, "failed").Add(1)
+	operationsCounter.WithLabelValues(server, operation, result).Add(1)
+	if result == "failed" {
+		// We do not log timer for failures.
+		return
 	}
+
+	operationsTimer.WithLabelValues(server, operation).Observe(duration.Seconds())
 }

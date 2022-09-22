@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -55,23 +54,33 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to create GET request")
 	}
 
-	// Prefer SSZ if available.
-	req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
+	// Prefer SSZ if available (enable when we support SSZ) .
+	// req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
+	req.Header.Set("Accept", "application/json")
 	resp, err := s.client.Do(req)
 	if err != nil {
 		cancel()
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to call GET endpoint")
 	}
+	log = log.With().Int("status_code", resp.StatusCode).Logger()
 
-	if resp.StatusCode == 404 {
-		// Nothing found.  This is not an error, so we return nil on both counts.
+	if resp.StatusCode == http.StatusNotFound {
 		cancel()
+		log.Debug().Msg("Endpoint not found")
+		return ContentTypeUnknown, nil, errors.New("not found")
+	}
+
+	if resp.StatusCode == http.StatusNoContent {
+		// Nothing returned.  This is not an error, so we return nil on both counts.
+		cancel()
+		log.Trace().Msg("Endpoint returned no content")
 		return ContentTypeUnknown, nil, nil
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		cancel()
+		log.Debug().Err(err).Msg("Endpoint returned no data")
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to read GET response")
 	}
 
@@ -80,7 +89,7 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 	statusFamily := resp.StatusCode / 100
 	if statusFamily != 2 {
 		cancel()
-		log.Trace().Int("status_code", resp.StatusCode).RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("GET failed")
+		log.Debug().RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("GET failed")
 		return ContentTypeUnknown, nil, fmt.Errorf("GET failed with status %d: %s", resp.StatusCode, string(data))
 	}
 	cancel()
@@ -90,7 +99,6 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 		// For now, assume that unknown type is JSON.
 		log.Debug().Err(err).Msg("Failed to obtain content type; assuming JSON")
 		contentType = ContentTypeJSON
-		// return ContentTypeUnknown, nil, err
 	}
 
 	return contentType, bytes.NewReader(data), nil
@@ -101,7 +109,7 @@ func (s *Service) post(ctx context.Context, endpoint string, contentType Content
 	// #nosec G404
 	log := log.With().Str("id", fmt.Sprintf("%02x", rand.Int31())).Str("endpoint", endpoint).Str("address", s.address).Logger()
 	if e := log.Trace(); e.Enabled() {
-		bodyBytes, err := ioutil.ReadAll(body)
+		bodyBytes, err := io.ReadAll(body)
 		if err != nil {
 			return ContentTypeUnknown, nil, errors.New("failed to read request body")
 		}
@@ -124,8 +132,9 @@ func (s *Service) post(ctx context.Context, endpoint string, contentType Content
 	}
 
 	req.Header.Set("Content-type", contentType.MediaType())
-	// Prefer SSZ if available.
-	req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
+	// Prefer SSZ if available (enable when we support SSZ) .
+	// req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
+	req.Header.Set("Accept", "application/json")
 	resp, err := s.client.Do(req)
 	if err != nil {
 		cancel()
@@ -133,7 +142,7 @@ func (s *Service) post(ctx context.Context, endpoint string, contentType Content
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to call POST endpoint")
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		cancel()
 		log.Trace().Err(err).Msg("Failed to read POST response")

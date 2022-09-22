@@ -59,13 +59,13 @@ func (s *Service) unblindBellatrixBlock(ctx context.Context,
 ) {
 	specJSON, err := json.Marshal(block)
 	if err != nil {
-		monitorOperation(s.Address(), "unblind block", false, time.Since(started))
+		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
 		return nil, errors.Wrap(err, "failed to marshal JSON")
 	}
 
 	contentType, respBodyReader, err := s.post(ctx, "/eth/v1/builder/blinded_blocks", ContentTypeJSON, bytes.NewBuffer(specJSON))
 	if err != nil {
-		monitorOperation(s.Address(), "unblind block", false, time.Since(started))
+		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
 		return nil, errors.Wrap(err, "failed to submit unblind block request")
 	}
 
@@ -73,7 +73,7 @@ func (s *Service) unblindBellatrixBlock(ctx context.Context,
 	metadataReader := io.TeeReader(respBodyReader, &dataBodyReader)
 	var metadata responseMetadata
 	if err := json.NewDecoder(metadataReader).Decode(&metadata); err != nil {
-		monitorOperation(s.Address(), "unblind block", false, time.Since(started))
+		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
 		return nil, errors.Wrap(err, "failed to parse response")
 	}
 	res := &consensusspec.VersionedSignedBeaconBlock{
@@ -122,6 +122,6 @@ func (s *Service) unblindBellatrixBlock(ctx context.Context,
 	default:
 		return nil, fmt.Errorf("unsupported content type %v", contentType)
 	}
-	monitorOperation(s.Address(), "unblind block", true, time.Since(started))
+	monitorOperation(s.Address(), "unblind block", "succeeded", time.Since(started))
 	return res, nil
 }

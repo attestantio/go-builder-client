@@ -80,6 +80,9 @@ func New(ctx context.Context, params ...Parameter) (builderclient.Service, error
 	if !strings.HasPrefix(address, "http") {
 		address = fmt.Sprintf("http://%s", parameters.address)
 	}
+	if !strings.HasSuffix(address, "/") {
+		address = fmt.Sprintf("%s/", parameters.address)
+	}
 	base, err := url.Parse(address)
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid URL")

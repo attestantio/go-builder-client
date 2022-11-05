@@ -31,7 +31,7 @@ import (
 // BuilderBid represents a BuilderBid.
 type BuilderBid struct {
 	Header *bellatrix.ExecutionPayloadHeader
-	Value  *uint256.Int     `ssz-size:"4"`
+	Value  *uint256.Int     `ssz-size:"32"`
 	Pubkey phase0.BLSPubKey `ssz-size:"48"`
 }
 

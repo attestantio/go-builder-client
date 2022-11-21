@@ -22,6 +22,9 @@ import (
 	"github.com/attestantio/go-builder-client/api"
 	"github.com/attestantio/go-builder-client/spec"
 	"github.com/pkg/errors"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var submitValidatorRegistrationsChunkSize = 500
@@ -30,6 +33,10 @@ var submitValidatorRegistrationsChunkSize = 500
 func (s *Service) SubmitValidatorRegistrations(ctx context.Context,
 	registrations []*api.VersionedSignedValidatorRegistration,
 ) error {
+	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "SubmitValidatorRegistrations", trace.WithAttributes(
+		attribute.Int("validators", len(registrations)),
+	))
+	defer span.End()
 	started := time.Now()
 
 	if len(registrations) == 0 {

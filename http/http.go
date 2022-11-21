@@ -26,6 +26,10 @@ import (
 
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/pkg/errors"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func init() {
@@ -38,6 +42,9 @@ func init() {
 // get sends an HTTP get request and returns the body.
 // If the response from the server is a 404 this will return nil for both the reader and the error.
 func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Reader, error) {
+	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "get")
+	defer span.End()
+
 	// #nosec G404
 	log := log.With().Str("id", fmt.Sprintf("%02x", rand.Int31())).Str("endpoint", endpoint).Str("address", s.address).Logger()
 	log.Trace().Msg("GET request")
@@ -46,26 +53,31 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 	if err != nil {
 		return ContentTypeUnknown, nil, errors.Wrap(err, "invalid endpoint")
 	}
+	span.SetAttributes(attribute.String("url", url.String()))
 
 	opCtx, cancel := context.WithTimeout(ctx, s.timeout)
 	req, err := http.NewRequestWithContext(opCtx, http.MethodGet, url.String(), nil)
 	if err != nil {
 		cancel()
+		span.SetStatus(codes.Error, "Failed to create request")
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to create GET request")
 	}
 
 	// Prefer SSZ if available (enable when we support SSZ) .
 	// req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
 	req.Header.Set("Accept", "application/json")
+	span.AddEvent("Sending request")
 	resp, err := s.client.Do(req)
 	if err != nil {
 		cancel()
+		span.SetStatus(codes.Error, "Request failed")
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to call GET endpoint")
 	}
 	log = log.With().Int("status_code", resp.StatusCode).Logger()
 
 	if resp.StatusCode == http.StatusNotFound {
 		cancel()
+		span.RecordError(errors.New("endpoint not found"))
 		log.Debug().Msg("Endpoint not found")
 		return ContentTypeUnknown, nil, errors.New("not found")
 	}
@@ -73,6 +85,7 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 	if resp.StatusCode == http.StatusNoContent {
 		// Nothing returned.  This is not an error, so we return nil on both counts.
 		cancel()
+		span.AddEvent("Received empty response")
 		log.Trace().Msg("Endpoint returned no content")
 		return ContentTypeUnknown, nil, nil
 	}
@@ -80,16 +93,16 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		cancel()
-		log.Debug().Err(err).Msg("Endpoint returned no data")
+		span.SetStatus(codes.Error, "Failed to read response")
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to read GET response")
 	}
-
-	log.Trace().RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("GET response")
+	span.AddEvent("Received response", trace.WithAttributes(attribute.Int("size", len(data))))
 
 	statusFamily := resp.StatusCode / 100
 	if statusFamily != 2 {
+		log.Debug().Int("status_code", resp.StatusCode).RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("GET failed")
 		cancel()
-		log.Debug().RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("GET failed")
+		span.SetStatus(codes.Error, fmt.Sprintf("Status code %d", resp.StatusCode))
 		return ContentTypeUnknown, nil, fmt.Errorf("GET failed with status %d: %s", resp.StatusCode, string(data))
 	}
 	cancel()
@@ -106,6 +119,9 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 
 // post sends an HTTP post request and returns the body.
 func (s *Service) post(ctx context.Context, endpoint string, contentType ContentType, body io.Reader) (ContentType, io.Reader, error) {
+	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "post")
+	defer span.End()
+
 	// #nosec G404
 	log := log.With().Str("id", fmt.Sprintf("%02x", rand.Int31())).Str("endpoint", endpoint).Str("address", s.address).Logger()
 	if e := log.Trace(); e.Enabled() {
@@ -122,12 +138,13 @@ func (s *Service) post(ctx context.Context, endpoint string, contentType Content
 	if err != nil {
 		return ContentTypeUnknown, nil, errors.Wrap(err, "invalid endpoint")
 	}
+	span.SetAttributes(attribute.String("url", url.String()))
 
 	opCtx, cancel := context.WithTimeout(ctx, s.timeout)
 	req, err := http.NewRequestWithContext(opCtx, http.MethodPost, url.String(), body)
 	if err != nil {
 		cancel()
-		log.Trace().Err(err).Msg("Failed to create POST endpoint")
+		span.SetStatus(codes.Error, "Failed to create request")
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to create POST request")
 	}
 
@@ -135,25 +152,35 @@ func (s *Service) post(ctx context.Context, endpoint string, contentType Content
 	// Prefer SSZ if available (enable when we support SSZ) .
 	// req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
 	req.Header.Set("Accept", "application/json")
+	span.AddEvent("Sending request")
 	resp, err := s.client.Do(req)
 	if err != nil {
 		cancel()
-		log.Trace().Err(err).Msg("Failed to call POST endpoint")
+		span.SetStatus(codes.Error, "Request failed")
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to call POST endpoint")
+	}
+
+	if resp.StatusCode == http.StatusNoContent {
+		// Nothing returned.  This is not an error, so we return nil on both counts.
+		cancel()
+		span.AddEvent("Received empty response")
+		log.Trace().Msg("Endpoint returned no content")
+		return ContentTypeUnknown, nil, nil
 	}
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		cancel()
-		log.Trace().Err(err).Msg("Failed to read POST response")
+		span.SetStatus(codes.Error, "Failed to read response")
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to read POST response")
 	}
+	span.AddEvent("Received response", trace.WithAttributes(attribute.Int("size", len(data))))
 
 	statusFamily := resp.StatusCode / 100
 	if statusFamily != 2 {
-		log.Trace().Int("status_code", resp.StatusCode).RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("POST failed")
+		log.Debug().Int("status_code", resp.StatusCode).RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("POST failed")
 		cancel()
-		log.Trace().Err(err).Msg("POST failed with status")
+		span.SetStatus(codes.Error, fmt.Sprintf("Status code %d", resp.StatusCode))
 		return ContentTypeUnknown, nil, fmt.Errorf("POST failed with status %d: %s", resp.StatusCode, string(data))
 	}
 	cancel()

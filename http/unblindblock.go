@@ -27,6 +27,7 @@ import (
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/attestantio/go-eth2-client/spec/bellatrix"
 	"github.com/pkg/errors"
+	"go.opentelemetry.io/otel"
 )
 
 // UnblindBlock unblinds a block.
@@ -36,6 +37,8 @@ func (s *Service) UnblindBlock(ctx context.Context,
 	*consensusspec.VersionedSignedBeaconBlock,
 	error,
 ) {
+	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "UnblindBlock")
+	defer span.End()
 	started := time.Now()
 
 	if block == nil {
@@ -57,6 +60,9 @@ func (s *Service) unblindBellatrixBlock(ctx context.Context,
 	*consensusspec.VersionedSignedBeaconBlock,
 	error,
 ) {
+	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "unblindBellatrixBlock")
+	defer span.End()
+
 	specJSON, err := json.Marshal(block)
 	if err != nil {
 		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))

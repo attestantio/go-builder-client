@@ -76,10 +76,11 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 	log = log.With().Int("status_code", resp.StatusCode).Logger()
 
 	if resp.StatusCode == http.StatusNotFound {
+		// Nothing found.  This is not an error, so we return nil on both counts.
 		cancel()
 		span.RecordError(errors.New("endpoint not found"))
 		log.Debug().Msg("Endpoint not found")
-		return ContentTypeUnknown, nil, errors.New("not found")
+		return ContentTypeUnknown, nil, nil
 	}
 
 	if resp.StatusCode == http.StatusNoContent {
@@ -100,8 +101,9 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 
 	statusFamily := resp.StatusCode / 100
 	if statusFamily != 2 {
-		log.Debug().Int("status_code", resp.StatusCode).RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("GET failed")
 		cancel()
+		trimmedResponse := bytes.ReplaceAll(bytes.ReplaceAll(data, []byte{0x0a}, []byte{}), []byte{0x0d}, []byte{})
+		log.Debug().Int("status_code", resp.StatusCode).RawJSON("response", trimmedResponse).Msg("GET failed")
 		span.SetStatus(codes.Error, fmt.Sprintf("Status code %d", resp.StatusCode))
 		return ContentTypeUnknown, nil, fmt.Errorf("GET failed with status %d: %s", resp.StatusCode, string(data))
 	}
@@ -178,7 +180,8 @@ func (s *Service) post(ctx context.Context, endpoint string, contentType Content
 
 	statusFamily := resp.StatusCode / 100
 	if statusFamily != 2 {
-		log.Debug().Int("status_code", resp.StatusCode).RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("POST failed")
+		trimmedResponse := bytes.ReplaceAll(bytes.ReplaceAll(data, []byte{0x0a}, []byte{}), []byte{0x0d}, []byte{})
+		log.Debug().Int("status_code", resp.StatusCode).RawJSON("response", trimmedResponse).Msg("POST failed")
 		cancel()
 		span.SetStatus(codes.Error, fmt.Sprintf("Status code %d", resp.StatusCode))
 		return ContentTypeUnknown, nil, fmt.Errorf("POST failed with status %d: %s", resp.StatusCode, string(data))

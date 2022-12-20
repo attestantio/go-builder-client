@@ -11,22 +11,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package api
+package capella
 
 import (
-	consensusspec "github.com/attestantio/go-eth2-client/spec"
-	"github.com/attestantio/go-eth2-client/spec/bellatrix"
+	"fmt"
+
 	"github.com/attestantio/go-eth2-client/spec/capella"
+	"github.com/attestantio/go-eth2-client/spec/phase0"
+	"github.com/goccy/go-yaml"
+	"github.com/holiman/uint256"
 )
 
-// VersionedExecutionPayload contains a versioned ExecutionPayloadV1.
-type VersionedExecutionPayload struct {
-	Version   consensusspec.DataVersion
-	Bellatrix *bellatrix.ExecutionPayload
-	Capella   *capella.ExecutionPayload
+// BuilderBid represents a BuilderBid.
+type BuilderBid struct {
+	Header *capella.ExecutionPayloadHeader
+	Value  *uint256.Int     `ssz-size:"32"`
+	Pubkey phase0.BLSPubKey `ssz-size:"48"`
 }
 
-// IsEmpty returns true if there is no payload.
-func (v *VersionedExecutionPayload) IsEmpty() bool {
-	return v.Bellatrix == nil && v.Capella == nil
+// String returns a string version of the structure.
+func (b *BuilderBid) String() string {
+	data, err := yaml.Marshal(b)
+	if err != nil {
+		return fmt.Sprintf("ERR: %v", err)
+	}
+	return string(data)
 }

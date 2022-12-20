@@ -3,16 +3,16 @@ module github.com/attestantio/go-builder-client
 go 1.18
 
 require (
-	github.com/attestantio/go-eth2-client v0.14.3
+	github.com/attestantio/go-eth2-client v0.15.0
 	github.com/ferranbt/fastssz v0.1.2
-	github.com/goccy/go-yaml v1.9.6
+	github.com/goccy/go-yaml v1.9.2
 	github.com/holiman/uint256 v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.12.1
 	github.com/rs/zerolog v1.26.1
-	github.com/stretchr/testify v1.8.0
-	go.opentelemetry.io/otel v1.11.1
-	go.opentelemetry.io/otel/trace v1.11.1
+	github.com/stretchr/testify v1.8.1
+	go.opentelemetry.io/otel v1.11.2
+	go.opentelemetry.io/otel/trace v1.11.2
 	gotest.tools v2.2.0+incompatible
 )
 

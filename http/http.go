@@ -73,6 +73,7 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 		span.SetStatus(codes.Error, "Request failed")
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to call GET endpoint")
 	}
+	defer resp.Body.Close()
 	log = log.With().Int("status_code", resp.StatusCode).Logger()
 
 	if resp.StatusCode == http.StatusNotFound {
@@ -161,6 +162,8 @@ func (s *Service) post(ctx context.Context, endpoint string, contentType Content
 		span.SetStatus(codes.Error, "Request failed")
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to call POST endpoint")
 	}
+	defer resp.Body.Close()
+	log = log.With().Int("status_code", resp.StatusCode).Logger()
 
 	if resp.StatusCode == http.StatusNoContent {
 		// Nothing returned.  This is not an error, so we return nil on both counts.

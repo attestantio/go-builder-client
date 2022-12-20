@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/attestantio/go-builder-client/api/bellatrix"
+	"github.com/attestantio/go-builder-client/api/capella"
 	"github.com/attestantio/go-builder-client/spec"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
@@ -33,6 +34,10 @@ import (
 
 type bellatrixBuilderBidJSON struct {
 	Data *bellatrix.SignedBuilderBid `json:"data"`
+}
+
+type capellaBuilderBidJSON struct {
+	Data *capella.SignedBuilderBid `json:"data"`
 }
 
 // BuilderBid obtains a builder bid.
@@ -85,6 +90,15 @@ func (s *Service) BuilderBid(ctx context.Context,
 				return nil, errors.New("parent hash mismatch")
 			}
 			res.Data = resp.Data
+		case consensusspec.DataVersionCapella:
+			var resp capellaBuilderBidJSON
+			if err := json.NewDecoder(&dataBodyReader).Decode(&resp); err != nil {
+				return nil, errors.Wrap(err, "failed to parse capella builder bid")
+			}
+			if !bytes.Equal(resp.Data.Message.Header.ParentHash[:], parentHash[:]) {
+				return nil, errors.New("parent hash mismatch")
+			}
+			res.Capella = resp.Data
 		default:
 			return nil, fmt.Errorf("unsupported block version %s", metadata.Version)
 		}

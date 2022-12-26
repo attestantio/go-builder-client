@@ -49,8 +49,14 @@ func (s *Service) UnblindBlock(ctx context.Context,
 
 	switch block.Version {
 	case consensusspec.DataVersionBellatrix:
+		if block.Bellatrix == nil {
+			return nil, errors.New("bellatrix block without payload")
+		}
 		return s.unblindBellatrixBlock(ctx, started, block.Bellatrix)
 	case consensusspec.DataVersionCapella:
+		if block.Capella == nil {
+			return nil, errors.New("capella block without payload")
+		}
 		return s.unblindCapellaBlock(ctx, started, block.Capella)
 	default:
 		return nil, fmt.Errorf("unhandled data version %v", block.Version)

@@ -34,13 +34,49 @@ type capellaVersionedExecutionPayloadJSON struct {
 	Data *capella.ExecutionPayload `json:"data"`
 }
 
+// MarshalJSON implements json.Marshaler.
+func (v *VersionedExecutionPayload) MarshalJSON() ([]byte, error) {
+	version := &versionJSON{
+		Version: v.Version,
+	}
+	switch v.Version {
+	case spec.DataVersionBellatrix:
+		if v.Bellatrix == nil {
+			return nil, errors.New("no bellatrix data")
+		}
+		data := &bellatrixVersionedExecutionPayloadJSON{
+			Data: v.Bellatrix,
+		}
+		payload := struct {
+			*versionJSON
+			*bellatrixVersionedExecutionPayloadJSON
+		}{version, data}
+		return json.Marshal(payload)
+	case spec.DataVersionCapella:
+		if v.Capella == nil {
+			return nil, errors.New("no capella data")
+		}
+		data := &capellaVersionedExecutionPayloadJSON{
+			Data: v.Capella,
+		}
+		payload := struct {
+			*versionJSON
+			*capellaVersionedExecutionPayloadJSON
+		}{version, data}
+		return json.Marshal(payload)
+	default:
+		return nil, fmt.Errorf("unsupported data version %v", v.Version)
+	}
+}
+
 // UnmarshalJSON implements json.Unmarshaler.
 func (v *VersionedExecutionPayload) UnmarshalJSON(input []byte) error {
 	var metadata versionJSON
 	if err := json.Unmarshal(input, &metadata); err != nil {
 		return errors.Wrap(err, "invalid JSON")
 	}
-	switch metadata.Version {
+	v.Version = metadata.Version
+	switch v.Version {
 	case spec.DataVersionBellatrix:
 		var data bellatrixVersionedExecutionPayloadJSON
 		if err := json.Unmarshal(input, &data); err != nil {
@@ -56,6 +92,5 @@ func (v *VersionedExecutionPayload) UnmarshalJSON(input []byte) error {
 	default:
 		return fmt.Errorf("unsupported data version %v", metadata.Version)
 	}
-
 	return nil
 }

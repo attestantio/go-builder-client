@@ -28,5 +28,12 @@ type VersionedExecutionPayload struct {
 
 // IsEmpty returns true if there is no payload.
 func (v *VersionedExecutionPayload) IsEmpty() bool {
-	return v.Bellatrix == nil && v.Capella == nil
+	switch v.Version {
+	case consensusspec.DataVersionBellatrix:
+		return v.Bellatrix == nil
+	case consensusspec.DataVersionCapella:
+		return v.Capella == nil
+	default:
+		return true
+	}
 }

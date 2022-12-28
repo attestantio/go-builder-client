@@ -16,7 +16,6 @@ package spec
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
@@ -37,38 +36,38 @@ type capellaVersionedSignedBuilderBidJSON struct {
 
 // MarshalJSON implements json.Marshaler.
 func (v *VersionedSignedBuilderBid) MarshalJSON() ([]byte, error) {
-	builder := strings.Builder{}
-	builder.WriteString(`{"version":"`)
-	builder.WriteString(v.Version.String())
-	builder.WriteString(`"`)
+	version := &versionJSON{
+		Version: v.Version,
+	}
 
-	var data []byte
-	var err error
 	switch v.Version {
 	case spec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
-			err = fmt.Errorf("no bellatrix data")
-			break
+			return nil, errors.New("no bellatrix data")
 		}
-		data, err = json.Marshal(v.Bellatrix)
+		data := &bellatrixVersionedSignedBuilderBidJSON{
+			Data: v.Bellatrix,
+		}
+		payload := struct {
+			*versionJSON
+			*bellatrixVersionedSignedBuilderBidJSON
+		}{version, data}
+		return json.Marshal(payload)
 	case spec.DataVersionCapella:
 		if v.Capella == nil {
-			err = fmt.Errorf("no capella data")
-			break
+			return nil, errors.New("no capella data")
 		}
-		data, err = json.Marshal(v.Capella)
+		data := &capellaVersionedSignedBuilderBidJSON{
+			Data: v.Capella,
+		}
+		payload := struct {
+			*versionJSON
+			*capellaVersionedSignedBuilderBidJSON
+		}{version, data}
+		return json.Marshal(payload)
 	default:
-		err = fmt.Errorf("unsupported version %v", v.Version)
+		return nil, fmt.Errorf("unsupported data version %v", v.Version)
 	}
-	if err != nil {
-		return nil, err
-	}
-	if data != nil {
-		builder.WriteString(`,"data":`)
-		builder.WriteString(string(data))
-	}
-	builder.WriteString(`}`)
-	return []byte(builder.String()), nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

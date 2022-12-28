@@ -3,7 +3,7 @@ module github.com/attestantio/go-builder-client
 go 1.18
 
 require (
-	github.com/attestantio/go-eth2-client v0.15.0
+	github.com/attestantio/go-eth2-client v0.15.1
 	github.com/ferranbt/fastssz v0.1.2
 	github.com/goccy/go-yaml v1.9.2
 	github.com/holiman/uint256 v1.2.1

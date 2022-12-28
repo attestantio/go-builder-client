@@ -89,7 +89,7 @@ func (s *Service) BuilderBid(ctx context.Context,
 			if !bytes.Equal(resp.Data.Message.Header.ParentHash[:], parentHash[:]) {
 				return nil, errors.New("parent hash mismatch")
 			}
-			res.Data = resp.Data
+			res.Bellatrix = resp.Data
 		case consensusspec.DataVersionCapella:
 			var resp capellaBuilderBidJSON
 			if err := json.NewDecoder(&dataBodyReader).Decode(&resp); err != nil {

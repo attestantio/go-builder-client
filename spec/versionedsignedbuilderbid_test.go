@@ -883,6 +883,101 @@ func TestVersionedSignedBuilderBidMessageHashTreeRoot(t *testing.T) {
 			err: "no data message",
 		},
 		{
+			name: "BellatrixGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionBellatrix,
+				Bellatrix: &bellatrix.SignedBuilderBid{
+					Message: &bellatrix.BuilderBid{
+						Value:  uint256.NewInt(12345),
+						Header: &consensusbellatrix.ExecutionPayloadHeader{},
+					},
+				},
+			},
+			res: phase0.Root{
+				0x23, 0xef, 0x2a, 0xa3, 0xce, 0x3b, 0x05, 0x76, 0xf6, 0xcb, 0x34, 0x4e, 0xed, 0xa4, 0xdf, 0x63,
+				0x9c, 0xd3, 0x88, 0x22, 0x62, 0x86, 0x11, 0x86, 0x5f, 0x74, 0x09, 0x8e, 0x04, 0x94, 0xf8, 0x4b,
+			},
+		},
+		{
+			name: "CapellaNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionCapella,
+			},
+			err: "no data",
+		},
+		{
+			name: "CapellaNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionCapella,
+				Capella: &capella.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "CapellaGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionCapella,
+				Capella: &capella.SignedBuilderBid{
+					Message: &capella.BuilderBid{
+						Value:  uint256.NewInt(12345),
+						Header: &consensuscapella.ExecutionPayloadHeader{},
+					},
+				},
+			},
+			res: phase0.Root{
+				0x23, 0xef, 0x2a, 0xa3, 0xce, 0x3b, 0x05, 0x76, 0xf6, 0xcb, 0x34, 0x4e, 0xed, 0xa4, 0xdf, 0x63,
+				0x9c, 0xd3, 0x88, 0x22, 0x62, 0x86, 0x11, 0x86, 0x5f, 0x74, 0x09, 0x8e, 0x04, 0x94, 0xf8, 0x4b,
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			res, err := test.bid.MessageHashTreeRoot()
+			if test.err != "" {
+				require.EqualError(t, err, test.err)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, test.res, res)
+			}
+		})
+	}
+}
+
+func TestVersionedSignedBuilderBidHeaderHashTreeRoot(t *testing.T) {
+	tests := []struct {
+		name string
+		bid  *spec.VersionedSignedBuilderBid
+		res  phase0.Root
+		err  string
+	}{
+		{
+			name: "Empty",
+			err:  "nil struct",
+		},
+		{
+			name: "UnsupportedVersion",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionAltair,
+			},
+			err: "unsupported version",
+		},
+		{
+			name: "BellatrixNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionBellatrix,
+			},
+			err: "no data",
+		},
+		{
+			name: "BellatrixNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version:   consensusspec.DataVersionBellatrix,
+				Bellatrix: &bellatrix.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
 			name: "BellatrixNoDataMessageHeader",
 			bid: &spec.VersionedSignedBuilderBid{
 				Version: consensusspec.DataVersionBellatrix,
@@ -904,8 +999,8 @@ func TestVersionedSignedBuilderBidMessageHashTreeRoot(t *testing.T) {
 				},
 			},
 			res: phase0.Root{
-				0x23, 0xef, 0x2a, 0xa3, 0xce, 0x3b, 0x05, 0x76, 0xf6, 0xcb, 0x34, 0x4e, 0xed, 0xa4, 0xdf, 0x63,
-				0x9c, 0xd3, 0x88, 0x22, 0x62, 0x86, 0x11, 0x86, 0x5f, 0x74, 0x09, 0x8e, 0x04, 0x94, 0xf8, 0x4b,
+				0x22, 0x21, 0x6a, 0x4a, 0x17, 0xe5, 0x5c, 0xc4, 0x1c, 0xe4, 0x54, 0x60, 0x0e, 0x5d, 0xeb, 0x8a,
+				0xad, 0x32, 0xf1, 0x55, 0x80, 0xa9, 0x38, 0xb1, 0x91, 0x4f, 0x93, 0xa9, 0x65, 0x2c, 0x0e, 0x2c,
 			},
 		},
 		{
@@ -945,15 +1040,15 @@ func TestVersionedSignedBuilderBidMessageHashTreeRoot(t *testing.T) {
 				},
 			},
 			res: phase0.Root{
-				0x23, 0xef, 0x2a, 0xa3, 0xce, 0x3b, 0x05, 0x76, 0xf6, 0xcb, 0x34, 0x4e, 0xed, 0xa4, 0xdf, 0x63,
-				0x9c, 0xd3, 0x88, 0x22, 0x62, 0x86, 0x11, 0x86, 0x5f, 0x74, 0x09, 0x8e, 0x04, 0x94, 0xf8, 0x4b,
+				0x22, 0x21, 0x6a, 0x4a, 0x17, 0xe5, 0x5c, 0xc4, 0x1c, 0xe4, 0x54, 0x60, 0x0e, 0x5d, 0xeb, 0x8a,
+				0xad, 0x32, 0xf1, 0x55, 0x80, 0xa9, 0x38, 0xb1, 0x91, 0x4f, 0x93, 0xa9, 0x65, 0x2c, 0x0e, 0x2c,
 			},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			res, err := test.bid.MessageHashTreeRoot()
+			res, err := test.bid.HeaderHashTreeRoot()
 			if test.err != "" {
 				require.EqualError(t, err, test.err)
 			} else {

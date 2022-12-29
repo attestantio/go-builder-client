@@ -277,10 +277,37 @@ func (v *VersionedSignedBuilderBid) MessageHashTreeRoot() (phase0.Root, error) {
 		if v.Bellatrix.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+		return v.Bellatrix.Message.HashTreeRoot()
+	case consensusspec.DataVersionCapella:
+		if v.Capella == nil {
+			return phase0.Root{}, errors.New("no data")
+		}
+		if v.Capella.Message == nil {
+			return phase0.Root{}, errors.New("no data message")
+		}
+		return v.Capella.Message.HashTreeRoot()
+	default:
+		return phase0.Root{}, errors.New("unsupported version")
+	}
+}
+
+// HeaderHashTreeRoot returns the hash tree root of the header of the bid.
+func (v *VersionedSignedBuilderBid) HeaderHashTreeRoot() (phase0.Root, error) {
+	if v == nil {
+		return phase0.Root{}, errors.New("nil struct")
+	}
+	switch v.Version {
+	case consensusspec.DataVersionBellatrix:
+		if v.Bellatrix == nil {
+			return phase0.Root{}, errors.New("no data")
+		}
+		if v.Bellatrix.Message == nil {
+			return phase0.Root{}, errors.New("no data message")
+		}
 		if v.Bellatrix.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
-		return v.Bellatrix.Message.HashTreeRoot()
+		return v.Bellatrix.Message.Header.HashTreeRoot()
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
 			return phase0.Root{}, errors.New("no data")
@@ -291,7 +318,7 @@ func (v *VersionedSignedBuilderBid) MessageHashTreeRoot() (phase0.Root, error) {
 		if v.Capella.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
-		return v.Capella.Message.HashTreeRoot()
+		return v.Capella.Message.Header.HashTreeRoot()
 	default:
 		return phase0.Root{}, errors.New("unsupported version")
 	}

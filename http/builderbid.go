@@ -50,6 +50,7 @@ func (s *Service) BuilderBid(ctx context.Context,
 	error,
 ) {
 	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "BuilderBid", trace.WithAttributes(
+		attribute.String("relay", s.Address()),
 		attribute.Int64("slot", int64(slot)),
 	))
 	defer span.End()
@@ -107,5 +108,14 @@ func (s *Service) BuilderBid(ctx context.Context,
 	}
 
 	monitorOperation(s.Address(), "builder bid", "succeeded", time.Since(started))
+
+	value, err := res.Value()
+	if err == nil {
+		span.SetAttributes(
+			// Has to be a string due to the potential size being >maxint64.
+			attribute.String("value", value.ToBig().String()),
+		)
+	}
+
 	return res, nil
 }

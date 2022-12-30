@@ -30,6 +30,8 @@ import (
 	"github.com/attestantio/go-eth2-client/spec/capella"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // UnblindBlock unblinds a block.
@@ -39,7 +41,9 @@ func (s *Service) UnblindBlock(ctx context.Context,
 	*consensusspec.VersionedSignedBeaconBlock,
 	error,
 ) {
-	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "UnblindBlock")
+	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "UnblindBlock", trace.WithAttributes(
+		attribute.String("relay", s.Address()),
+	))
 	defer span.End()
 	started := time.Now()
 
@@ -70,9 +74,6 @@ func (s *Service) unblindBellatrixBlock(ctx context.Context,
 	*consensusspec.VersionedSignedBeaconBlock,
 	error,
 ) {
-	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "unblindBellatrixBlock")
-	defer span.End()
-
 	specJSON, err := json.Marshal(block)
 	if err != nil {
 		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
@@ -149,9 +150,6 @@ func (s *Service) unblindCapellaBlock(ctx context.Context,
 	*consensusspec.VersionedSignedBeaconBlock,
 	error,
 ) {
-	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "unblindCapellaBlock")
-	defer span.End()
-
 	specJSON, err := json.Marshal(block)
 	if err != nil {
 		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))

@@ -1160,7 +1160,7 @@ func TestVersionedSignedBuilderString(t *testing.T) {
 			bid: &spec.VersionedSignedBuilderBid{
 				Version: consensusspec.DataVersionAltair,
 			},
-			res: `ERR: json: error calling MarshalJSON for type *spec.VersionedSignedBuilderBid: unsupported version altair`,
+			res: `ERR: json: error calling MarshalJSON for type *spec.VersionedSignedBuilderBid: unsupported data version altair`,
 		},
 		{
 			name: "BellatrixNoData",

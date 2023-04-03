@@ -58,7 +58,7 @@ func (c *ContentType) UnmarshalJSON(input []byte) error {
 	return err
 }
 
-// String returns a string representation of the
+// String returns a string representation of the type.
 func (c ContentType) String() string {
 	if int(c) >= len(contentTypeStrings) {
 		return contentTypeStrings[0]

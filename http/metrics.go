@@ -1,4 +1,4 @@
-// Copyright © 2022 Attestant Limited.
+// Copyright © 2022, 2023 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -21,8 +21,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var operationsCounter *prometheus.CounterVec
-var operationsTimer *prometheus.HistogramVec
+var (
+	operationsCounter *prometheus.CounterVec
+	operationsTimer   *prometheus.HistogramVec
+)
 
 func registerMetrics(ctx context.Context, monitor metrics.Service) error {
 	if operationsCounter != nil {
@@ -40,7 +42,7 @@ func registerMetrics(ctx context.Context, monitor metrics.Service) error {
 }
 
 // skipcq: RVV-B0012
-func registerPrometheusMetrics(ctx context.Context) error {
+func registerPrometheusMetrics(_ context.Context) error {
 	operationsCounter = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: "eth_builder_client",
 		Subsystem: "operations",

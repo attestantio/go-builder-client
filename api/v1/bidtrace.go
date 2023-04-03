@@ -76,6 +76,7 @@ func (b *BidTrace) UnmarshalJSON(input []byte) error {
 	if err := json.Unmarshal(input, &data); err != nil {
 		return errors.Wrap(err, "invalid JSON")
 	}
+
 	return b.unpack(&data)
 }
 
@@ -202,6 +203,7 @@ func (b *BidTrace) MarshalYAML() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return bytes.ReplaceAll(yamlBytes, []byte(`"`), []byte(`'`)), nil
 }
 
@@ -212,6 +214,7 @@ func (b *BidTrace) UnmarshalYAML(input []byte) error {
 	if err := yaml.Unmarshal(input, &data); err != nil {
 		return err
 	}
+
 	return b.unpack(&data)
 }
 
@@ -221,5 +224,6 @@ func (b *BidTrace) String() string {
 	if err != nil {
 		return fmt.Sprintf("ERR: %v", err)
 	}
+
 	return string(data)
 }

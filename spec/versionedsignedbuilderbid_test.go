@@ -57,7 +57,6 @@ func TestVersionedSignedBuilderBidEmpty(t *testing.T) {
 		Bellatrix: &bellatrix.SignedBuilderBid{},
 	}
 	require.False(t, notEmpty.IsEmpty())
-
 }
 
 func TestVersionedSignedBuilderBidBuilder(t *testing.T) {

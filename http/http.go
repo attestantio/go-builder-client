@@ -22,7 +22,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/pkg/errors"
@@ -31,13 +30,6 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
-
-func init() {
-	// We seed math.rand here so that we can obtain different IDs for requests.
-	// This is purely used as a way to match request and response entries in logs, so there is no
-	// requirement for this to cryptographically secure.
-	rand.Seed(time.Now().UnixNano())
-}
 
 // get sends an HTTP get request and returns the body.
 // If the response from the server is a 404 this will return nil for both the reader and the error.

@@ -42,11 +42,10 @@ func (b *BidTrace) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = ssz.MarshalUint64(dst, b.GasUsed)
 
 	// Field (8) 'Value'
-	value := b.Value.Bytes()
-	for i, j := 0, len(value)-1; i < j; i, j = i+1, j-1 {
-		value[i], value[j] = value[j], value[i]
+	value := b.Value.Bytes32()
+	for i := 0; i < 32; i++ {
+		dst = append(dst, value[31-i])
 	}
-	dst = append(dst, value...)
 
 	return
 }
@@ -84,12 +83,14 @@ func (b *BidTrace) UnmarshalSSZ(buf []byte) error {
 	b.GasUsed = ssz.UnmarshallUint64(buf[196:204])
 
 	// Field (8) 'Value'
-	value := buf[204:236]
-	for i, j := 0, len(value)-1; i < j; i, j = i+1, j-1 {
-		value[i], value[j] = value[j], value[i]
+	value := make([]byte, 32)
+	for i := 0; i < 32; i++ {
+		value[i] = buf[235-i]
 	}
-	b.Value = new(uint256.Int)
-	b.Value.SetBytes(value)
+	if b.Value == nil {
+		b.Value = new(uint256.Int)
+	}
+	b.Value.SetBytes32(value)
 
 	return err
 }
@@ -134,11 +135,11 @@ func (b *BidTrace) HashTreeRootWith(hh ssz.HashWalker) (err error) {
 	hh.PutUint64(b.GasUsed)
 
 	// Field (8) 'Value'
-	value := b.Value.Bytes()
-	for i, j := 0, len(value)-1; i < j; i, j = i+1, j-1 {
+	value := b.Value.Bytes32()
+	for i, j := 0, 31; i < j; i, j = i+1, j-1 {
 		value[i], value[j] = value[j], value[i]
 	}
-	hh.PutBytes(value)
+	hh.PutBytes(value[:])
 
 	hh.Merkleize(indx)
 	return

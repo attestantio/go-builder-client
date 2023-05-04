@@ -26,11 +26,10 @@ func (b *BuilderBid) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	offset += b.Header.SizeSSZ()
 
 	// Field (1) 'Value'
-	value := b.Value.Bytes()
-	for i, j := 0, len(value)-1; i < j; i, j = i+1, j-1 {
-		value[i], value[j] = value[j], value[i]
+	value := b.Value.Bytes32()
+	for i := 0; i < 32; i++ {
+		dst = append(dst, value[31-i])
 	}
-	dst = append(dst, value...)
 
 	// Field (2) 'Pubkey'
 	dst = append(dst, b.Pubkey[:]...)
@@ -64,12 +63,14 @@ func (b *BuilderBid) UnmarshalSSZ(buf []byte) error {
 	}
 
 	// Field (1) 'Value'
-	value := buf[4:36]
-	for i, j := 0, len(value)-1; i < j; i, j = i+1, j-1 {
-		value[i], value[j] = value[j], value[i]
+	value := make([]byte, 32)
+	for i := 0; i < 32; i++ {
+		value[i] = buf[35-i]
 	}
-	b.Value = new(uint256.Int)
-	b.Value.SetBytes(value)
+	if b.Value == nil {
+		b.Value = new(uint256.Int)
+	}
+	b.Value.SetBytes32(value)
 
 	// Field (2) 'Pubkey'
 	copy(b.Pubkey[:], buf[36:84])
@@ -115,11 +116,11 @@ func (b *BuilderBid) HashTreeRootWith(hh ssz.HashWalker) (err error) {
 	}
 
 	// Field (1) 'Value'
-	value := b.Value.Bytes()
-	for i, j := 0, len(value)-1; i < j; i, j = i+1, j-1 {
+	value := b.Value.Bytes32()
+	for i, j := 0, 31; i < j; i, j = i+1, j-1 {
 		value[i], value[j] = value[j], value[i]
 	}
-	hh.PutBytes(value)
+	hh.PutBytes(value[:])
 
 	// Field (2) 'Pubkey'
 	hh.PutBytes(b.Pubkey[:])

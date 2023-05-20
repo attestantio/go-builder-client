@@ -17,6 +17,9 @@ import (
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/attestantio/go-eth2-client/spec/bellatrix"
 	"github.com/attestantio/go-eth2-client/spec/capella"
+	"github.com/attestantio/go-eth2-client/spec/deneb"
+	"github.com/attestantio/go-eth2-client/spec/phase0"
+	"github.com/pkg/errors"
 )
 
 // VersionedExecutionPayload contains a versioned ExecutionPayloadV1.
@@ -24,6 +27,7 @@ type VersionedExecutionPayload struct {
 	Version   consensusspec.DataVersion
 	Bellatrix *bellatrix.ExecutionPayload
 	Capella   *capella.ExecutionPayload
+	Deneb     *deneb.ExecutionPayload
 }
 
 // IsEmpty returns true if there is no payload.
@@ -33,7 +37,34 @@ func (v *VersionedExecutionPayload) IsEmpty() bool {
 		return v.Bellatrix == nil
 	case consensusspec.DataVersionCapella:
 		return v.Capella == nil
+	case consensusspec.DataVersionDeneb:
+		return v.Deneb == nil
 	default:
 		return true
+	}
+}
+
+func (v *VersionedExecutionPayload) BlockHash() (phase0.Hash32, error) {
+	if v == nil {
+		return phase0.Hash32{}, errors.New("nil struct")
+	}
+	switch v.Version {
+	case consensusspec.DataVersionBellatrix:
+		if v.Bellatrix == nil {
+			return phase0.Hash32{}, errors.New("no data")
+		}
+		return v.Bellatrix.BlockHash, nil
+	case consensusspec.DataVersionCapella:
+		if v.Capella == nil {
+			return phase0.Hash32{}, errors.New("no data")
+		}
+		return v.Capella.BlockHash, nil
+	case consensusspec.DataVersionDeneb:
+		if v.Deneb == nil {
+			return phase0.Hash32{}, errors.New("no data")
+		}
+		return v.Deneb.BlockHash, nil
+	default:
+		return phase0.Hash32{}, errors.New("unsupported version")
 	}
 }

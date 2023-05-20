@@ -372,6 +372,129 @@ func TestVersionedSignedBuilderBidParentHash(t *testing.T) {
 	}
 }
 
+func TestVersionedSignedBuilderBidBlockHash(t *testing.T) {
+	tests := []struct {
+		name string
+		bid  *spec.VersionedSignedBuilderBid
+		res  phase0.Hash32
+		err  string
+	}{
+		{
+			name: "Empty",
+			err:  "nil struct",
+		},
+		{
+			name: "UnsupportedVersion",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionAltair,
+			},
+			err: "unsupported version",
+		},
+		{
+			name: "BellatrixNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionBellatrix,
+			},
+			err: "no data",
+		},
+		{
+			name: "BellatrixNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version:   consensusspec.DataVersionBellatrix,
+				Bellatrix: &bellatrix.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "BellatrixNoDataMessageHeader",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionBellatrix,
+				Bellatrix: &bellatrix.SignedBuilderBid{
+					Message: &bellatrix.BuilderBid{},
+				},
+			},
+			err: "no data message header",
+		},
+		{
+			name: "BellatrixGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionBellatrix,
+				Bellatrix: &bellatrix.SignedBuilderBid{
+					Message: &bellatrix.BuilderBid{
+						Header: &consensusbellatrix.ExecutionPayloadHeader{
+							BlockHash: phase0.Hash32{
+								0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+								0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+							},
+						},
+					},
+				},
+			},
+			res: phase0.Hash32{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+			},
+		},
+		{
+			name: "CapellaNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionCapella,
+			},
+			err: "no data",
+		},
+		{
+			name: "CapellaNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionCapella,
+				Capella: &capella.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "CapellaNoDataMessageHeader",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionCapella,
+				Capella: &capella.SignedBuilderBid{
+					Message: &capella.BuilderBid{},
+				},
+			},
+			err: "no data message header",
+		},
+		{
+			name: "CapellaGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionCapella,
+				Capella: &capella.SignedBuilderBid{
+					Message: &capella.BuilderBid{
+						Header: &consensuscapella.ExecutionPayloadHeader{
+							BlockHash: phase0.Hash32{
+								0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+								0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+							},
+						},
+					},
+				},
+			},
+			res: phase0.Hash32{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			res, err := test.bid.BlockHash()
+			if test.err != "" {
+				require.EqualError(t, err, test.err)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, test.res, res)
+			}
+		})
+	}
+}
+
 func TestVersionedSignedBuilderBidStateRoot(t *testing.T) {
 	tests := []struct {
 		name string

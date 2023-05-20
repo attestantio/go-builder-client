@@ -99,6 +99,39 @@ func (v *VersionedSignedBuilderBid) Value() (*uint256.Int, error) {
 	}
 }
 
+// BlockHash returns the block hash of the bid.
+func (v *VersionedSignedBuilderBid) BlockHash() (phase0.Hash32, error) {
+	if v == nil {
+		return phase0.Hash32{}, errors.New("nil struct")
+	}
+	switch v.Version {
+	case consensusspec.DataVersionBellatrix:
+		if v.Bellatrix == nil {
+			return phase0.Hash32{}, errors.New("no data")
+		}
+		if v.Bellatrix.Message == nil {
+			return phase0.Hash32{}, errors.New("no data message")
+		}
+		if v.Bellatrix.Message.Header == nil {
+			return phase0.Hash32{}, errors.New("no data message header")
+		}
+		return v.Bellatrix.Message.Header.BlockHash, nil
+	case consensusspec.DataVersionCapella:
+		if v.Capella == nil {
+			return phase0.Hash32{}, errors.New("no data")
+		}
+		if v.Capella.Message == nil {
+			return phase0.Hash32{}, errors.New("no data message")
+		}
+		if v.Capella.Message.Header == nil {
+			return phase0.Hash32{}, errors.New("no data message header")
+		}
+		return v.Capella.Message.Header.BlockHash, nil
+	default:
+		return phase0.Hash32{}, errors.New("unsupported version")
+	}
+}
+
 // ParentHash returns the parent hash of the bid.
 func (v *VersionedSignedBuilderBid) ParentHash() (phase0.Hash32, error) {
 	if v == nil {

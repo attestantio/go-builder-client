@@ -1,4 +1,4 @@
-// Copyright © 2022 Attestant Limited.
+// Copyright © 2022, 2023 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -55,6 +55,7 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to create GET request")
 	}
 
+	s.addExtraHeaders(req)
 	// Prefer SSZ if available (enable when we support SSZ) .
 	// req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
 	req.Header.Set("Accept", "application/json")
@@ -143,6 +144,7 @@ func (s *Service) post(ctx context.Context, endpoint string, contentType Content
 		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to create POST request")
 	}
 
+	s.addExtraHeaders(req)
 	req.Header.Set("Content-type", contentType.MediaType())
 	// Prefer SSZ if available (enable when we support SSZ) .
 	// req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
@@ -186,6 +188,12 @@ func (s *Service) post(ctx context.Context, endpoint string, contentType Content
 	log.Trace().RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("POST response")
 
 	return contentType, bytes.NewReader(data), nil
+}
+
+func (s *Service) addExtraHeaders(req *http.Request) {
+	for k, v := range s.extraHeaders {
+		req.Header.Add(k, v)
+	}
 }
 
 // responseMetadata returns metadata related to responses.

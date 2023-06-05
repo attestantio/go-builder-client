@@ -1,4 +1,4 @@
-// Copyright © 2022 Attestant Limited.
+// Copyright © 2022, 2023 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -22,10 +22,11 @@ import (
 )
 
 type parameters struct {
-	logLevel zerolog.Level
-	monitor  metrics.Service
-	address  string
-	timeout  time.Duration
+	logLevel     zerolog.Level
+	monitor      metrics.Service
+	address      string
+	timeout      time.Duration
+	extraHeaders map[string]string
 }
 
 // Parameter is the interface for service parameters.
@@ -67,11 +68,19 @@ func WithTimeout(timeout time.Duration) Parameter {
 	})
 }
 
+// WithExtraHeaders sets additional headers to be sent with each HTTP request.
+func WithExtraHeaders(headers map[string]string) Parameter {
+	return parameterFunc(func(p *parameters) {
+		p.extraHeaders = headers
+	})
+}
+
 // parseAndCheckParameters parses and checks parameters to ensure that mandatory parameters are present and correct.
 func parseAndCheckParameters(params ...Parameter) (*parameters, error) {
 	parameters := parameters{
-		logLevel: zerolog.GlobalLevel(),
-		timeout:  2 * time.Second,
+		logLevel:     zerolog.GlobalLevel(),
+		timeout:      2 * time.Second,
+		extraHeaders: make(map[string]string),
 	}
 	for _, p := range params {
 		if params != nil {

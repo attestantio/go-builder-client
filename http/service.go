@@ -1,4 +1,4 @@
-// Copyright © 2022 Attestant Limited.
+// Copyright © 2022, 2023 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -30,13 +30,14 @@ import (
 	zerologger "github.com/rs/zerolog/log"
 )
 
-// Service is an Ethereum 2 client service.
+// Service is a builder client service.
 type Service struct {
-	base    *url.URL
-	address string
-	client  *http.Client
-	timeout time.Duration
-	pubkey  *phase0.BLSPubKey
+	base         *url.URL
+	address      string
+	client       *http.Client
+	timeout      time.Duration
+	pubkey       *phase0.BLSPubKey
+	extraHeaders map[string]string
 }
 
 // log is a service-wide logger.
@@ -103,11 +104,12 @@ func New(ctx context.Context, params ...Parameter) (builderclient.Service, error
 		base.User = nil
 	}
 	s := &Service{
-		base:    base,
-		address: base.String(),
-		client:  client,
-		timeout: parameters.timeout,
-		pubkey:  pubkey,
+		base:         base,
+		address:      base.String(),
+		client:       client,
+		timeout:      parameters.timeout,
+		pubkey:       pubkey,
+		extraHeaders: parameters.extraHeaders,
 	}
 
 	// Close the service on context done.

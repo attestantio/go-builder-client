@@ -16,15 +16,28 @@ package api
 import (
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/attestantio/go-eth2-client/spec/bellatrix"
+	"github.com/attestantio/go-eth2-client/spec/capella"
+	"github.com/attestantio/go-eth2-client/spec/deneb"
 )
 
 // VersionedExecutionPayloadHeader contains a versioned ExecutionPayloadHeaderV1.
 type VersionedExecutionPayloadHeader struct {
 	Version   consensusspec.DataVersion         `json:"version"`
 	Bellatrix *bellatrix.ExecutionPayloadHeader `json:"bellatrix,omitempty"`
+	Capella   *capella.ExecutionPayloadHeader   `json:"capella,omitempty"`
+	Deneb     *deneb.ExecutionPayloadHeader     `json:"deneb,omitempty"`
 }
 
 // IsEmpty returns true if there is no payload.
 func (v *VersionedExecutionPayloadHeader) IsEmpty() bool {
-	return v.Bellatrix == nil
+	switch v.Version {
+	case consensusspec.DataVersionBellatrix:
+		return v.Bellatrix == nil
+	case consensusspec.DataVersionCapella:
+		return v.Capella == nil
+	case consensusspec.DataVersionDeneb:
+		return v.Deneb == nil
+	default:
+		return true
+	}
 }

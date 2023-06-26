@@ -99,6 +99,39 @@ func (v *VersionedSignedBuilderBid) Value() (*uint256.Int, error) {
 	}
 }
 
+// BlockNumber returns the block number of the bid.
+func (v *VersionedSignedBuilderBid) BlockNumber() (uint64, error) {
+	if v == nil {
+		return 0, errors.New("nil struct")
+	}
+	switch v.Version {
+	case consensusspec.DataVersionBellatrix:
+		if v.Bellatrix == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Bellatrix.Message == nil {
+			return 0, errors.New("no data message")
+		}
+		if v.Bellatrix.Message.Header == nil {
+			return 0, errors.New("no data message header")
+		}
+		return v.Bellatrix.Message.Header.BlockNumber, nil
+	case consensusspec.DataVersionCapella:
+		if v.Capella == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Capella.Message == nil {
+			return 0, errors.New("no data message")
+		}
+		if v.Capella.Message.Header == nil {
+			return 0, errors.New("no data message header")
+		}
+		return v.Capella.Message.Header.BlockNumber, nil
+	default:
+		return 0, errors.New("unsupported version")
+	}
+}
+
 // BlockHash returns the block hash of the bid.
 func (v *VersionedSignedBuilderBid) BlockHash() (phase0.Hash32, error) {
 	if v == nil {

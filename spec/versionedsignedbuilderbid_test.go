@@ -249,6 +249,117 @@ func TestVersionedSignedBuilderBidValue(t *testing.T) {
 	}
 }
 
+func TestVersionedSignedBuilderBidBlockNumber(t *testing.T) {
+	tests := []struct {
+		name string
+		bid  *spec.VersionedSignedBuilderBid
+		res  uint64
+		err  string
+	}{
+		{
+			name: "Empty",
+			err:  "nil struct",
+		},
+		{
+			name: "UnsupportedVersion",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionAltair,
+			},
+			err: "unsupported version",
+		},
+		{
+			name: "BellatrixNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionBellatrix,
+			},
+			err: "no data",
+		},
+		{
+			name: "BellatrixNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version:   consensusspec.DataVersionBellatrix,
+				Bellatrix: &bellatrix.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "BellatrixNoDataMessageHeader",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionBellatrix,
+				Bellatrix: &bellatrix.SignedBuilderBid{
+					Message: &bellatrix.BuilderBid{},
+				},
+			},
+			err: "no data message header",
+		},
+		{
+			name: "BellatrixGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionBellatrix,
+				Bellatrix: &bellatrix.SignedBuilderBid{
+					Message: &bellatrix.BuilderBid{
+						Header: &consensusbellatrix.ExecutionPayloadHeader{
+							BlockNumber: 123,
+						},
+					},
+				},
+			},
+			res: 123,
+		},
+		{
+			name: "CapellaNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionCapella,
+			},
+			err: "no data",
+		},
+		{
+			name: "CapellaNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionCapella,
+				Capella: &capella.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "CapellaNoDataMessageHeader",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionCapella,
+				Capella: &capella.SignedBuilderBid{
+					Message: &capella.BuilderBid{},
+				},
+			},
+			err: "no data message header",
+		},
+		{
+			name: "CapellaGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionCapella,
+				Capella: &capella.SignedBuilderBid{
+					Message: &capella.BuilderBid{
+						Header: &consensuscapella.ExecutionPayloadHeader{
+							BlockNumber: 123,
+						},
+					},
+				},
+			},
+			res: 123,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			res, err := test.bid.BlockNumber()
+			if test.err != "" {
+				require.EqualError(t, err, test.err)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, test.res, res)
+			}
+		})
+	}
+}
+
 func TestVersionedSignedBuilderBidParentHash(t *testing.T) {
 	tests := []struct {
 		name string

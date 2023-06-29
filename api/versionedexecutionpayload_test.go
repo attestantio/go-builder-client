@@ -158,3 +158,82 @@ func TestVersionedExecutionPayloadBlockHash(t *testing.T) {
 		})
 	}
 }
+
+func TestVersionedExecutionPayloadTransactions(t *testing.T) {
+	tests := []struct {
+		name string
+		bid  *api.VersionedExecutionPayload
+		res  []bellatrix.Transaction
+		err  string
+	}{
+		{
+			name: "Empty",
+			err:  "nil struct",
+		},
+		{
+			name: "UnsupportedVersion",
+			bid: &api.VersionedExecutionPayload{
+				Version: consensusspec.DataVersionAltair,
+			},
+			err: "unsupported version",
+		},
+		{
+			name: "BellatrixNoData",
+			bid: &api.VersionedExecutionPayload{
+				Version: consensusspec.DataVersionBellatrix,
+			},
+			err: "no data",
+		},
+		{
+			name: "BellatrixGood",
+			bid: &api.VersionedExecutionPayload{
+				Version: consensusspec.DataVersionBellatrix,
+				Bellatrix: &bellatrix.ExecutionPayload{
+					Transactions: []bellatrix.Transaction{
+						{0x00},
+						{0x01},
+					},
+				},
+			},
+			res: []bellatrix.Transaction{
+				{0x00},
+				{0x01},
+			},
+		},
+		{
+			name: "CapellaNoData",
+			bid: &api.VersionedExecutionPayload{
+				Version: consensusspec.DataVersionCapella,
+			},
+			err: "no data",
+		},
+		{
+			name: "CapellaGood",
+			bid: &api.VersionedExecutionPayload{
+				Version: consensusspec.DataVersionCapella,
+				Capella: &capella.ExecutionPayload{
+					Transactions: []bellatrix.Transaction{
+						{0x00},
+						{0x01},
+					},
+				},
+			},
+			res: []bellatrix.Transaction{
+				{0x00},
+				{0x01},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			res, err := test.bid.Transactions()
+			if test.err != "" {
+				require.EqualError(t, err, test.err)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, test.res, res)
+			}
+		})
+	}
+}

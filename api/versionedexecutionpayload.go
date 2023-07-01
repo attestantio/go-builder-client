@@ -68,3 +68,29 @@ func (v *VersionedExecutionPayload) BlockHash() (phase0.Hash32, error) {
 		return phase0.Hash32{}, errors.New("unsupported version")
 	}
 }
+
+// Transactions returns the transactions in the execution payload.
+func (v *VersionedExecutionPayload) Transactions() ([]bellatrix.Transaction, error) {
+	if v == nil {
+		return nil, errors.New("nil struct")
+	}
+	switch v.Version {
+	case consensusspec.DataVersionBellatrix:
+		if v.Bellatrix == nil {
+			return nil, errors.New("no data")
+		}
+		return v.Bellatrix.Transactions, nil
+	case consensusspec.DataVersionCapella:
+		if v.Capella == nil {
+			return nil, errors.New("no data")
+		}
+		return v.Capella.Transactions, nil
+	case consensusspec.DataVersionDeneb:
+		if v.Deneb == nil {
+			return nil, errors.New("no data")
+		}
+		return v.Deneb.Transactions, nil
+	default:
+		return nil, errors.New("unsupported version")
+	}
+}

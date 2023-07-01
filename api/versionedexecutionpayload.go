@@ -69,7 +69,7 @@ func (v *VersionedExecutionPayload) BlockHash() (phase0.Hash32, error) {
 	}
 }
 
-// Transactions returns the transactions in the execution payload
+// Transactions returns the transactions in the execution payload.
 func (v *VersionedExecutionPayload) Transactions() ([]bellatrix.Transaction, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")

@@ -20,6 +20,7 @@ import (
 
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
+	v1 "github.com/attestantio/go-builder-client/api/v1"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	consensusbellatrix "github.com/attestantio/go-eth2-client/spec/bellatrix"
 	consensuscapella "github.com/attestantio/go-eth2-client/spec/capella"
@@ -46,7 +47,7 @@ func (v *VersionedSubmitBlockRequest) IsEmpty() bool {
 	}
 }
 
-// Slot returns the slot of the request
+// Slot returns the slot of the request.
 func (v *VersionedSubmitBlockRequest) Slot() (uint64, error) {
 	if v == nil {
 		return 0, errors.New("nil struct")
@@ -154,8 +155,8 @@ func (v *VersionedSubmitBlockRequest) ProposerFeeRecipient() (consensusbellatrix
 	}
 }
 
-// ProposerPubkey returns the proposer fee recipient of the request.
-func (v *VersionedSubmitBlockRequest) ProposerPubkey() (phase0.BLSPubKey, error) {
+// ProposerPubKey returns the proposer fee recipient of the request.
+func (v *VersionedSubmitBlockRequest) ProposerPubKey() (phase0.BLSPubKey, error) {
 	if v == nil {
 		return phase0.BLSPubKey{}, errors.New("nil struct")
 	}
@@ -235,30 +236,30 @@ func (v *VersionedSubmitBlockRequest) Value() (*uint256.Int, error) {
 	}
 }
 
-// MessageHashTreeRoot returns the hash tree root of the message of the bid.
-func (v *VersionedSubmitBlockRequest) MessageHashTreeRoot() (phase0.Root, error) {
+// BidTrace returns the bid trace of the request.
+func (v *VersionedSubmitBlockRequest) BidTrace() (*v1.BidTrace, error) {
 	if v == nil {
-		return phase0.Root{}, errors.New("nil struct")
+		return nil, errors.New("nil struct")
 	}
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
-			return phase0.Root{}, errors.New("no data")
+			return nil, errors.New("no data")
 		}
 		if v.Bellatrix.Message == nil {
-			return phase0.Root{}, errors.New("no data message")
+			return nil, errors.New("no data message")
 		}
-		return v.Bellatrix.Message.HashTreeRoot()
+		return v.Bellatrix.Message, nil
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
-			return phase0.Root{}, errors.New("no data")
+			return nil, errors.New("no data")
 		}
 		if v.Capella.Message == nil {
-			return phase0.Root{}, errors.New("no data message")
+			return nil, errors.New("no data message")
 		}
-		return v.Capella.Message.HashTreeRoot()
+		return v.Capella.Message, nil
 	default:
-		return phase0.Root{}, errors.New("unsupported version")
+		return nil, errors.New("unsupported version")
 	}
 }
 
@@ -283,7 +284,7 @@ func (v *VersionedSubmitBlockRequest) Signature() (phase0.BLSSignature, error) {
 	}
 }
 
-// ExecutionPayloadBlockHash returns the block hash of the payload
+// ExecutionPayloadBlockHash returns the block hash of the payload.
 func (v *VersionedSubmitBlockRequest) ExecutionPayloadBlockHash() (phase0.Hash32, error) {
 	if v == nil {
 		return phase0.Hash32{}, errors.New("nil struct")
@@ -310,7 +311,7 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadBlockHash() (phase0.Hash32
 	}
 }
 
-// ExecutionPayloadParentHash returns the block hash of the payload
+// ExecutionPayloadParentHash returns the block hash of the payload.
 func (v *VersionedSubmitBlockRequest) ExecutionPayloadParentHash() (phase0.Hash32, error) {
 	if v == nil {
 		return phase0.Hash32{}, errors.New("nil struct")
@@ -337,7 +338,7 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadParentHash() (phase0.Hash3
 	}
 }
 
-// PrevRandao returns the prev randao of the payload
+// PrevRandao returns the prev randao of the payload.
 func (v *VersionedSubmitBlockRequest) PrevRandao() (phase0.Hash32, error) {
 	if v == nil {
 		return phase0.Hash32{}, errors.New("nil struct")
@@ -364,7 +365,7 @@ func (v *VersionedSubmitBlockRequest) PrevRandao() (phase0.Hash32, error) {
 	}
 }
 
-// GasLimit returns the prev randao of the payload
+// GasLimit returns the prev randao of the payload.
 func (v *VersionedSubmitBlockRequest) GasLimit() (uint64, error) {
 	if v == nil {
 		return 0, errors.New("nil struct")
@@ -391,7 +392,7 @@ func (v *VersionedSubmitBlockRequest) GasLimit() (uint64, error) {
 	}
 }
 
-// GasUsed returns the prev randao of the payload
+// GasUsed returns the prev randao of the payload.
 func (v *VersionedSubmitBlockRequest) GasUsed() (uint64, error) {
 	if v == nil {
 		return 0, errors.New("nil struct")
@@ -472,7 +473,7 @@ func (v *VersionedSubmitBlockRequest) Timestamp() (uint64, error) {
 	}
 }
 
-// Transactions returns the transactions of the payload
+// Transactions returns the transactions of the payload.
 func (v *VersionedSubmitBlockRequest) Transactions() ([]consensusbellatrix.Transaction, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")
@@ -499,7 +500,7 @@ func (v *VersionedSubmitBlockRequest) Transactions() ([]consensusbellatrix.Trans
 	}
 }
 
-// Withdrawals returns the withdrawals of the payload
+// Withdrawals returns the withdrawals of the payload.
 func (v *VersionedSubmitBlockRequest) Withdrawals() ([]*consensuscapella.Withdrawal, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")

@@ -18,7 +18,7 @@ import (
 
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
-	apiv1 "github.com/attestantio/go-builder-client/api/v1"
+	v1 "github.com/attestantio/go-builder-client/api/v1"
 	"github.com/attestantio/go-builder-client/spec"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	consensusbellatrix "github.com/attestantio/go-eth2-client/spec/bellatrix"
@@ -98,7 +98,7 @@ func TestVersionedSubmitBlockRequestSlot(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionBellatrix,
 				Bellatrix: &bellatrix.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						Slot: 12345,
 					},
 				},
@@ -125,7 +125,7 @@ func TestVersionedSubmitBlockRequestSlot(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						Slot: 12345,
 					},
 				},
@@ -185,7 +185,7 @@ func TestVersionedSubmitBlockRequestBlockHash(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionBellatrix,
 				Bellatrix: &bellatrix.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						BlockHash: phase0.Hash32{
 							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -218,7 +218,7 @@ func TestVersionedSubmitBlockRequestBlockHash(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						BlockHash: phase0.Hash32{
 							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -284,7 +284,7 @@ func TestVersionedSubmitBlockRequestBuilder(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionBellatrix,
 				Bellatrix: &bellatrix.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						BuilderPubkey: phase0.BLSPubKey{
 							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -319,7 +319,7 @@ func TestVersionedSubmitBlockRequestBuilder(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						BuilderPubkey: phase0.BLSPubKey{
 							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -387,7 +387,7 @@ func TestVersionedSubmitBlockRequestProposerFeeRecipient(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionBellatrix,
 				Bellatrix: &bellatrix.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						ProposerFeeRecipient: consensusbellatrix.ExecutionAddress{
 							0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a,
 							0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a,
@@ -420,7 +420,7 @@ func TestVersionedSubmitBlockRequestProposerFeeRecipient(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						ProposerFeeRecipient: consensusbellatrix.ExecutionAddress{
 							0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a,
 							0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a,
@@ -448,7 +448,7 @@ func TestVersionedSubmitBlockRequestProposerFeeRecipient(t *testing.T) {
 	}
 }
 
-func TestVersionedSubmitBlockRequestProposerPubkey(t *testing.T) {
+func TestVersionedSubmitBlockRequestProposerPubKey(t *testing.T) {
 	tests := []struct {
 		name    string
 		request *spec.VersionedSubmitBlockRequest
@@ -486,7 +486,7 @@ func TestVersionedSubmitBlockRequestProposerPubkey(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionBellatrix,
 				Bellatrix: &bellatrix.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						ProposerPubkey: phase0.BLSPubKey{
 							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -521,7 +521,7 @@ func TestVersionedSubmitBlockRequestProposerPubkey(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						ProposerPubkey: phase0.BLSPubKey{
 							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -540,7 +540,7 @@ func TestVersionedSubmitBlockRequestProposerPubkey(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			res, err := test.request.ProposerPubkey()
+			res, err := test.request.ProposerPubKey()
 			if test.err != "" {
 				require.EqualError(t, err, test.err)
 			} else {
@@ -589,7 +589,7 @@ func TestVersionedSubmitBlockRequestParentHash(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionBellatrix,
 				Bellatrix: &bellatrix.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						ParentHash: phase0.Hash32{
 							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -622,7 +622,7 @@ func TestVersionedSubmitBlockRequestParentHash(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						ParentHash: phase0.Hash32{
 							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -688,7 +688,7 @@ func TestVersionedSubmitBlockRequestValue(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionBellatrix,
 				Bellatrix: &bellatrix.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						Value: uint256.NewInt(12345),
 					},
 				},
@@ -715,7 +715,7 @@ func TestVersionedSubmitBlockRequestValue(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						Value: uint256.NewInt(12345),
 					},
 				},
@@ -737,11 +737,11 @@ func TestVersionedSubmitBlockRequestValue(t *testing.T) {
 	}
 }
 
-func TestVersionedSubmitBlockRequestMessageHashTreeRoot(t *testing.T) {
+func TestVersionedSubmitBlockRequestBidTrace(t *testing.T) {
 	tests := []struct {
 		name    string
 		request *spec.VersionedSubmitBlockRequest
-		res     phase0.Root
+		res     *v1.BidTrace
 		err     string
 	}{
 		{
@@ -775,14 +775,15 @@ func TestVersionedSubmitBlockRequestMessageHashTreeRoot(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionBellatrix,
 				Bellatrix: &bellatrix.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
+						Slot:  123,
 						Value: uint256.NewInt(12345),
 					},
 				},
 			},
-			res: phase0.Root{
-				0x6e, 0x21, 0x57, 0xbe, 0x11, 0xe5, 0xda, 0xc3, 0x30, 0x6b, 0xd6, 0x41, 0x61, 0x17, 0x93, 0x30,
-				0x53, 0xe8, 0x7d, 0x66, 0xb2, 0xfc, 0xcd, 0x7b, 0xd1, 0x7f, 0x27, 0xee, 0x90, 0xb4, 0x6c, 0x7c,
+			res: &v1.BidTrace{
+				Slot:  123,
+				Value: uint256.NewInt(12345),
 			},
 		},
 		{
@@ -805,21 +806,22 @@ func TestVersionedSubmitBlockRequestMessageHashTreeRoot(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
+						Slot:  123,
 						Value: uint256.NewInt(12345),
 					},
 				},
 			},
-			res: phase0.Root{
-				0x6e, 0x21, 0x57, 0xbe, 0x11, 0xe5, 0xda, 0xc3, 0x30, 0x6b, 0xd6, 0x41, 0x61, 0x17, 0x93, 0x30,
-				0x53, 0xe8, 0x7d, 0x66, 0xb2, 0xfc, 0xcd, 0x7b, 0xd1, 0x7f, 0x27, 0xee, 0x90, 0xb4, 0x6c, 0x7c,
+			res: &v1.BidTrace{
+				Slot:  123,
+				Value: uint256.NewInt(12345),
 			},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			res, err := test.request.MessageHashTreeRoot()
+			res, err := test.request.BidTrace()
 			if test.err != "" {
 				require.EqualError(t, err, test.err)
 			} else {
@@ -1775,7 +1777,7 @@ func TestVersionedSubmitBlockRequestString(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionBellatrix,
 				Bellatrix: &bellatrix.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						Slot:  123,
 						Value: uint256.NewInt(12345),
 					},
@@ -1807,7 +1809,7 @@ func TestVersionedSubmitBlockRequestString(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
-					Message: &apiv1.BidTrace{
+					Message: &v1.BidTrace{
 						Slot:  123,
 						Value: uint256.NewInt(12345),
 					},

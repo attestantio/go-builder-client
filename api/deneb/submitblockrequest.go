@@ -4,16 +4,15 @@ import (
 	"fmt"
 
 	v1 "github.com/attestantio/go-builder-client/api/v1"
-	"github.com/attestantio/go-eth2-client/spec/deneb"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/goccy/go-yaml"
 )
 
 // SubmitBlockRequest is the request from the builder to submit a block.
 type SubmitBlockRequest struct {
-	Message          *v1.BidTrace
-	ExecutionPayload *deneb.ExecutionPayload
-	Signature        phase0.BLSSignature `ssz-size:"96"`
+	Message *v1.BidTrace
+	ExecutionPayloadAndBlobsBundle
+	Signature phase0.BLSSignature `ssz-size:"96"`
 }
 
 // String returns a string version of the structure.

@@ -16,6 +16,7 @@ import (
 type submitBlockRequestJSON struct {
 	Message          *v1.BidTrace            `json:"message"`
 	ExecutionPayload *deneb.ExecutionPayload `json:"execution_payload"`
+	BlobsBundle      *BlobsBundle            `json:"blobs_bundle"`
 	Signature        string                  `json:"signature"`
 }
 
@@ -25,6 +26,7 @@ func (s *SubmitBlockRequest) MarshalJSON() ([]byte, error) {
 		Signature:        fmt.Sprintf("%#x", s.Signature),
 		Message:          s.Message,
 		ExecutionPayload: s.ExecutionPayload,
+		BlobsBundle:      s.BlobsBundle,
 	})
 }
 
@@ -59,5 +61,10 @@ func (s *SubmitBlockRequest) unpack(data *submitBlockRequestJSON) error {
 		return errors.New("execution payload missing")
 	}
 	s.ExecutionPayload = data.ExecutionPayload
+
+	if data.BlobsBundle == nil {
+		return errors.New("blobs bundle missing")
+	}
+	s.BlobsBundle = data.BlobsBundle
 	return nil
 }

@@ -13,6 +13,7 @@ import (
 type submitBlockRequestYAML struct {
 	Message          *v1.BidTrace            `yaml:"message"`
 	ExecutionPayload *deneb.ExecutionPayload `yaml:"execution_payload"`
+	BlobsBundle      *BlobsBundle            `yaml:"blobs_bundle"`
 	Signature        string                  `yaml:"signature"`
 }
 
@@ -22,6 +23,7 @@ func (s *SubmitBlockRequest) MarshalYAML() ([]byte, error) {
 		Message:          s.Message,
 		Signature:        fmt.Sprintf("%#x", s.Signature),
 		ExecutionPayload: s.ExecutionPayload,
+		BlobsBundle:      s.BlobsBundle,
 	}, yaml.Flow(true))
 	if err != nil {
 		return nil, err

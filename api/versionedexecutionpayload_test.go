@@ -43,6 +43,12 @@ func TestVersionedExecutionPayloadEmpty(t *testing.T) {
 	}
 	require.True(t, mismatch2.IsEmpty())
 
+	mismatch3 := &api.VersionedExecutionPayload{
+		Version: consensusspec.DataVersionDeneb,
+		Capella: &capella.ExecutionPayload{},
+	}
+	require.True(t, mismatch3.IsEmpty())
+
 	incorrectVersion := &api.VersionedExecutionPayload{
 		Version:   consensusspec.DataVersionDeneb,
 		Bellatrix: &bellatrix.ExecutionPayload{},
@@ -212,6 +218,29 @@ func TestVersionedExecutionPayloadTransactions(t *testing.T) {
 			bid: &api.VersionedExecutionPayload{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.ExecutionPayload{
+					Transactions: []bellatrix.Transaction{
+						{0x00},
+						{0x01},
+					},
+				},
+			},
+			res: []bellatrix.Transaction{
+				{0x00},
+				{0x01},
+			},
+		},
+		{
+			name: "DenebNoData",
+			bid: &api.VersionedExecutionPayload{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebGood",
+			bid: &api.VersionedExecutionPayload{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.ExecutionPayload{
 					Transactions: []bellatrix.Transaction{
 						{0x00},
 						{0x01},

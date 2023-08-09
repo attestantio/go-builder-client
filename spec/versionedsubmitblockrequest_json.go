@@ -19,6 +19,7 @@ import (
 
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
+	"github.com/attestantio/go-builder-client/api/deneb"
 	"github.com/attestantio/go-eth2-client/spec"
 	"github.com/pkg/errors"
 )
@@ -28,6 +29,10 @@ type bellatrixVersionedSubmitBlockRequestJSON struct {
 }
 type capellaVersionedSubmitBlockRequestJSON struct {
 	Data *capella.SubmitBlockRequest `json:"data"`
+}
+
+type denebVersionedSubmitBlockRequestJSON struct {
+	Data *deneb.SubmitBlockRequest `json:"data"`
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -61,6 +66,18 @@ func (v *VersionedSubmitBlockRequest) MarshalJSON() ([]byte, error) {
 			*capellaVersionedSubmitBlockRequestJSON
 		}{version, data}
 		return json.Marshal(payload)
+	case spec.DataVersionDeneb:
+		if v.Deneb == nil {
+			return nil, errors.New("no deneb data")
+		}
+		data := &denebVersionedSubmitBlockRequestJSON{
+			Data: v.Deneb,
+		}
+		payload := struct {
+			*versionJSON
+			*denebVersionedSubmitBlockRequestJSON
+		}{version, data}
+		return json.Marshal(payload)
 	default:
 		return nil, fmt.Errorf("unsupported data version %v", v.Version)
 	}
@@ -86,6 +103,12 @@ func (v *VersionedSubmitBlockRequest) UnmarshalJSON(input []byte) error {
 			return errors.Wrap(err, "invalid JSON")
 		}
 		v.Capella = data.Data
+	case spec.DataVersionDeneb:
+		var data denebVersionedSubmitBlockRequestJSON
+		if err := json.Unmarshal(input, &data); err != nil {
+			return errors.Wrap(err, "invalid JSON")
+		}
+		v.Deneb = data.Data
 	default:
 		return fmt.Errorf("unsupported data version %v", metadata.Version)
 	}

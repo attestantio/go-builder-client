@@ -18,11 +18,13 @@ import (
 
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
+	"github.com/attestantio/go-builder-client/api/deneb"
 	v1 "github.com/attestantio/go-builder-client/api/v1"
 	"github.com/attestantio/go-builder-client/spec"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	consensusbellatrix "github.com/attestantio/go-eth2-client/spec/bellatrix"
 	consensuscapella "github.com/attestantio/go-eth2-client/spec/capella"
+	consensusdeneb "github.com/attestantio/go-eth2-client/spec/deneb"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/holiman/uint256"
 	"github.com/stretchr/testify/require"
@@ -45,6 +47,12 @@ func TestVersionedSubmitBlockRequestEmpty(t *testing.T) {
 		Bellatrix: &bellatrix.SubmitBlockRequest{},
 	}
 	require.True(t, mismatch2.IsEmpty())
+
+	mismatch3 := &spec.VersionedSubmitBlockRequest{
+		Version: consensusspec.DataVersionDeneb,
+		Capella: &capella.SubmitBlockRequest{},
+	}
+	require.True(t, mismatch3.IsEmpty())
 
 	incorrectVersion := &spec.VersionedSubmitBlockRequest{
 		Version:   consensusspec.DataVersionAltair,
@@ -125,6 +133,33 @@ func TestVersionedSubmitBlockRequestSlot(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
+					Message: &v1.BidTrace{
+						Slot: 12345,
+					},
+				},
+			},
+			res: 12345,
+		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
 					Message: &v1.BidTrace{
 						Slot: 12345,
 					},
@@ -218,6 +253,39 @@ func TestVersionedSubmitBlockRequestBlockHash(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
+					Message: &v1.BidTrace{
+						BlockHash: phase0.Hash32{
+							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+						},
+					},
+				},
+			},
+			res: phase0.Hash32{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+			},
+		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
 					Message: &v1.BidTrace{
 						BlockHash: phase0.Hash32{
 							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
@@ -334,6 +402,41 @@ func TestVersionedSubmitBlockRequestBuilder(t *testing.T) {
 				0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
 			},
 		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
+					Message: &v1.BidTrace{
+						BuilderPubkey: phase0.BLSPubKey{
+							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+							0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+						},
+					},
+				},
+			},
+			res: phase0.BLSPubKey{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+				0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -420,6 +523,39 @@ func TestVersionedSubmitBlockRequestProposerFeeRecipient(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
+					Message: &v1.BidTrace{
+						ProposerFeeRecipient: consensusbellatrix.ExecutionAddress{
+							0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a,
+							0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a,
+						},
+					},
+				},
+			},
+			res: consensusbellatrix.ExecutionAddress{
+				0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a,
+				0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a,
+			},
+		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
 					Message: &v1.BidTrace{
 						ProposerFeeRecipient: consensusbellatrix.ExecutionAddress{
 							0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a,
@@ -536,6 +672,41 @@ func TestVersionedSubmitBlockRequestProposerPubKey(t *testing.T) {
 				0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
 			},
 		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
+					Message: &v1.BidTrace{
+						ProposerPubkey: phase0.BLSPubKey{
+							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+							0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+						},
+					},
+				},
+			},
+			res: phase0.BLSPubKey{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+				0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -635,6 +806,39 @@ func TestVersionedSubmitBlockRequestParentHash(t *testing.T) {
 				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
 			},
 		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
+					Message: &v1.BidTrace{
+						ParentHash: phase0.Hash32{
+							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+						},
+					},
+				},
+			},
+			res: phase0.Hash32{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -715,6 +919,33 @@ func TestVersionedSubmitBlockRequestValue(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
+					Message: &v1.BidTrace{
+						Value: uint256.NewInt(12345),
+					},
+				},
+			},
+			res: uint256.NewInt(12345),
+		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
 					Message: &v1.BidTrace{
 						Value: uint256.NewInt(12345),
 					},
@@ -817,6 +1048,37 @@ func TestVersionedSubmitBlockRequestBidTrace(t *testing.T) {
 				Value: uint256.NewInt(12345),
 			},
 		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
+					Message: &v1.BidTrace{
+						Slot:  123,
+						Value: uint256.NewInt(12345),
+					},
+				},
+			},
+			res: &v1.BidTrace{
+				Slot:  123,
+				Value: uint256.NewInt(12345),
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -889,6 +1151,33 @@ func TestVersionedSubmitBlockRequestSignature(t *testing.T) {
 			request: &spec.VersionedSubmitBlockRequest{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
+					Signature: phase0.BLSSignature{
+						0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+						0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+						0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+						0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
+					},
+				},
+			},
+			res: phase0.BLSSignature{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+				0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+				0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
+			},
+		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
 					Signature: phase0.BLSSignature{
 						0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 						0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -1003,6 +1292,39 @@ func TestVersionedSubmitBlockRequestExecutionPayloadBlockHash(t *testing.T) {
 				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
 			},
 		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataExecutionPayload",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data execution payload",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
+					ExecutionPayload: &consensusdeneb.ExecutionPayload{
+						BlockHash: phase0.Hash32{
+							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+						},
+					},
+				},
+			},
+			res: phase0.Hash32{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -1090,6 +1412,39 @@ func TestVersionedSubmitBlockRequestExecutionPayloadParentHash(t *testing.T) {
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
 					ExecutionPayload: &consensuscapella.ExecutionPayload{
+						ParentHash: phase0.Hash32{
+							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+						},
+					},
+				},
+			},
+			res: phase0.Hash32{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+			},
+		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataExecutionPayload",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data execution payload",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
+					ExecutionPayload: &consensusdeneb.ExecutionPayload{
 						ParentHash: phase0.Hash32{
 							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -1201,6 +1556,39 @@ func TestVersionedSubmitBlockRequestPrevRandao(t *testing.T) {
 				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
 			},
 		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataExecutionPayload",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data execution payload",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
+					ExecutionPayload: &consensusdeneb.ExecutionPayload{
+						PrevRandao: phase0.Hash32{
+							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+						},
+					},
+				},
+			},
+			res: phase0.Hash32{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -1282,6 +1670,33 @@ func TestVersionedSubmitBlockRequestGasLimit(t *testing.T) {
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
 					ExecutionPayload: &consensuscapella.ExecutionPayload{
+						GasLimit: 123,
+					},
+				},
+			},
+			res: 123,
+		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataExecutionPayload",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data execution payload",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
+					ExecutionPayload: &consensusdeneb.ExecutionPayload{
 						GasLimit: 123,
 					},
 				},
@@ -1375,6 +1790,33 @@ func TestVersionedSubmitBlockRequestGasUsed(t *testing.T) {
 			},
 			res: 123,
 		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataExecutionPayload",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data execution payload",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
+					ExecutionPayload: &consensusdeneb.ExecutionPayload{
+						GasUsed: 123,
+					},
+				},
+			},
+			res: 123,
+		},
 	}
 
 	for _, test := range tests {
@@ -1462,6 +1904,33 @@ func TestVersionedSubmitBlockRequestBlockNumber(t *testing.T) {
 			},
 			res: 123,
 		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataExecutionPayload",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data execution payload",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
+					ExecutionPayload: &consensusdeneb.ExecutionPayload{
+						BlockNumber: 123,
+					},
+				},
+			},
+			res: 123,
+		},
 	}
 
 	for _, test := range tests {
@@ -1543,6 +2012,33 @@ func TestVersionedSubmitBlockRequestTimestamp(t *testing.T) {
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SubmitBlockRequest{
 					ExecutionPayload: &consensuscapella.ExecutionPayload{
+						Timestamp: 12345,
+					},
+				},
+			},
+			res: 12345,
+		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataExecutionPayload",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data execution payload",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
+					ExecutionPayload: &consensusdeneb.ExecutionPayload{
 						Timestamp: 12345,
 					},
 				},
@@ -1648,6 +2144,39 @@ func TestVersionedSubmitBlockRequestTransactions(t *testing.T) {
 				{0x01},
 			},
 		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataExecutionPayload",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data execution payload",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
+					ExecutionPayload: &consensusdeneb.ExecutionPayload{
+						Transactions: []consensusbellatrix.Transaction{
+							{0x00},
+							{0x01},
+						},
+					},
+				},
+			},
+			res: []consensusbellatrix.Transaction{
+				{0x00},
+				{0x01},
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -1734,6 +2263,59 @@ func TestVersionedSubmitBlockRequestWithdrawals(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataExecutionPayload",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SubmitBlockRequest{},
+			},
+			err: "no data execution payload",
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
+					ExecutionPayload: &consensusdeneb.ExecutionPayload{
+						Withdrawals: []*consensuscapella.Withdrawal{
+							{
+								Index:          5,
+								ValidatorIndex: 10,
+								Address:        consensusbellatrix.ExecutionAddress{},
+								Amount:         12345,
+							},
+							{
+								Index:          10,
+								ValidatorIndex: 20,
+								Address:        consensusbellatrix.ExecutionAddress{},
+								Amount:         12345,
+							},
+						},
+					},
+				},
+			},
+			res: []*consensuscapella.Withdrawal{
+				{
+					Index:          5,
+					ValidatorIndex: 10,
+					Address:        consensusbellatrix.ExecutionAddress{},
+					Amount:         12345,
+				},
+				{
+					Index:          10,
+					ValidatorIndex: 20,
+					Address:        consensusbellatrix.ExecutionAddress{},
+					Amount:         12345,
+				},
+			},
+		},						
 	}
 
 	for _, test := range tests {
@@ -1829,6 +2411,45 @@ func TestVersionedSubmitBlockRequestString(t *testing.T) {
 				},
 			},
 			res: `{"version":"capella","data":{"message":{"slot":"123","parent_hash":"0x0000000000000000000000000000000000000000000000000000000000000000","block_hash":"0x0000000000000000000000000000000000000000000000000000000000000000","builder_pubkey":"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","proposer_pubkey":"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","proposer_fee_recipient":"0x0000000000000000000000000000000000000000","gas_limit":"0","gas_used":"0","value":"12345"},"execution_payload":{"parent_hash":"0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f","fee_recipient":"0x0000000000000000000000000000000000000000","state_root":"0x0000000000000000000000000000000000000000000000000000000000000000","receipts_root":"0x0000000000000000000000000000000000000000000000000000000000000000","logs_bloom":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","prev_randao":"0x0000000000000000000000000000000000000000000000000000000000000000","block_number":"0","gas_limit":"0","gas_used":"0","timestamp":"0","extra_data":"0x","base_fee_per_gas":"0","block_hash":"0x0000000000000000000000000000000000000000000000000000000000000000","transactions":[],"withdrawals":[]},"signature":"0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f0000000000000000000000000000000000000000000000000000000000000000"}}`,
+		},
+		{
+			name: "DenebNoData",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			res: `ERR: json: error calling MarshalJSON for type *spec.VersionedSubmitBlockRequest: no deneb data`,
+		},
+		{
+			name: "DenebGood",
+			request: &spec.VersionedSubmitBlockRequest{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SubmitBlockRequest{
+					Message: &v1.BidTrace{
+						Slot:  123,
+						Value: uint256.NewInt(12345),
+					},
+					ExecutionPayload: &consensusdeneb.ExecutionPayload{
+						ParentHash: phase0.Hash32{
+							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+						},
+						BaseFeePerGas: uint256.NewInt(0),
+						Withdrawals: make([]*consensuscapella.Withdrawal, 0),
+					},
+					BlobsBundle: &deneb.BlobsBundle{
+						Commitments: make([]consensusdeneb.KzgCommitment, 0),
+						Proofs: 	make([]consensusdeneb.KzgProof, 0),
+						Blobs: 		make([]consensusdeneb.Blob, 0),
+					},
+					Signature: phase0.BLSSignature{
+						0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+						0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+						0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+						0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
+					},
+				},
+			},
+			res: `{"version":"deneb","data":{"message":{"slot":"123","parent_hash":"0x0000000000000000000000000000000000000000000000000000000000000000","block_hash":"0x0000000000000000000000000000000000000000000000000000000000000000","builder_pubkey":"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","proposer_pubkey":"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","proposer_fee_recipient":"0x0000000000000000000000000000000000000000","gas_limit":"0","gas_used":"0","value":"12345"},"execution_payload":{"parent_hash":"0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f","fee_recipient":"0x0000000000000000000000000000000000000000","state_root":"0x0000000000000000000000000000000000000000000000000000000000000000","receipts_root":"0x0000000000000000000000000000000000000000000000000000000000000000","logs_bloom":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","prev_randao":"0x0000000000000000000000000000000000000000000000000000000000000000","block_number":"0","gas_limit":"0","gas_used":"0","timestamp":"0","extra_data":"0x","base_fee_per_gas":"0","block_hash":"0x0000000000000000000000000000000000000000000000000000000000000000","transactions":[],"withdrawals":[],"data_gas_used":"0","excess_data_gas":"0"},"blobs_bundle":{"commitments":[],"proofs":[],"blobs":[]},"signature":"0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f0000000000000000000000000000000000000000000000000000000000000000"}}`,
 		},
 	}
 

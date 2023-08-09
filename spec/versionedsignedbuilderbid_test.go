@@ -18,10 +18,12 @@ import (
 
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
+	"github.com/attestantio/go-builder-client/api/deneb"
 	"github.com/attestantio/go-builder-client/spec"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	consensusbellatrix "github.com/attestantio/go-eth2-client/spec/bellatrix"
 	consensuscapella "github.com/attestantio/go-eth2-client/spec/capella"
+	consensusdeneb "github.com/attestantio/go-eth2-client/spec/deneb"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/holiman/uint256"
 	"github.com/stretchr/testify/require"
@@ -147,6 +149,41 @@ func TestVersionedSignedBuilderBidBuilder(t *testing.T) {
 				0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
 			},
 		},
+		{
+			name: "DenebNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{
+						Pubkey: phase0.BLSPubKey{
+							0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+							0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+							0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+						},
+					},
+				},
+			},
+			res: phase0.BLSPubKey{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+				0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -228,6 +265,33 @@ func TestVersionedSignedBuilderBidValue(t *testing.T) {
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SignedBuilderBid{
 					Message: &capella.BuilderBid{
+						Value: uint256.NewInt(12345),
+					},
+				},
+			},
+			res: uint256.NewInt(12345),
+		},
+		{
+			name: "DenebNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{
 						Value: uint256.NewInt(12345),
 					},
 				},
@@ -345,6 +409,45 @@ func TestVersionedSignedBuilderBidBlockNumber(t *testing.T) {
 			},
 			res: 123,
 		},
+		{
+			name: "DenebNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebNoDataMessageHeader",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{},
+				},
+			},
+			err: "no data message header",
+		},
+		{
+			name: "DenebGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{
+						Header: &consensusdeneb.ExecutionPayloadHeader{
+							BlockNumber: 123,
+						},
+					},
+				},
+			},
+			res: 123,
+		},
 	}
 
 	for _, test := range tests {
@@ -455,6 +558,51 @@ func TestVersionedSignedBuilderBidParentHash(t *testing.T) {
 				Capella: &capella.SignedBuilderBid{
 					Message: &capella.BuilderBid{
 						Header: &consensuscapella.ExecutionPayloadHeader{
+							ParentHash: phase0.Hash32{
+								0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+								0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+							},
+						},
+					},
+				},
+			},
+			res: phase0.Hash32{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+			},
+		},
+		{
+			name: "DenebNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebNoDataMessageHeader",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{},
+				},
+			},
+			err: "no data message header",
+		},
+		{
+			name: "DenebGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{
+						Header: &consensusdeneb.ExecutionPayloadHeader{
 							ParentHash: phase0.Hash32{
 								0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 								0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -591,6 +739,51 @@ func TestVersionedSignedBuilderBidBlockHash(t *testing.T) {
 				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
 			},
 		},
+		{
+			name: "DenebNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebNoDataMessageHeader",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{},
+				},
+			},
+			err: "no data message header",
+		},
+		{
+			name: "DenebGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{
+						Header: &consensusdeneb.ExecutionPayloadHeader{
+							BlockHash: phase0.Hash32{
+								0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+								0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+							},
+						},
+					},
+				},
+			},
+			res: phase0.Hash32{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -701,6 +894,51 @@ func TestVersionedSignedBuilderBidStateRoot(t *testing.T) {
 				Capella: &capella.SignedBuilderBid{
 					Message: &capella.BuilderBid{
 						Header: &consensuscapella.ExecutionPayloadHeader{
+							StateRoot: phase0.Root{
+								0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+								0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+							},
+						},
+					},
+				},
+			},
+			res: phase0.Root{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+			},
+		},
+		{
+			name: "DenebNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebNoDataMessageHeader",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{},
+				},
+			},
+			err: "no data message header",
+		},
+		{
+			name: "DenebGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{
+						Header: &consensusdeneb.ExecutionPayloadHeader{
 							StateRoot: phase0.Root{
 								0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 								0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -833,6 +1071,49 @@ func TestVersionedSignedBuilderBidFeeRecipient(t *testing.T) {
 				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13,
 			},
 		},
+		{
+			name: "DenebNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebNoDataMessageHeader",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{},
+				},
+			},
+			err: "no data message header",
+		},
+		{
+			name: "DenebGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{
+						Header: &consensusdeneb.ExecutionPayloadHeader{
+							FeeRecipient: consensusbellatrix.ExecutionAddress{
+								0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13,
+							},
+						},
+					},
+				},
+			},
+			res: consensusbellatrix.ExecutionAddress{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13,
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -937,6 +1218,45 @@ func TestVersionedSignedBuilderBidTimestamp(t *testing.T) {
 				Capella: &capella.SignedBuilderBid{
 					Message: &capella.BuilderBid{
 						Header: &consensuscapella.ExecutionPayloadHeader{
+							Timestamp: 12345,
+						},
+					},
+				},
+			},
+			res: 12345,
+		},
+		{
+			name: "DenebNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebNoDataMessageHeader",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{},
+				},
+			},
+			err: "no data message header",
+		},
+		{
+			name: "DenebGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{
+						Header: &consensusdeneb.ExecutionPayloadHeader{
 							Timestamp: 12345,
 						},
 					},
@@ -1067,6 +1387,51 @@ func TestVersionedSignedBuilderBidTransactionsRoot(t *testing.T) {
 				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
 			},
 		},
+		{
+			name: "DenebNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebNoDataMessageHeader",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{},
+				},
+			},
+			err: "no data message header",
+		},
+		{
+			name: "DenebGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{
+						Header: &consensusdeneb.ExecutionPayloadHeader{
+							TransactionsRoot: phase0.Root{
+								0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+								0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+							},
+						},
+					},
+				},
+			},
+			res: phase0.Root{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -1160,6 +1525,40 @@ func TestVersionedSignedBuilderBidMessageHashTreeRoot(t *testing.T) {
 			res: phase0.Root{
 				0x23, 0xef, 0x2a, 0xa3, 0xce, 0x3b, 0x05, 0x76, 0xf6, 0xcb, 0x34, 0x4e, 0xed, 0xa4, 0xdf, 0x63,
 				0x9c, 0xd3, 0x88, 0x22, 0x62, 0x86, 0x11, 0x86, 0x5f, 0x74, 0x09, 0x8e, 0x04, 0x94, 0xf8, 0x4b,
+			},
+		},
+		{
+			name: "DenebNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{
+						Value: uint256.NewInt(12345),
+						Header: &consensusdeneb.ExecutionPayloadHeader{
+							BaseFeePerGas: &uint256.Int{},
+						},
+						BlindedBlobsBundle: &deneb.BlindedBlobsBundle{},
+					},
+				},
+			},
+			res: phase0.Root{
+				0xfb, 0x3a, 0xe3, 0xdc, 0x57, 0xe4, 0x16, 0x8c,  0x65, 0xc6, 0x43, 0x3f, 0x56, 0xb6, 0x99, 0x67,
+				0x33, 0x36, 0x52, 0x8e, 0x4a, 0xae, 0x4f, 0x79,  0xe7, 0x82, 0x66, 0x03, 0x9f, 0xe4, 0xe8, 0x25,
 			},
 		},
 	}
@@ -1277,6 +1676,49 @@ func TestVersionedSignedBuilderBidHeaderHashTreeRoot(t *testing.T) {
 				0xad, 0x32, 0xf1, 0x55, 0x80, 0xa9, 0x38, 0xb1, 0x91, 0x4f, 0x93, 0xa9, 0x65, 0x2c, 0x0e, 0x2c,
 			},
 		},
+		{
+			name: "DenebNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebNoDataMessage",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb:   &deneb.SignedBuilderBid{},
+			},
+			err: "no data message",
+		},
+		{
+			name: "DenebNoDataMessageHeader",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{},
+				},
+			},
+			err: "no data message header",
+		},
+		{
+			name: "DenebGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{
+						Value: uint256.NewInt(12345),
+						Header: &consensusdeneb.ExecutionPayloadHeader{
+							BaseFeePerGas: &uint256.Int{},
+						},
+					},
+				},
+			},
+			res: phase0.Root{
+				0x54, 0xb4, 0xb8, 0xb8, 0x97, 0x92, 0x9a, 0x1e, 0xde, 0x97, 0xd2, 0x9e, 0x95, 0x51, 0xd6, 0x10,
+				0x22, 0x9f, 0x22, 0xc1, 0xa5, 0x9d, 0x18, 0x6d, 0x95, 0xae, 0xd2, 0x03, 0x33, 0x3b, 0x4e, 0x5e,
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -1349,6 +1791,33 @@ func TestVersionedSignedBuilderSignature(t *testing.T) {
 			bid: &spec.VersionedSignedBuilderBid{
 				Version: consensusspec.DataVersionCapella,
 				Capella: &capella.SignedBuilderBid{
+					Signature: phase0.BLSSignature{
+						0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+						0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+						0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+						0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
+					},
+				},
+			},
+			res: phase0.BLSSignature{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+				0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+				0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+				0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
+			},
+		},
+		{
+			name: "DenebNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			err: "no data",
+		},
+		{
+			name: "DenebGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
 					Signature: phase0.BLSSignature{
 						0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 						0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -1456,6 +1925,39 @@ func TestVersionedSignedBuilderString(t *testing.T) {
 				},
 			},
 			res: `{"version":"capella","data":{"message":{"header":{"parent_hash":"0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f","fee_recipient":"0x0000000000000000000000000000000000000000","state_root":"0x0000000000000000000000000000000000000000000000000000000000000000","receipts_root":"0x0000000000000000000000000000000000000000000000000000000000000000","logs_bloom":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","prev_randao":"0x0000000000000000000000000000000000000000000000000000000000000000","block_number":"0","gas_limit":"0","gas_used":"0","timestamp":"0","extra_data":"0x","base_fee_per_gas":"0","block_hash":"0x0000000000000000000000000000000000000000000000000000000000000000","transactions_root":"0x0000000000000000000000000000000000000000000000000000000000000000","withdrawals_root":"0x0000000000000000000000000000000000000000000000000000000000000000"},"value":"12345","pubkey":"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"},"signature":"0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f0000000000000000000000000000000000000000000000000000000000000000"}}`,
+		},
+		{
+			name: "DenebNoData",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+			},
+			res: `ERR: json: error calling MarshalJSON for type *spec.VersionedSignedBuilderBid: no deneb data`,
+		},
+		{
+			name: "DenebGood",
+			bid: &spec.VersionedSignedBuilderBid{
+				Version: consensusspec.DataVersionDeneb,
+				Deneb: &deneb.SignedBuilderBid{
+					Message: &deneb.BuilderBid{
+						Header: &consensusdeneb.ExecutionPayloadHeader{
+							ParentHash: phase0.Hash32{
+								0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+								0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+							},
+							BaseFeePerGas: uint256.NewInt(0),
+						},
+						Value: uint256.NewInt(12345),
+						BlindedBlobsBundle: &deneb.BlindedBlobsBundle{},
+					},
+					Signature: phase0.BLSSignature{
+						0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+						0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+						0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+						0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
+					},
+				},
+			},
+			res: `{"version":"deneb","data":{"message":{"header":{"parent_hash":"0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f","fee_recipient":"0x0000000000000000000000000000000000000000","state_root":"0x0000000000000000000000000000000000000000000000000000000000000000","receipts_root":"0x0000000000000000000000000000000000000000000000000000000000000000","logs_bloom":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","prev_randao":"0x0000000000000000000000000000000000000000000000000000000000000000","block_number":"0","gas_limit":"0","gas_used":"0","timestamp":"0","extra_data":"0x","base_fee_per_gas":"0","block_hash":"0x0000000000000000000000000000000000000000000000000000000000000000","transactions_root":"0x0000000000000000000000000000000000000000000000000000000000000000","withdrawals_root":"0x0000000000000000000000000000000000000000000000000000000000000000","data_gas_used":"0","excess_data_gas":"0"},"value":"12345","pubkey":"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","blinded_blobs_bundle":{"commitments":[],"proofs":[],"blob_roots":[]}},"signature":"0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f0000000000000000000000000000000000000000000000000000000000000000"}}`,
 		},
 	}
 

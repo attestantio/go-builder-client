@@ -114,6 +114,8 @@ func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Rea
 }
 
 // post sends an HTTP post request and returns the body.
+//
+//nolint:unparam
 func (s *Service) post(ctx context.Context, endpoint string, contentType ContentType, body io.Reader) (ContentType, io.Reader, error) {
 	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "post")
 	defer span.End()

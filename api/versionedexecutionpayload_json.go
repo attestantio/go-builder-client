@@ -30,6 +30,7 @@ type versionJSON struct {
 type bellatrixVersionedExecutionPayloadJSON struct {
 	Data *bellatrix.ExecutionPayload `json:"data"`
 }
+
 type capellaVersionedExecutionPayloadJSON struct {
 	Data *capella.ExecutionPayload `json:"data"`
 }

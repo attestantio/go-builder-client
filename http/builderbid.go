@@ -23,6 +23,7 @@ import (
 
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
+	"github.com/attestantio/go-builder-client/api/deneb"
 	"github.com/attestantio/go-builder-client/spec"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
@@ -38,6 +39,10 @@ type bellatrixBuilderBidJSON struct {
 
 type capellaBuilderBidJSON struct {
 	Data *capella.SignedBuilderBid `json:"data"`
+}
+
+type denebBuilderBidJSON struct {
+	Data *deneb.SignedBuilderBid `json:"data"`
 }
 
 // BuilderBid obtains a builder bid.
@@ -100,6 +105,15 @@ func (s *Service) BuilderBid(ctx context.Context,
 				return nil, errors.New("parent hash mismatch")
 			}
 			res.Capella = resp.Data
+		case consensusspec.DataVersionDeneb:
+			var resp denebBuilderBidJSON
+			if err := json.NewDecoder(&dataBodyReader).Decode(&resp); err != nil {
+				return nil, errors.Wrap(err, "failed to parse deneb builder bid")
+			}
+			if !bytes.Equal(resp.Data.Message.Header.ParentHash[:], parentHash[:]) {
+				return nil, errors.New("parent hash mismatch")
+			}
+			res.Deneb = resp.Data
 		default:
 			return nil, fmt.Errorf("unsupported block version %s", metadata.Version)
 		}

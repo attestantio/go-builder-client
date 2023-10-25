@@ -58,14 +58,14 @@ type bidTraceYAML struct {
 // MarshalJSON implements json.Marshaler.
 func (b *BidTrace) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&bidTraceJSON{
-		Slot:                 fmt.Sprintf("%d", b.Slot),
+		Slot:                 strconv.FormatUint(b.Slot, 10),
 		ParentHash:           fmt.Sprintf("%#x", b.ParentHash),
 		BlockHash:            fmt.Sprintf("%#x", b.BlockHash),
 		BuilderPubkey:        fmt.Sprintf("%#x", b.BuilderPubkey),
 		ProposerPubkey:       fmt.Sprintf("%#x", b.ProposerPubkey),
 		ProposerFeeRecipient: b.ProposerFeeRecipient.String(),
-		GasLimit:             fmt.Sprintf("%d", b.GasLimit),
-		GasUsed:              fmt.Sprintf("%d", b.GasUsed),
+		GasLimit:             strconv.FormatUint(b.GasLimit, 10),
+		GasUsed:              strconv.FormatUint(b.GasUsed, 10),
 		Value:                fmt.Sprintf("%d", b.Value),
 	})
 }

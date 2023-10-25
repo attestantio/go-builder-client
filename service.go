@@ -1,4 +1,4 @@
-// Copyright © 2022 Attestant Limited.
+// Copyright © 2022, 2023 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -19,7 +19,6 @@ import (
 	"github.com/attestantio/go-builder-client/api"
 	"github.com/attestantio/go-builder-client/spec"
 	consensusapi "github.com/attestantio/go-eth2-client/api"
-	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 )
 
@@ -63,10 +62,25 @@ type UnblindedBlockProvider interface {
 	Service
 
 	// UnblindBlock unblinds a block.
+	//
+	// Deprecated: this will not work from the deneb hard-fork onwards.  Use UnblindedProposalProvider.UnblindProposal() instead.
 	UnblindBlock(ctx context.Context,
 		block *consensusapi.VersionedSignedBlindedBeaconBlock,
 	) (
-		*consensusspec.VersionedSignedBeaconBlock,
+		*consensusapi.VersionedSignedProposal,
+		error,
+	)
+}
+
+// UnblindedProposalProvider is the interface for unblinded proposals.
+type UnblindedProposalProvider interface {
+	Service
+
+	// UnblindProposal unblinds a proposal.
+	UnblindProposal(ctx context.Context,
+		proposal *consensusapi.VersionedSignedBlindedProposal,
+	) (
+		*consensusapi.VersionedSignedProposal,
 		error,
 	)
 }

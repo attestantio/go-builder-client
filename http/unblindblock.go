@@ -1,4 +1,4 @@
-// Copyright © 2022 Attestant Limited.
+// Copyright © 2022, 2023 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -35,10 +35,12 @@ import (
 )
 
 // UnblindBlock unblinds a block.
+//
+// Deprecated: this will not work from the deneb hard-fork onwards.  Use UnblindProposal() instead.
 func (s *Service) UnblindBlock(ctx context.Context,
 	block *consensusapi.VersionedSignedBlindedBeaconBlock,
 ) (
-	*consensusspec.VersionedSignedBeaconBlock,
+	*consensusapi.VersionedSignedProposal,
 	error,
 ) {
 	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "UnblindBlock", trace.WithAttributes(
@@ -62,6 +64,8 @@ func (s *Service) UnblindBlock(ctx context.Context,
 			return nil, errors.New("capella block without payload")
 		}
 		return s.unblindCapellaBlock(ctx, started, block.Capella)
+	case consensusspec.DataVersionDeneb:
+		return nil, errors.New("deneb not supported; use UnblindProposal()")
 	default:
 		return nil, fmt.Errorf("unhandled data version %v", block.Version)
 	}
@@ -71,7 +75,7 @@ func (s *Service) unblindBellatrixBlock(ctx context.Context,
 	started time.Time,
 	block *consensusapiv1bellatrix.SignedBlindedBeaconBlock,
 ) (
-	*consensusspec.VersionedSignedBeaconBlock,
+	*consensusapi.VersionedSignedProposal,
 	error,
 ) {
 	specJSON, err := json.Marshal(block)
@@ -93,7 +97,7 @@ func (s *Service) unblindBellatrixBlock(ctx context.Context,
 		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
 		return nil, errors.Wrap(err, "failed to parse response")
 	}
-	res := &consensusspec.VersionedSignedBeaconBlock{
+	res := &consensusapi.VersionedSignedProposal{
 		Version: consensusspec.DataVersionBellatrix,
 		Bellatrix: &bellatrix.SignedBeaconBlock{
 			Message: &bellatrix.BeaconBlock{
@@ -147,7 +151,7 @@ func (s *Service) unblindCapellaBlock(ctx context.Context,
 	started time.Time,
 	block *consensusapiv1capella.SignedBlindedBeaconBlock,
 ) (
-	*consensusspec.VersionedSignedBeaconBlock,
+	*consensusapi.VersionedSignedProposal,
 	error,
 ) {
 	specJSON, err := json.Marshal(block)
@@ -169,7 +173,7 @@ func (s *Service) unblindCapellaBlock(ctx context.Context,
 		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
 		return nil, errors.Wrap(err, "failed to parse response")
 	}
-	res := &consensusspec.VersionedSignedBeaconBlock{
+	res := &consensusapi.VersionedSignedProposal{
 		Version: consensusspec.DataVersionCapella,
 		Capella: &capella.SignedBeaconBlock{
 			Message: &capella.BeaconBlock{

@@ -46,7 +46,7 @@ func TestBlindedBlobsBundleJSON(t *testing.T) {
 		{
 			name:  "CommitmentsWrongType",
 			input: []byte(`{"commitments":true,"proofs":["0xc6e27a3ae80243ba7ea88eab107a0675020e0745d75ab6a1553691007a50f7f99f597693ac33ae3cea63bf0b90a734ff","0xc6e27a3ae80243ba7ea88eab107a0675020e0745d75ab6a1553691007a50f7f99f597693ac33ae3cea63bf0b90a734ff"],"blob_roots":["0x3c1820c62034fc45c10abc983dbce08de28f303192dea32371a902b3e6a1fc29","0xba4d784293df28bab771a14df58cdbed9d8d64afd0ddf1c52dff3e25fcdd51df"]}`),
-			err:   "commitments: json: cannot unmarshal bool into Go value of type []deneb.KzgCommitment",
+			err:   "commitments: json: cannot unmarshal bool into Go value of type []deneb.KZGCommitment",
 		},
 		{
 			name:  "CommitmentWrongType",
@@ -71,7 +71,7 @@ func TestBlindedBlobsBundleJSON(t *testing.T) {
 		{
 			name:  "ProofsWrongType",
 			input: []byte(`{"commitments":["0x95cc5099bbd8420d8ebade383c00a2346dace60a7604f768cd71501757b4d72eeb7d5474a6b615af10379d69aa9f478f","0xae9f2d2217013ef61f995f9074faead9ec24e8048440164ec3d6029b87d43686dd0c97c2df9554fc997d0d66c3a78929"],"proofs":true,"blob_roots":["0x3c1820c62034fc45c10abc983dbce08de28f303192dea32371a902b3e6a1fc29","0xba4d784293df28bab771a14df58cdbed9d8d64afd0ddf1c52dff3e25fcdd51df"]}`),
-			err:   "proofs: json: cannot unmarshal bool into Go value of type []deneb.KzgProof",
+			err:   "proofs: json: cannot unmarshal bool into Go value of type []deneb.KZGProof",
 		},
 		{
 			name:  "ProofWrongType",

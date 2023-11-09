@@ -98,7 +98,7 @@ func (b *BlindedBlobsBundle) UnmarshalSSZ(buf []byte) error {
 		if err != nil {
 			return err
 		}
-		b.Commitments = make([]deneb.KzgCommitment, num)
+		b.Commitments = make([]deneb.KZGCommitment, num)
 		for ii := 0; ii < num; ii++ {
 			copy(b.Commitments[ii][:], buf[ii*48:(ii+1)*48])
 		}
@@ -111,7 +111,7 @@ func (b *BlindedBlobsBundle) UnmarshalSSZ(buf []byte) error {
 		if err != nil {
 			return err
 		}
-		b.Proofs = make([]deneb.KzgProof, num)
+		b.Proofs = make([]deneb.KZGProof, num)
 		for ii := 0; ii < num; ii++ {
 			copy(b.Proofs[ii][:], buf[ii*48:(ii+1)*48])
 		}

@@ -2437,8 +2437,8 @@ func TestVersionedSubmitBlockRequestString(t *testing.T) {
 						Withdrawals:   make([]*consensuscapella.Withdrawal, 0),
 					},
 					BlobsBundle: &deneb.BlobsBundle{
-						Commitments: make([]consensusdeneb.KzgCommitment, 0),
-						Proofs:      make([]consensusdeneb.KzgProof, 0),
+						Commitments: make([]consensusdeneb.KZGCommitment, 0),
+						Proofs:      make([]consensusdeneb.KZGProof, 0),
 						Blobs:       make([]consensusdeneb.Blob, 0),
 					},
 					Signature: phase0.BLSSignature{

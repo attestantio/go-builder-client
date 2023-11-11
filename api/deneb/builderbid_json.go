@@ -29,18 +29,18 @@ import (
 // builderBidJSON is the spec representation of the struct.
 type builderBidJSON struct {
 	Header             *deneb.ExecutionPayloadHeader `json:"header"`
+	BlobKZGCommitments []deneb.KZGCommitment         `json:"blob_kzg_commitments"`
 	Value              string                        `json:"value"`
 	Pubkey             string                        `json:"pubkey"`
-	BlindedBlobsBundle *BlindedBlobsBundle           `json:"blinded_blobs_bundle"`
 }
 
 // MarshalJSON implements json.Marshaler.
 func (b *BuilderBid) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&builderBidJSON{
 		Header:             b.Header,
+		BlobKZGCommitments: b.BlobKZGCommitments,
 		Value:              fmt.Sprintf("%d", b.Value),
 		Pubkey:             b.Pubkey.String(),
-		BlindedBlobsBundle: b.BlindedBlobsBundle,
 	})
 }
 
@@ -87,10 +87,10 @@ func (b *BuilderBid) unpack(data *builderBidJSON) error {
 	}
 	copy(b.Pubkey[:], pubKey)
 
-	if data.BlindedBlobsBundle == nil {
-		return errors.New("blinded blobs bundle missing")
+	if data.BlobKZGCommitments == nil {
+		return errors.New("blob KZG commitments missing")
 	}
-	b.BlindedBlobsBundle = data.BlindedBlobsBundle
+	b.BlobKZGCommitments = data.BlobKZGCommitments
 
 	return nil
 }

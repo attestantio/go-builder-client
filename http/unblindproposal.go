@@ -43,7 +43,7 @@ type denebBundle struct {
 
 // UnblindProposal unblinds a proposal.
 func (s *Service) UnblindProposal(ctx context.Context,
-	proposal *consensusapi.VersionedSignedBlindedProposal,
+	proposal *consensusapi.VersionedSignedBlindedBeaconBlock,
 ) (
 	*consensusapi.VersionedSignedProposal,
 	error,
@@ -234,7 +234,7 @@ func (s *Service) unblindCapellaProposal(ctx context.Context,
 
 func (s *Service) unblindDenebProposal(ctx context.Context,
 	started time.Time,
-	proposal *consensusapiv1deneb.SignedBlindedBlockContents,
+	proposal *consensusapiv1deneb.SignedBlindedBeaconBlock,
 ) (
 	*consensusapi.VersionedSignedProposal,
 	error,
@@ -259,40 +259,32 @@ func (s *Service) unblindDenebProposal(ctx context.Context,
 		return nil, errors.Wrap(err, "failed to parse response")
 	}
 
-	signedBlobSidecars := make([]*deneb.SignedBlobSidecar, len(proposal.SignedBlindedBlobSidecars))
-	for i := range proposal.SignedBlindedBlobSidecars {
-		signedBlobSidecars[i] = &deneb.SignedBlobSidecar{
-			Signature: proposal.SignedBlindedBlobSidecars[i].Signature,
-		}
-	}
-
 	// Reconstruct proposal.
 	res := &consensusapi.VersionedSignedProposal{
 		Version: consensusspec.DataVersionDeneb,
 		Deneb: &consensusapiv1deneb.SignedBlockContents{
 			SignedBlock: &deneb.SignedBeaconBlock{
 				Message: &deneb.BeaconBlock{
-					Slot:          proposal.SignedBlindedBlock.Message.Slot,
-					ProposerIndex: proposal.SignedBlindedBlock.Message.ProposerIndex,
-					ParentRoot:    proposal.SignedBlindedBlock.Message.ParentRoot,
-					StateRoot:     proposal.SignedBlindedBlock.Message.StateRoot,
+					Slot:          proposal.Message.Slot,
+					ProposerIndex: proposal.Message.ProposerIndex,
+					ParentRoot:    proposal.Message.ParentRoot,
+					StateRoot:     proposal.Message.StateRoot,
 					Body: &deneb.BeaconBlockBody{
-						RANDAOReveal:          proposal.SignedBlindedBlock.Message.Body.RANDAOReveal,
-						ETH1Data:              proposal.SignedBlindedBlock.Message.Body.ETH1Data,
-						Graffiti:              proposal.SignedBlindedBlock.Message.Body.Graffiti,
-						ProposerSlashings:     proposal.SignedBlindedBlock.Message.Body.ProposerSlashings,
-						AttesterSlashings:     proposal.SignedBlindedBlock.Message.Body.AttesterSlashings,
-						Attestations:          proposal.SignedBlindedBlock.Message.Body.Attestations,
-						Deposits:              proposal.SignedBlindedBlock.Message.Body.Deposits,
-						VoluntaryExits:        proposal.SignedBlindedBlock.Message.Body.VoluntaryExits,
-						SyncAggregate:         proposal.SignedBlindedBlock.Message.Body.SyncAggregate,
-						BLSToExecutionChanges: proposal.SignedBlindedBlock.Message.Body.BLSToExecutionChanges,
-						BlobKzgCommitments:    proposal.SignedBlindedBlock.Message.Body.BlobKzgCommitments,
+						RANDAOReveal:          proposal.Message.Body.RANDAOReveal,
+						ETH1Data:              proposal.Message.Body.ETH1Data,
+						Graffiti:              proposal.Message.Body.Graffiti,
+						ProposerSlashings:     proposal.Message.Body.ProposerSlashings,
+						AttesterSlashings:     proposal.Message.Body.AttesterSlashings,
+						Attestations:          proposal.Message.Body.Attestations,
+						Deposits:              proposal.Message.Body.Deposits,
+						VoluntaryExits:        proposal.Message.Body.VoluntaryExits,
+						SyncAggregate:         proposal.Message.Body.SyncAggregate,
+						BLSToExecutionChanges: proposal.Message.Body.BLSToExecutionChanges,
+						BlobKZGCommitments:    proposal.Message.Body.BlobKZGCommitments,
 					},
 				},
-				Signature: proposal.SignedBlindedBlock.Signature,
+				Signature: proposal.Signature,
 			},
-			SignedBlobSidecars: signedBlobSidecars,
 		},
 	}
 
@@ -303,7 +295,7 @@ func (s *Service) unblindDenebProposal(ctx context.Context,
 			return nil, errors.Wrap(err, "failed to parse deneb response")
 		}
 		// Ensure that the data returned is what we expect.
-		ourExecutionPayloadHash, err := proposal.SignedBlindedBlock.Message.Body.ExecutionPayloadHeader.HashTreeRoot()
+		ourExecutionPayloadHash, err := proposal.Message.Body.ExecutionPayloadHeader.HashTreeRoot()
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to generate hash tree root for our execution payload header")
 		}
@@ -316,27 +308,16 @@ func (s *Service) unblindDenebProposal(ctx context.Context,
 		}
 		res.Deneb.SignedBlock.Message.Body.ExecutionPayload = resp.Bundle.ExecutionPayload
 
-		root, err := proposal.SignedBlindedBlock.Message.HashTreeRoot()
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to generate hash tree root for proposal")
-		}
-
 		// Reconstruct blobs.
+		res.Deneb.KZGProofs = make([]deneb.KZGProof, len(resp.Bundle.BlobsBundle.Proofs))
+		res.Deneb.Blobs = make([]deneb.Blob, len(resp.Bundle.BlobsBundle.Blobs))
 		for i := range resp.Bundle.BlobsBundle.Blobs {
-			if !bytes.Equal(resp.Bundle.BlobsBundle.Commitments[i][:], res.Deneb.SignedBlock.Message.Body.BlobKzgCommitments[i][:]) {
+			if !bytes.Equal(resp.Bundle.BlobsBundle.Commitments[i][:], res.Deneb.SignedBlock.Message.Body.BlobKZGCommitments[i][:]) {
 				return nil, fmt.Errorf("blob %d commitment mismatch", i)
 			}
 
-			res.Deneb.SignedBlobSidecars[i].Message = &deneb.BlobSidecar{
-				BlockRoot:       root,
-				Index:           deneb.BlobIndex(i),
-				Slot:            proposal.SignedBlindedBlock.Message.Slot,
-				BlockParentRoot: res.Deneb.SignedBlock.Message.ParentRoot,
-				ProposerIndex:   res.Deneb.SignedBlock.Message.ProposerIndex,
-				Blob:            resp.Bundle.BlobsBundle.Blobs[i],
-				KzgCommitment:   resp.Bundle.BlobsBundle.Commitments[i],
-				KzgProof:        resp.Bundle.BlobsBundle.Proofs[i],
-			}
+			res.Deneb.KZGProofs[i] = resp.Bundle.BlobsBundle.Proofs[i]
+			res.Deneb.Blobs[i] = resp.Bundle.BlobsBundle.Blobs[i]
 		}
 	default:
 		return nil, fmt.Errorf("unsupported content type %v", contentType)

@@ -43,7 +43,7 @@ type denebBundle struct {
 
 // UnblindProposal unblinds a proposal.
 func (s *Service) UnblindProposal(ctx context.Context,
-	proposal *consensusapi.VersionedSignedBlindedBeaconBlock,
+	proposal *consensusapi.VersionedSignedBlindedProposal,
 ) (
 	*consensusapi.VersionedSignedProposal,
 	error,

@@ -31,8 +31,9 @@ func (b *BuilderBid) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	offset += len(b.BlobKZGCommitments) * 48
 
 	// Field (2) 'Value'
-	for ii := 0; ii < 32; ii++ {
-		dst = ssz.MarshalUint64(dst, b.Value[ii])
+	value := b.Value.Bytes32()
+	for i := 0; i < 32; i++ {
+		dst = append(dst, value[31-i])
 	}
 
 	// Field (3) 'Pubkey'

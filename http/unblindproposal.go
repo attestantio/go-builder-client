@@ -1,4 +1,4 @@
-// Copyright © 2023 Attestant Limited.
+// Copyright © 2023, 2024 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -34,10 +34,6 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
-
-type denebBundle struct {
-	Bundle *apideneb.ExecutionPayloadAndBlobsBundle `json:"data"`
-}
 
 // UnblindProposal unblinds a proposal.
 func (s *Service) UnblindProposal(ctx context.Context,
@@ -264,7 +260,7 @@ func (s *Service) unblindDenebProposal(ctx context.Context,
 
 	switch httpResponse.contentType {
 	case ContentTypeJSON:
-		bundle, _, err := decodeJSONResponse(bytes.NewReader(httpResponse.body), &denebBundle{})
+		bundle, _, err := decodeJSONResponse(bytes.NewReader(httpResponse.body), &apideneb.ExecutionPayloadAndBlobsBundle{})
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to parse deneb response")
 		}
@@ -273,25 +269,25 @@ func (s *Service) unblindDenebProposal(ctx context.Context,
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to generate hash tree root for our execution payload header")
 		}
-		receivedExecutionPayloadHash, err := bundle.Bundle.ExecutionPayload.HashTreeRoot()
+		receivedExecutionPayloadHash, err := bundle.ExecutionPayload.HashTreeRoot()
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to generate hash tree root for the received execution payload")
 		}
 		if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
 			return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:], ourExecutionPayloadHash[:])
 		}
-		res.Deneb.SignedBlock.Message.Body.ExecutionPayload = bundle.Bundle.ExecutionPayload
+		res.Deneb.SignedBlock.Message.Body.ExecutionPayload = bundle.ExecutionPayload
 
 		// Reconstruct blobs.
-		res.Deneb.KZGProofs = make([]deneb.KZGProof, len(bundle.Bundle.BlobsBundle.Proofs))
-		res.Deneb.Blobs = make([]deneb.Blob, len(bundle.Bundle.BlobsBundle.Blobs))
-		for i := range bundle.Bundle.BlobsBundle.Blobs {
-			if !bytes.Equal(bundle.Bundle.BlobsBundle.Commitments[i][:], res.Deneb.SignedBlock.Message.Body.BlobKZGCommitments[i][:]) {
+		res.Deneb.KZGProofs = make([]deneb.KZGProof, len(bundle.BlobsBundle.Proofs))
+		res.Deneb.Blobs = make([]deneb.Blob, len(bundle.BlobsBundle.Blobs))
+		for i := range bundle.BlobsBundle.Blobs {
+			if !bytes.Equal(bundle.BlobsBundle.Commitments[i][:], res.Deneb.SignedBlock.Message.Body.BlobKZGCommitments[i][:]) {
 				return nil, fmt.Errorf("blob %d commitment mismatch", i)
 			}
 
-			res.Deneb.KZGProofs[i] = bundle.Bundle.BlobsBundle.Proofs[i]
-			res.Deneb.Blobs[i] = bundle.Bundle.BlobsBundle.Blobs[i]
+			res.Deneb.KZGProofs[i] = bundle.BlobsBundle.Proofs[i]
+			res.Deneb.Blobs[i] = bundle.BlobsBundle.Blobs[i]
 		}
 	default:
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)

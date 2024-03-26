@@ -1,4 +1,4 @@
-// Copyright © 2022, 2023 Attestant Limited.
+// Copyright © 2022 - 2024 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,16 +16,17 @@ package http
 import (
 	"context"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 	"time"
 
 	builderclient "github.com/attestantio/go-builder-client"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	zerologger "github.com/rs/zerolog/log"
 )
@@ -47,7 +48,7 @@ var log zerolog.Logger
 func New(ctx context.Context, params ...Parameter) (builderclient.Service, error) {
 	parameters, err := parseAndCheckParameters(params...)
 	if err != nil {
-		return nil, errors.Wrap(err, "problem with parameters")
+		return nil, errors.Join(errors.New("problem with parameters"), err)
 	}
 
 	// Set logging.
@@ -58,7 +59,7 @@ func New(ctx context.Context, params ...Parameter) (builderclient.Service, error
 
 	if parameters.monitor != nil {
 		if err := registerMetrics(ctx, parameters.monitor); err != nil {
-			return nil, errors.Wrap(err, "problem registering metrics")
+			return nil, errors.Join(errors.New("problem registering metrics"), err)
 		}
 	}
 
@@ -77,16 +78,9 @@ func New(ctx context.Context, params ...Parameter) (builderclient.Service, error
 		},
 	}
 
-	address := parameters.address
-	if !strings.HasPrefix(address, "http") {
-		address = fmt.Sprintf("http://%s", address)
-	}
-	if !strings.HasSuffix(address, "/") {
-		address = fmt.Sprintf("%s/", address)
-	}
-	base, err := url.Parse(address)
+	base, address, err := parseAddress(parameters.address)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid URL")
+		return nil, err
 	}
 
 	// Obtain the public key from the URL's user.
@@ -95,7 +89,7 @@ func New(ctx context.Context, params ...Parameter) (builderclient.Service, error
 		key := phase0.BLSPubKey{}
 		data, err := hex.DecodeString(strings.TrimPrefix(base.User.Username(), "0x"))
 		if err != nil {
-			return nil, errors.Wrap(err, fmt.Sprintf("failed to parse public key %s", base.User.Username()))
+			return nil, errors.Join(fmt.Errorf("failed to parse public key %s", base.User.Username()), err)
 		}
 		copy(key[:], data)
 		pubkey = &key
@@ -105,7 +99,7 @@ func New(ctx context.Context, params ...Parameter) (builderclient.Service, error
 	}
 	s := &Service{
 		base:         base,
-		address:      base.String(),
+		address:      address.String(),
 		client:       client,
 		timeout:      parameters.timeout,
 		pubkey:       pubkey,
@@ -138,4 +132,26 @@ func (s *Service) close() {}
 // Pubkey returns the public key of the builder (if any).
 func (s *Service) Pubkey() *phase0.BLSPubKey {
 	return s.pubkey
+}
+
+func parseAddress(address string) (*url.URL, *url.URL, error) {
+	if !strings.HasPrefix(address, "http") {
+		address = "http://" + address
+	}
+	base, err := url.Parse(address)
+	if err != nil {
+		return nil, nil, errors.Join(errors.New("invalid URL"), err)
+	}
+	base.Path = ""
+	baseAddress := *base
+	if _, pwExists := baseAddress.User.Password(); pwExists {
+		user := baseAddress.User.Username()
+		baseAddress.User = url.UserPassword(user, "***")
+	}
+	if baseAddress.RawQuery != "" {
+		sensitiveRegex := regexp.MustCompile("=([^&]*)(&)?")
+		baseAddress.RawQuery = sensitiveRegex.ReplaceAllString(baseAddress.RawQuery, "=***$2")
+	}
+
+	return base, &baseAddress, nil
 }

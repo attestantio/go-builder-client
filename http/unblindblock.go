@@ -18,10 +18,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"time"
 
-	"github.com/attestantio/go-builder-client/api"
 	consensusapi "github.com/attestantio/go-eth2-client/api"
 	consensusapiv1bellatrix "github.com/attestantio/go-eth2-client/api/v1/bellatrix"
 	consensusapiv1capella "github.com/attestantio/go-eth2-client/api/v1/capella"
@@ -84,19 +82,12 @@ func (s *Service) unblindBellatrixBlock(ctx context.Context,
 		return nil, errors.Wrap(err, "failed to marshal JSON")
 	}
 
-	contentType, respBodyReader, err := s.post(ctx, "/eth/v1/builder/blinded_blocks", ContentTypeJSON, bytes.NewBuffer(specJSON))
+	httpResponse, err := s.post(ctx, "/eth/v1/builder/blinded_blocks", "", bytes.NewBuffer(specJSON), ContentTypeJSON, map[string]string{})
 	if err != nil {
 		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
 		return nil, errors.Wrap(err, "failed to submit unblind block request")
 	}
 
-	var dataBodyReader bytes.Buffer
-	metadataReader := io.TeeReader(respBodyReader, &dataBodyReader)
-	var metadata responseMetadata
-	if err := json.NewDecoder(metadataReader).Decode(&metadata); err != nil {
-		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
-		return nil, errors.Wrap(err, "failed to parse response")
-	}
 	res := &consensusapi.VersionedSignedProposal{
 		Version: consensusspec.DataVersionBellatrix,
 		Bellatrix: &bellatrix.SignedBeaconBlock{
@@ -121,10 +112,10 @@ func (s *Service) unblindBellatrixBlock(ctx context.Context,
 		},
 	}
 
-	switch contentType {
+	switch httpResponse.contentType {
 	case ContentTypeJSON:
-		var resp api.VersionedExecutionPayload
-		if err := json.NewDecoder(&dataBodyReader).Decode(&resp); err != nil {
+		res.Bellatrix.Message.Body.ExecutionPayload, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &bellatrix.ExecutionPayload{})
+		if err != nil {
 			return nil, errors.Wrap(err, "failed to parse bellatrix response")
 		}
 		// Ensure that the data returned is what we expect.
@@ -132,16 +123,15 @@ func (s *Service) unblindBellatrixBlock(ctx context.Context,
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to generate hash tree root for our execution payload header")
 		}
-		receivedExecutionPayloadHash, err := resp.Bellatrix.HashTreeRoot()
+		receivedExecutionPayloadHash, err := res.Bellatrix.Message.Body.ExecutionPayload.HashTreeRoot()
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to generate hash tree root for the received execution payload")
 		}
 		if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
 			return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:], ourExecutionPayloadHash[:])
 		}
-		res.Bellatrix.Message.Body.ExecutionPayload = resp.Bellatrix
 	default:
-		return nil, fmt.Errorf("unsupported content type %v", contentType)
+		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
 	}
 	monitorOperation(s.Address(), "unblind block", "succeeded", time.Since(started))
 	return res, nil
@@ -160,19 +150,12 @@ func (s *Service) unblindCapellaBlock(ctx context.Context,
 		return nil, errors.Wrap(err, "failed to marshal JSON")
 	}
 
-	contentType, respBodyReader, err := s.post(ctx, "/eth/v1/builder/blinded_blocks", ContentTypeJSON, bytes.NewBuffer(specJSON))
+	httpResponse, err := s.post(ctx, "/eth/v1/builder/blinded_blocks", "", bytes.NewBuffer(specJSON), ContentTypeJSON, map[string]string{})
 	if err != nil {
 		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
 		return nil, errors.Wrap(err, "failed to submit unblind block request")
 	}
 
-	var dataBodyReader bytes.Buffer
-	metadataReader := io.TeeReader(respBodyReader, &dataBodyReader)
-	var metadata responseMetadata
-	if err := json.NewDecoder(metadataReader).Decode(&metadata); err != nil {
-		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
-		return nil, errors.Wrap(err, "failed to parse response")
-	}
 	res := &consensusapi.VersionedSignedProposal{
 		Version: consensusspec.DataVersionCapella,
 		Capella: &capella.SignedBeaconBlock{
@@ -198,10 +181,10 @@ func (s *Service) unblindCapellaBlock(ctx context.Context,
 		},
 	}
 
-	switch contentType {
+	switch httpResponse.contentType {
 	case ContentTypeJSON:
-		var resp api.VersionedExecutionPayload
-		if err := json.NewDecoder(&dataBodyReader).Decode(&resp); err != nil {
+		res.Capella.Message.Body.ExecutionPayload, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &capella.ExecutionPayload{})
+		if err != nil {
 			return nil, errors.Wrap(err, "failed to parse capella response")
 		}
 		// Ensure that the data returned is what we expect.
@@ -209,16 +192,15 @@ func (s *Service) unblindCapellaBlock(ctx context.Context,
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to generate hash tree root for our execution payload header")
 		}
-		receivedExecutionPayloadHash, err := resp.Capella.HashTreeRoot()
+		receivedExecutionPayloadHash, err := res.Capella.Message.Body.ExecutionPayload.HashTreeRoot()
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to generate hash tree root for the received execution payload")
 		}
 		if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
 			return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:], ourExecutionPayloadHash[:])
 		}
-		res.Capella.Message.Body.ExecutionPayload = resp.Capella
 	default:
-		return nil, fmt.Errorf("unsupported content type %v", contentType)
+		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
 	}
 	monitorOperation(s.Address(), "unblind block", "succeeded", time.Since(started))
 	return res, nil

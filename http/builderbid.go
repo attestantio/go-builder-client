@@ -1,4 +1,4 @@
-// Copyright © 2022 Attestant Limited.
+// Copyright © 2022, 2024 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,9 +16,7 @@ package http
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"time"
 
 	"github.com/attestantio/go-builder-client/api/bellatrix"
@@ -32,18 +30,6 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
-
-type bellatrixBuilderBidJSON struct {
-	Data *bellatrix.SignedBuilderBid `json:"data"`
-}
-
-type capellaBuilderBidJSON struct {
-	Data *capella.SignedBuilderBid `json:"data"`
-}
-
-type denebBuilderBidJSON struct {
-	Data *deneb.SignedBuilderBid `json:"data"`
-}
 
 // BuilderBid obtains a builder bid.
 func (s *Service) BuilderBid(ctx context.Context,
@@ -61,64 +47,55 @@ func (s *Service) BuilderBid(ctx context.Context,
 	defer span.End()
 	started := time.Now()
 
-	url := fmt.Sprintf("/eth/v1/builder/header/%d/%#x/%#x", slot, parentHash[:], pubKey[:])
-	contentType, respBodyReader, err := s.get(ctx, url)
+	endpoint := fmt.Sprintf("/eth/v1/builder/header/%d/%#x/%#x", slot, parentHash[:], pubKey[:])
+	httpResponse, err := s.get(ctx, endpoint, "")
 	if err != nil {
-		log.Trace().Str("url", url).Err(err).Msg("Request failed")
+		log.Trace().Str("endpoint", endpoint).Err(err).Msg("Request failed")
 		monitorOperation(s.Address(), "builder bid", "failed", time.Since(started))
 		return nil, errors.Wrap(err, "failed to request execution payload header")
 	}
-	if respBodyReader == nil {
+
+	if len(httpResponse.body) == 0 {
 		monitorOperation(s.Address(), "builder bid", "no response", time.Since(started))
 		return nil, nil
 	}
 
-	var dataBodyReader bytes.Buffer
-	metadataReader := io.TeeReader(respBodyReader, &dataBodyReader)
-	var metadata responseMetadata
-	if err := json.NewDecoder(metadataReader).Decode(&metadata); err != nil {
-		monitorOperation(s.Address(), "builder bid", "failed", time.Since(started))
-		return nil, errors.Wrap(err, "failed to parse response")
-	}
 	res := &spec.VersionedSignedBuilderBid{
-		Version: metadata.Version,
+		Version: httpResponse.consensusVersion,
 	}
 
-	switch contentType {
+	switch httpResponse.contentType {
 	case ContentTypeJSON:
-		switch metadata.Version {
+		switch httpResponse.consensusVersion {
 		case consensusspec.DataVersionBellatrix:
-			var resp bellatrixBuilderBidJSON
-			if err := json.NewDecoder(&dataBodyReader).Decode(&resp); err != nil {
+			res.Bellatrix, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &bellatrix.SignedBuilderBid{})
+			if err != nil {
 				return nil, errors.Wrap(err, "failed to parse bellatrix builder bid")
 			}
-			if !bytes.Equal(resp.Data.Message.Header.ParentHash[:], parentHash[:]) {
+			if !bytes.Equal(res.Bellatrix.Message.Header.ParentHash[:], parentHash[:]) {
 				return nil, errors.New("parent hash mismatch")
 			}
-			res.Bellatrix = resp.Data
 		case consensusspec.DataVersionCapella:
-			var resp capellaBuilderBidJSON
-			if err := json.NewDecoder(&dataBodyReader).Decode(&resp); err != nil {
+			res.Capella, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &capella.SignedBuilderBid{})
+			if err != nil {
 				return nil, errors.Wrap(err, "failed to parse capella builder bid")
 			}
-			if !bytes.Equal(resp.Data.Message.Header.ParentHash[:], parentHash[:]) {
+			if !bytes.Equal(res.Capella.Message.Header.ParentHash[:], parentHash[:]) {
 				return nil, errors.New("parent hash mismatch")
 			}
-			res.Capella = resp.Data
 		case consensusspec.DataVersionDeneb:
-			var resp denebBuilderBidJSON
-			if err := json.NewDecoder(&dataBodyReader).Decode(&resp); err != nil {
+			res.Deneb, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &deneb.SignedBuilderBid{})
+			if err != nil {
 				return nil, errors.Wrap(err, "failed to parse deneb builder bid")
 			}
-			if !bytes.Equal(resp.Data.Message.Header.ParentHash[:], parentHash[:]) {
+			if !bytes.Equal(res.Deneb.Message.Header.ParentHash[:], parentHash[:]) {
 				return nil, errors.New("parent hash mismatch")
 			}
-			res.Deneb = resp.Data
 		default:
-			return nil, fmt.Errorf("unsupported block version %s", metadata.Version)
+			return nil, fmt.Errorf("unsupported block version %s", httpResponse.consensusVersion)
 		}
 	default:
-		return nil, fmt.Errorf("unsupported content type %v", contentType)
+		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
 	}
 
 	monitorOperation(s.Address(), "builder bid", "succeeded", time.Since(started))

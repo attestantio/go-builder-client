@@ -91,7 +91,7 @@ func (s *Service) submitValidatorRegistrations(ctx context.Context,
 	if err != nil {
 		return errors.Wrap(err, "failed to marshal JSON")
 	}
-	_, _, err = s.post(ctx, "/eth/v1/builder/validators", ContentTypeJSON, bytes.NewBuffer(specJSON))
+	_, err = s.post(ctx, "/eth/v1/builder/validators", "", bytes.NewBuffer(specJSON), ContentTypeJSON, map[string]string{})
 	if err != nil {
 		return errors.Wrap(err, "failed to submit validator registration")
 	}

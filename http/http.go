@@ -1,4 +1,4 @@
-// Copyright © 2022, 2023 Attestant Limited.
+// Copyright © 2022 - 2024 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,6 +16,8 @@ package http
 import (
 	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"math/rand"
@@ -23,173 +25,269 @@ import (
 	"net/url"
 	"strings"
 
-	consensusspec "github.com/attestantio/go-eth2-client/spec"
-	"github.com/pkg/errors"
+	"github.com/attestantio/go-eth2-client/spec"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
 
-// get sends an HTTP get request and returns the body.
-// If the response from the server is a 404 this will return nil for both the reader and the error.
-func (s *Service) get(ctx context.Context, endpoint string) (ContentType, io.Reader, error) {
+type httpResponse struct {
+	statusCode       int
+	contentType      ContentType
+	headers          map[string]string
+	consensusVersion spec.DataVersion
+	body             []byte
+}
+
+// responseMetadata returns metadata related to responses.
+type responseMetadata struct {
+	Version spec.DataVersion `json:"version"`
+}
+
+// get sends an HTTP get request and returns the response.
+func (s *Service) get(ctx context.Context,
+	endpoint string,
+	query string,
+) (
+	*httpResponse,
+	error,
+) {
 	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "get")
 	defer span.End()
 
 	// #nosec G404
-	log := log.With().Str("id", fmt.Sprintf("%02x", rand.Int31())).Str("endpoint", endpoint).Str("address", s.address).Logger()
+	log := log.With().Str("id", fmt.Sprintf("%02x", rand.Int31())).Str("address", s.address).Str("endpoint", endpoint).Logger()
 	log.Trace().Msg("GET request")
 
-	url, err := url.Parse(fmt.Sprintf("%s%s", strings.TrimSuffix(s.base.String(), "/"), endpoint))
-	if err != nil {
-		return ContentTypeUnknown, nil, errors.Wrap(err, "invalid endpoint")
-	}
+	url := urlForCall(s.base, endpoint, query)
+	log.Trace().Str("url", url.String()).Msg("URL to GET")
 	span.SetAttributes(attribute.String("url", url.String()))
 
 	opCtx, cancel := context.WithTimeout(ctx, s.timeout)
+	defer cancel()
 	req, err := http.NewRequestWithContext(opCtx, http.MethodGet, url.String(), nil)
 	if err != nil {
-		cancel()
 		span.SetStatus(codes.Error, "Failed to create request")
-		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to create GET request")
+		return nil, errors.Join(errors.New("failed to create GET request"), err)
 	}
 
 	s.addExtraHeaders(req)
 	// Prefer SSZ if available (enable when we support SSZ) .
 	// req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
 	req.Header.Set("Accept", "application/json")
-	span.AddEvent("Sending request")
+	if req.Header.Get("User-Agent") == "" {
+		req.Header.Set("User-Agent", "go-builder-client/0.4.4")
+	}
+
 	resp, err := s.client.Do(req)
 	if err != nil {
-		cancel()
-		span.SetStatus(codes.Error, "Request failed")
-		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to call GET endpoint")
+		span.SetStatus(codes.Error, err.Error())
+
+		return nil, errors.Join(errors.New("failed to call GET endpoint"), err)
 	}
 	defer resp.Body.Close()
 	log = log.With().Int("status_code", resp.StatusCode).Logger()
 
-	if resp.StatusCode == http.StatusNotFound {
-		// Nothing found.  This is not an error, so we return nil on both counts.
-		cancel()
-		span.RecordError(errors.New("endpoint not found"))
-		log.Debug().Msg("Endpoint not found")
-		return ContentTypeUnknown, nil, nil
+	res := &httpResponse{
+		statusCode: resp.StatusCode,
+	}
+	populateHeaders(res, resp)
+
+	// Although it would be more efficient to keep the body as a Reader, that would
+	// require the calling function to be aware that it needs to close the body
+	// once it is done with it.  To avoid that complexity, we read here and store the
+	// body as a byte array.
+	res.body, err = io.ReadAll(resp.Body)
+	if err != nil {
+		span.SetStatus(codes.Error, err.Error())
+
+		return nil, errors.Join(errors.New("failed to read GET response"), err)
 	}
 
-	if resp.StatusCode == http.StatusNoContent {
-		// Nothing returned.  This is not an error, so we return nil on both counts.
-		cancel()
+	if resp.StatusCode == http.StatusNoContent || len(res.body) == 0 {
+		// Nothing returned.  This is not considered an error.
 		span.AddEvent("Received empty response")
 		log.Trace().Msg("Endpoint returned no content")
-		return ContentTypeUnknown, nil, nil
+
+		return res, nil
 	}
 
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		cancel()
-		span.SetStatus(codes.Error, "Failed to read response")
-		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to read GET response")
+	if err := populateContentType(res, resp); err != nil {
+		// For now, assume that unknown type is JSON.
+		log.Debug().Err(err).Msg("Failed to obtain content type; assuming JSON")
+		res.contentType = ContentTypeJSON
 	}
-	span.AddEvent("Received response", trace.WithAttributes(attribute.Int("size", len(data))))
+	span.AddEvent("Received response", trace.WithAttributes(
+		attribute.Int("size", len(res.body)),
+		attribute.String("content-type", res.contentType.String()),
+	))
+
+	if res.contentType == ContentTypeJSON {
+		if e := log.Trace(); e.Enabled() {
+			trimmedResponse := bytes.ReplaceAll(bytes.ReplaceAll(res.body, []byte{0x0a}, []byte{}), []byte{0x0d}, []byte{})
+			e.RawJSON("body", trimmedResponse).Msg("GET response")
+		}
+	}
 
 	statusFamily := resp.StatusCode / 100
 	if statusFamily != 2 {
-		cancel()
-		trimmedResponse := bytes.ReplaceAll(bytes.ReplaceAll(data, []byte{0x0a}, []byte{}), []byte{0x0d}, []byte{})
+		trimmedResponse := bytes.ReplaceAll(bytes.ReplaceAll(res.body, []byte{0x0a}, []byte{}), []byte{0x0d}, []byte{})
 		log.Debug().Int("status_code", resp.StatusCode).RawJSON("response", trimmedResponse).Msg("GET failed")
+
 		span.SetStatus(codes.Error, fmt.Sprintf("Status code %d", resp.StatusCode))
-		return ContentTypeUnknown, nil, fmt.Errorf("GET failed with status %d: %s", resp.StatusCode, string(data))
-	}
-	cancel()
 
-	contentType, err := contentTypeFromResp(resp)
-	if err != nil {
-		// For now, assume that unknown type is JSON.
-		log.Debug().Err(err).Msg("Failed to obtain content type; assuming JSON")
-		contentType = ContentTypeJSON
+		return nil, fmt.Errorf("GET failed with status %d: %s", resp.StatusCode, string(res.body))
 	}
 
-	return contentType, bytes.NewReader(data), nil
+	if err := populateConsensusVersion(res, resp); err != nil {
+		return nil, errors.Join(errors.New("failed to parse consensus version"), err)
+	}
+
+	return res, nil
 }
 
 // post sends an HTTP post request and returns the body.
 //
 //nolint:unparam
-func (s *Service) post(ctx context.Context, endpoint string, contentType ContentType, body io.Reader) (ContentType, io.Reader, error) {
+func (s *Service) post(ctx context.Context,
+	endpoint string,
+	query string,
+	body io.Reader,
+	contentType ContentType,
+	headers map[string]string,
+) (
+	*httpResponse,
+	error,
+) {
 	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "post")
 	defer span.End()
 
 	// #nosec G404
 	log := log.With().Str("id", fmt.Sprintf("%02x", rand.Int31())).Str("endpoint", endpoint).Str("address", s.address).Logger()
 	if e := log.Trace(); e.Enabled() {
-		bodyBytes, err := io.ReadAll(body)
-		if err != nil {
-			return ContentTypeUnknown, nil, errors.New("failed to read request body")
+		switch contentType {
+		case ContentTypeJSON:
+			bodyBytes, err := io.ReadAll(body)
+			if err != nil {
+				return nil, errors.New("failed to read request body")
+			}
+			body = bytes.NewReader(bodyBytes)
+
+			e.Str("body", string(bodyBytes)).Msg("POST request")
+		default:
+			e.Str("content_type", contentType.String()).Msg("POST request")
 		}
-		body = bytes.NewReader(bodyBytes)
-
-		e.RawJSON("body", bodyBytes).Msg("POST request")
 	}
 
-	url, err := url.Parse(fmt.Sprintf("%s%s", strings.TrimSuffix(s.base.String(), "/"), endpoint))
-	if err != nil {
-		return ContentTypeUnknown, nil, errors.Wrap(err, "invalid endpoint")
-	}
+	url := urlForCall(s.base, endpoint, query)
+	log.Trace().Str("url", url.String()).Msg("URL to POST")
 	span.SetAttributes(attribute.String("url", url.String()))
 
 	opCtx, cancel := context.WithTimeout(ctx, s.timeout)
+	defer cancel()
 	req, err := http.NewRequestWithContext(opCtx, http.MethodPost, url.String(), body)
 	if err != nil {
-		cancel()
-		span.SetStatus(codes.Error, "Failed to create request")
-		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to create POST request")
+		return nil, errors.Join(errors.New("failed to create POST request"), err)
 	}
 
 	s.addExtraHeaders(req)
-	req.Header.Set("Content-type", contentType.MediaType())
+	req.Header.Set("Content-Type", contentType.MediaType())
 	// Prefer SSZ if available (enable when we support SSZ) .
 	// req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
 	req.Header.Set("Accept", "application/json")
-	span.AddEvent("Sending request")
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+	if req.Header.Get("User-Agent") == "" {
+		req.Header.Set("User-Agent", "go-builder-client/0.4.4")
+	}
+
 	resp, err := s.client.Do(req)
 	if err != nil {
-		cancel()
 		span.SetStatus(codes.Error, "Request failed")
-		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to call POST endpoint")
+
+		return nil, errors.Join(errors.New("failed to call POST endpoint"), err)
 	}
 	defer resp.Body.Close()
 	log = log.With().Int("status_code", resp.StatusCode).Logger()
 
-	if resp.StatusCode == http.StatusNoContent {
-		// Nothing returned.  This is not an error, so we return nil on both counts.
-		cancel()
-		span.AddEvent("Received empty response")
-		log.Trace().Msg("Endpoint returned no content")
-		return ContentTypeUnknown, nil, nil
+	res := &httpResponse{
+		statusCode: resp.StatusCode,
+	}
+	populateHeaders(res, resp)
+
+	res.body, err = io.ReadAll(resp.Body)
+	if err != nil {
+		span.SetStatus(codes.Error, err.Error())
+
+		return nil, errors.Join(errors.New("failed to read POST response"), err)
 	}
 
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		cancel()
-		span.SetStatus(codes.Error, "Failed to read response")
-		return ContentTypeUnknown, nil, errors.Wrap(err, "failed to read POST response")
+	if resp.StatusCode == http.StatusNoContent || len(res.body) == 0 {
+		// Nothing returned.  This is not considered an error.
+		span.AddEvent("Received empty response")
+		log.Trace().Msg("Endpoint returned no content")
+
+		return res, nil
 	}
-	span.AddEvent("Received response", trace.WithAttributes(attribute.Int("size", len(data))))
+
+	if err := populateContentType(res, resp); err != nil {
+		// For now, assume that unknown type is JSON.
+		log.Debug().Err(err).Msg("Failed to obtain content type; assuming JSON")
+		res.contentType = ContentTypeJSON
+	}
+	span.AddEvent("Received response", trace.WithAttributes(
+		attribute.Int("size", len(res.body)),
+		attribute.String("content-type", res.contentType.String()),
+	))
+
+	if res.contentType == ContentTypeJSON {
+		if e := log.Trace(); e.Enabled() {
+			trimmedResponse := bytes.ReplaceAll(bytes.ReplaceAll(res.body, []byte{0x0a}, []byte{}), []byte{0x0d}, []byte{})
+			e.RawJSON("body", trimmedResponse).Msg("GET response")
+		}
+	}
 
 	statusFamily := resp.StatusCode / 100
 	if statusFamily != 2 {
-		trimmedResponse := bytes.ReplaceAll(bytes.ReplaceAll(data, []byte{0x0a}, []byte{}), []byte{0x0d}, []byte{})
+		trimmedResponse := bytes.ReplaceAll(bytes.ReplaceAll(res.body, []byte{0x0a}, []byte{}), []byte{0x0d}, []byte{})
 		log.Debug().Int("status_code", resp.StatusCode).RawJSON("response", trimmedResponse).Msg("POST failed")
-		cancel()
+
 		span.SetStatus(codes.Error, fmt.Sprintf("Status code %d", resp.StatusCode))
-		return ContentTypeUnknown, nil, fmt.Errorf("POST failed with status %d: %s", resp.StatusCode, string(data))
+
+		return nil, fmt.Errorf("POST failed with status %d: %s", resp.StatusCode, string(res.body))
 	}
-	cancel()
 
-	log.Trace().RawJSON("response", bytes.TrimSuffix(data, []byte{0x0a})).Msg("POST response")
+	return res, nil
+}
 
-	return contentType, bytes.NewReader(data), nil
+func populateConsensusVersion(res *httpResponse, resp *http.Response) error {
+	res.consensusVersion = spec.DataVersionUnknown
+	respConsensusVersions, exists := resp.Header["Eth-Consensus-Version"]
+	if !exists {
+		// No consensus version supplied in response; obtain it from the body if possible.
+		if res.contentType != ContentTypeJSON {
+			// Not present here either.  Many responses do not provide this information, so assume
+			// this is one of them.
+			return nil
+		}
+		var metadata responseMetadata
+		if err := json.Unmarshal(res.body, &metadata); err != nil {
+			return errors.Join(errors.New("no consensus version header and failed to parse response"), err)
+		}
+		res.consensusVersion = metadata.Version
+
+		return nil
+	}
+	if len(respConsensusVersions) != 1 {
+		return fmt.Errorf("malformed consensus version (%d entries)", len(respConsensusVersions))
+	}
+	if err := res.consensusVersion.UnmarshalJSON([]byte(fmt.Sprintf("%q", respConsensusVersions[0]))); err != nil {
+		return errors.Join(errors.New("failed to parse consensus version"), err)
+	}
+
+	return nil
 }
 
 func (s *Service) addExtraHeaders(req *http.Request) {
@@ -198,18 +296,40 @@ func (s *Service) addExtraHeaders(req *http.Request) {
 	}
 }
 
-// responseMetadata returns metadata related to responses.
-type responseMetadata struct {
-	Version consensusspec.DataVersion `json:"version"`
+func populateHeaders(res *httpResponse, resp *http.Response) {
+	res.headers = make(map[string]string, len(resp.Header))
+	for k, v := range resp.Header {
+		res.headers[k] = strings.Join(v, ";")
+	}
 }
 
-func contentTypeFromResp(resp *http.Response) (ContentType, error) {
-	respContentType, exists := resp.Header["Content-Type"]
+func populateContentType(res *httpResponse, resp *http.Response) error {
+	respContentTypes, exists := resp.Header["Content-Type"]
 	if !exists {
-		return ContentTypeUnknown, errors.New("no content type supplied in response")
+		return errors.New("no content type supplied in response")
 	}
-	if len(respContentType) != 1 {
-		return ContentTypeUnknown, fmt.Errorf("malformed content type (%d entries)", len(respContentType))
+	if len(respContentTypes) != 1 {
+		return fmt.Errorf("malformed content type (%d entries)", len(respContentTypes))
 	}
-	return ParseFromMediaType(respContentType[0])
+
+	var err error
+	res.contentType, err = ParseFromMediaType(respContentTypes[0])
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// urlForCall patches together a URL for a call.
+func urlForCall(base *url.URL, endpoint string, query string) *url.URL {
+	callURL := *base
+	callURL.Path = endpoint
+	if callURL.RawQuery == "" {
+		callURL.RawQuery = query
+	} else if query != "" {
+		callURL.RawQuery = fmt.Sprintf("%s&%s", callURL.RawQuery, query)
+	}
+
+	return &callURL
 }

@@ -11,22 +11,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package deneb
+package electra
 
 import (
 	"fmt"
 
-	apiv1 "github.com/attestantio/go-builder-client/api/v1"
-	"github.com/attestantio/go-eth2-client/spec/deneb"
+	"github.com/attestantio/go-builder-client/api/deneb"
+	v1 "github.com/attestantio/go-builder-client/api/v1"
+	"github.com/attestantio/go-eth2-client/spec/electra"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/goccy/go-yaml"
 )
 
 // SubmitBlockRequest is the request from the builder to submit a block.
 type SubmitBlockRequest struct {
-	Message          *apiv1.BidTrace
-	ExecutionPayload *deneb.ExecutionPayload
-	BlobsBundle      *BlobsBundle
+	Message          *v1.BidTrace
+	ExecutionPayload *electra.ExecutionPayload
+	BlobsBundle      *deneb.BlobsBundle
 	Signature        phase0.BLSSignature `ssz-size:"96"`
 }
 
@@ -36,6 +37,5 @@ func (s *SubmitBlockRequest) String() string {
 	if err != nil {
 		return fmt.Sprintf("ERR: %v", err)
 	}
-
 	return string(data)
 }

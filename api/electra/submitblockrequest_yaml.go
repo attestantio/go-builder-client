@@ -11,23 +11,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package deneb
+package electra
 
 import (
 	"bytes"
 	"fmt"
+	"github.com/attestantio/go-eth2-client/spec/electra"
 
-	apiv1 "github.com/attestantio/go-builder-client/api/v1"
-	"github.com/attestantio/go-eth2-client/spec/deneb"
+	"github.com/attestantio/go-builder-client/api/deneb"
+	v1 "github.com/attestantio/go-builder-client/api/v1"
 	"github.com/goccy/go-yaml"
 )
 
 // submitBlockRequestYAML is the spec representation of the struct.
 type submitBlockRequestYAML struct {
-	Message          *apiv1.BidTrace         `yaml:"message"`
-	ExecutionPayload *deneb.ExecutionPayload `yaml:"execution_payload"`
-	BlobsBundle      *BlobsBundle            `yaml:"blobs_bundle"`
-	Signature        string                  `yaml:"signature"`
+	Message          *v1.BidTrace              `yaml:"message"`
+	ExecutionPayload *electra.ExecutionPayload `yaml:"execution_payload"`
+	BlobsBundle      *deneb.BlobsBundle        `yaml:"blobs_bundle"`
+	Signature        string                    `yaml:"signature"`
 }
 
 // MarshalYAML implements yaml.Marshaler.
@@ -41,7 +42,6 @@ func (s *SubmitBlockRequest) MarshalYAML() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return bytes.ReplaceAll(yamlBytes, []byte(`"`), []byte(`'`)), nil
 }
 
@@ -52,6 +52,5 @@ func (s *SubmitBlockRequest) UnmarshalYAML(input []byte) error {
 	if err := yaml.Unmarshal(input, &data); err != nil {
 		return err
 	}
-
 	return s.unpack(&data)
 }

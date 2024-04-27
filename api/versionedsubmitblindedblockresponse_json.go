@@ -16,6 +16,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/attestantio/go-builder-client/api/electra"
 
 	"github.com/attestantio/go-builder-client/api/deneb"
 	"github.com/attestantio/go-eth2-client/spec"
@@ -24,6 +25,10 @@ import (
 
 type denebVersionedExecutionPayloadAndBlobsBundleJSON struct {
 	Data *deneb.ExecutionPayloadAndBlobsBundle `json:"data"`
+}
+
+type electraVersionedExecutionPayloadAndBlobsBundleJSON struct {
+	Data *electra.ExecutionPayloadAndBlobsBundle `json:"data"`
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -71,6 +76,18 @@ func (v *VersionedSubmitBlindedBlockResponse) MarshalJSON() ([]byte, error) {
 		}{version, data}
 
 		return json.Marshal(payload)
+	case spec.DataVersionElectra:
+		if v.Electra == nil {
+			return nil, errors.New("no electra data")
+		}
+		data := &electraVersionedExecutionPayloadAndBlobsBundleJSON{
+			Data: v.Electra,
+		}
+		payload := struct {
+			*versionJSON
+			*electraVersionedExecutionPayloadAndBlobsBundleJSON
+		}{version, data}
+		return json.Marshal(payload)
 	default:
 		return nil, fmt.Errorf("unsupported data version %v", v.Version)
 	}
@@ -102,6 +119,12 @@ func (v *VersionedSubmitBlindedBlockResponse) UnmarshalJSON(input []byte) error 
 			return errors.Wrap(err, "invalid JSON")
 		}
 		v.Deneb = data.Data
+	case spec.DataVersionElectra:
+		var data electraVersionedExecutionPayloadAndBlobsBundleJSON
+		if err := json.Unmarshal(input, &data); err != nil {
+			return errors.Wrap(err, "invalid JSON")
+		}
+		v.Electra = data.Data
 	default:
 		return fmt.Errorf("unsupported data version %v", metadata.Version)
 	}

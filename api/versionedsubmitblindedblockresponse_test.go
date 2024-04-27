@@ -26,6 +26,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TODO(JWT): add tests for electra.
+
 func TestVersionedSubmitBlindedBlockResponseEmpty(t *testing.T) {
 	empty := &api.VersionedSubmitBlindedBlockResponse{
 		Version: consensusspec.DataVersionBellatrix,
@@ -139,7 +141,7 @@ func TestVersionedSubmitBlindedBlockResponseBlockHash(t *testing.T) {
 			name: "DenebNoExecutionPayload",
 			payload: &api.VersionedSubmitBlindedBlockResponse{
 				Version: consensusspec.DataVersionDeneb,
-				Deneb: &denebapi.ExecutionPayloadAndBlobsBundle{},
+				Deneb:   &denebapi.ExecutionPayloadAndBlobsBundle{},
 			},
 			err: "no execution payload",
 		},
@@ -248,11 +250,11 @@ func TestVersionedSubmitBlindedBlockResponseTransactions(t *testing.T) {
 			},
 			err: "no data",
 		},
-				{
+		{
 			name: "DenebNoExecutionPayload",
 			bid: &api.VersionedSubmitBlindedBlockResponse{
 				Version: consensusspec.DataVersionDeneb,
-				Deneb: &denebapi.ExecutionPayloadAndBlobsBundle{},
+				Deneb:   &denebapi.ExecutionPayloadAndBlobsBundle{},
 			},
 			err: "no execution payload",
 		},

@@ -25,6 +25,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TODO(JWT): add tests for electra.
+
 func TestVersionedExecutionPayloadEmpty(t *testing.T) {
 	empty := &api.VersionedExecutionPayload{
 		Version: consensusspec.DataVersionBellatrix,

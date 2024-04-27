@@ -64,6 +64,8 @@ func (s *Service) UnblindBlock(ctx context.Context,
 		return s.unblindCapellaBlock(ctx, started, block.Capella)
 	case consensusspec.DataVersionDeneb:
 		return nil, errors.New("deneb not supported; use UnblindProposal()")
+	case consensusspec.DataVersionElectra:
+		return nil, errors.New("electra not supported; use UnblindProposal()")
 	default:
 		return nil, fmt.Errorf("unhandled data version %v", block.Version)
 	}

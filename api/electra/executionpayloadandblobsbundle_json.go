@@ -15,7 +15,6 @@ package electra
 
 import (
 	"encoding/json"
-
 	"github.com/attestantio/go-builder-client/api/deneb"
 	"github.com/attestantio/go-eth2-client/spec/electra"
 	"github.com/pkg/errors"
@@ -41,7 +40,6 @@ func (e *ExecutionPayloadAndBlobsBundle) UnmarshalJSON(input []byte) error {
 	if err := json.Unmarshal(input, &data); err != nil {
 		return errors.Wrap(err, "invalid JSON")
 	}
-
 	return e.unpack(&data)
 }
 

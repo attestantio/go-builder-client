@@ -15,7 +15,6 @@ package electra
 
 import (
 	"fmt"
-
 	"github.com/attestantio/go-builder-client/api/deneb"
 	"github.com/attestantio/go-eth2-client/spec/electra"
 	"github.com/goccy/go-yaml"
@@ -33,6 +32,5 @@ func (e *ExecutionPayloadAndBlobsBundle) String() string {
 	if err != nil {
 		return fmt.Sprintf("ERR: %v", err)
 	}
-
 	return string(data)
 }

@@ -16,6 +16,8 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/attestantio/go-eth2-client/spec/deneb"
+	"github.com/attestantio/go-eth2-client/spec/electra"
 
 	"github.com/attestantio/go-eth2-client/spec"
 	"github.com/attestantio/go-eth2-client/spec/bellatrix"
@@ -88,7 +90,6 @@ func (v *VersionedExecutionPayload) MarshalJSON() ([]byte, error) {
 			*versionJSON
 			*denebVersionedExecutionPayloadJSON
 		}{version, data}
-
 		return json.Marshal(payload)
 	case spec.DataVersionElectra:
 		if v.Electra == nil {
@@ -101,7 +102,6 @@ func (v *VersionedExecutionPayload) MarshalJSON() ([]byte, error) {
 			*versionJSON
 			*electraVersionedExecutionPayloadJSON
 		}{version, data}
-
 		return json.Marshal(payload)
 	default:
 		return nil, fmt.Errorf("unsupported data version %v", v.Version)

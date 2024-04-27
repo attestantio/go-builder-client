@@ -17,6 +17,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/attestantio/go-builder-client/api/electra"
 
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
@@ -93,7 +94,6 @@ func (v *VersionedSignedBuilderBid) Builder() (phase0.BLSPubKey, error) {
 		if v.Electra.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
-
 		return v.Electra.Message.Pubkey, nil
 	default:
 		return phase0.BLSPubKey{}, errors.New("unsupported version")
@@ -140,7 +140,6 @@ func (v *VersionedSignedBuilderBid) Value() (*uint256.Int, error) {
 		if v.Electra.Message == nil {
 			return nil, errors.New("no data message")
 		}
-
 		return v.Electra.Message.Value, nil
 	default:
 		return nil, errors.New("unsupported version")
@@ -199,7 +198,6 @@ func (v *VersionedSignedBuilderBid) BlockNumber() (uint64, error) {
 		if v.Electra.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
-
 		return v.Electra.Message.Header.BlockNumber, nil
 	default:
 		return 0, errors.New("unsupported version")
@@ -258,7 +256,6 @@ func (v *VersionedSignedBuilderBid) BlockHash() (phase0.Hash32, error) {
 		if v.Electra.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
-
 		return v.Electra.Message.Header.BlockHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
@@ -317,7 +314,6 @@ func (v *VersionedSignedBuilderBid) ParentHash() (phase0.Hash32, error) {
 		if v.Electra.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
-
 		return v.Electra.Message.Header.ParentHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
@@ -376,7 +372,6 @@ func (v *VersionedSignedBuilderBid) StateRoot() (phase0.Root, error) {
 		if v.Electra.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
-
 		return v.Electra.Message.Header.StateRoot, nil
 	default:
 		return phase0.Root{}, errors.New("unsupported version")
@@ -435,7 +430,6 @@ func (v *VersionedSignedBuilderBid) FeeRecipient() (consensusbellatrix.Execution
 		if v.Electra.Message.Header == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message header")
 		}
-
 		return v.Electra.Message.Header.FeeRecipient, nil
 	default:
 		return consensusbellatrix.ExecutionAddress{}, errors.New("unsupported version")
@@ -494,7 +488,6 @@ func (v *VersionedSignedBuilderBid) Timestamp() (uint64, error) {
 		if v.Electra.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
-
 		return v.Electra.Message.Header.Timestamp, nil
 	default:
 		return 0, errors.New("unsupported version")
@@ -553,7 +546,6 @@ func (v *VersionedSignedBuilderBid) TransactionsRoot() (phase0.Root, error) {
 		if v.Electra.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
-
 		return v.Electra.Message.Header.TransactionsRoot, nil
 	default:
 		return phase0.Root{}, errors.New("unsupported version")
@@ -600,7 +592,6 @@ func (v *VersionedSignedBuilderBid) MessageHashTreeRoot() (phase0.Root, error) {
 		if v.Electra.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
-
 		return v.Electra.Message.HashTreeRoot()
 	default:
 		return phase0.Root{}, errors.New("unsupported version")
@@ -659,7 +650,6 @@ func (v *VersionedSignedBuilderBid) HeaderHashTreeRoot() (phase0.Root, error) {
 		if v.Electra.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
-
 		return v.Electra.Message.Header.HashTreeRoot()
 	default:
 		return phase0.Root{}, errors.New("unsupported version")
@@ -694,7 +684,6 @@ func (v *VersionedSignedBuilderBid) Signature() (phase0.BLSSignature, error) {
 		if v.Electra == nil {
 			return phase0.BLSSignature{}, errors.New("no data")
 		}
-
 		return v.Electra.Signature, nil
 	default:
 		return phase0.BLSSignature{}, errors.New("unsupported version")

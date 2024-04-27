@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/attestantio/go-eth2-client/spec/electra"
 
 	client "github.com/attestantio/go-builder-client"
 	"github.com/attestantio/go-builder-client/api"
@@ -79,7 +80,6 @@ func (s *Service) UnblindProposal(ctx context.Context,
 		if opts.Proposal.Electra == nil {
 			return nil, errors.New("electra proposal without payload")
 		}
-
 		return s.unblindElectraProposal(ctx, opts)
 	default:
 		return nil, fmt.Errorf("unhandled data version %v", opts.Proposal.Version)
@@ -351,29 +351,22 @@ func (s *Service) unblindDenebProposal(ctx context.Context,
 }
 
 func (s *Service) unblindElectraProposal(ctx context.Context,
-	opts *api.UnblindProposalOpts,
+	started time.Time,
+	proposal *consensusapiv1electra.SignedBlindedBeaconBlock,
 ) (
-	*api.Response[*consensusapi.VersionedSignedProposal],
+	*consensusapi.VersionedSignedProposal,
 	error,
 ) {
-	proposal := opts.Proposal.Electra
-
 	specJSON, err := json.Marshal(proposal)
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to marshal JSON"), err)
+		monitorOperation(s.Address(), "unblind proposal", "failed", time.Since(started))
+		return nil, errors.Wrap(err, "failed to marshal JSON")
 	}
 
-	httpResponse, err := s.post(ctx,
-		"/eth/v1/builder/blinded_blocks",
-		"",
-		&opts.Common,
-		bytes.NewBuffer(specJSON),
-		ContentTypeJSON,
-		map[string]string{},
-		false,
-	)
+	httpResponse, err := s.post(ctx, "/eth/v1/builder/blinded_blocks", "", bytes.NewBuffer(specJSON), ContentTypeJSON, map[string]string{})
 	if err != nil {
-		return nil, errors.Join(errors.New("failed to submit unblind proposal request"), err)
+		monitorOperation(s.Address(), "unblind proposal", "failed", time.Since(started))
+		return nil, errors.Wrap(err, "failed to submit unblind proposal request")
 	}
 
 	// Reconstruct proposal.
@@ -410,16 +403,16 @@ func (s *Service) unblindElectraProposal(ctx context.Context,
 	case ContentTypeJSON:
 		bundle, _, err := decodeJSONResponse(bytes.NewReader(httpResponse.body), &apielectra.ExecutionPayloadAndBlobsBundle{})
 		if err != nil {
-			return nil, errors.Join(errors.New("failed to parse electra response"), err)
+			return nil, errors.Wrap(err, "failed to parse electra response")
 		}
 		// Ensure that the data returned is what we expect.
 		ourExecutionPayloadHash, err := proposal.Message.Body.ExecutionPayloadHeader.HashTreeRoot()
 		if err != nil {
-			return nil, errors.Join(errors.New("failed to generate hash tree root for our execution payload header"), err)
+			return nil, errors.Wrap(err, "failed to generate hash tree root for our execution payload header")
 		}
 		receivedExecutionPayloadHash, err := bundle.ExecutionPayload.HashTreeRoot()
 		if err != nil {
-			return nil, errors.Join(errors.New("failed to generate hash tree root for the received execution payload header"), err)
+			return nil, errors.Wrap(err, "failed to generate hash tree root for the received execution payload")
 		}
 		if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
 			return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:], ourExecutionPayloadHash[:])
@@ -440,9 +433,6 @@ func (s *Service) unblindElectraProposal(ctx context.Context,
 	default:
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
 	}
-
-	return &api.Response[*consensusapi.VersionedSignedProposal]{
-		Data:     res,
-		Metadata: metadataFromHeaders(httpResponse.headers),
-	}, nil
+	monitorOperation(s.Address(), "unblind proposal", "succeeded", time.Since(started))
+	return res, nil
 }

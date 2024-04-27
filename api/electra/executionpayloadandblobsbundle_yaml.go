@@ -36,7 +36,6 @@ func (e *ExecutionPayloadAndBlobsBundle) MarshalYAML() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return bytes.ReplaceAll(yamlBytes, []byte(`"`), []byte(`'`)), nil
 }
 
@@ -47,6 +46,5 @@ func (e *ExecutionPayloadAndBlobsBundle) UnmarshalYAML(input []byte) error {
 	if err := yaml.Unmarshal(input, &data); err != nil {
 		return err
 	}
-
 	return e.unpack(&data)
 }

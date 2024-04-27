@@ -4,8 +4,8 @@
 package electra
 
 import (
-	"github.com/attestantio/go-builder-client/api/deneb"
 	v1 "github.com/attestantio/go-builder-client/api/v1"
+	"github.com/attestantio/go-builder-client/api/deneb"
 	"github.com/attestantio/go-eth2-client/spec/electra"
 	ssz "github.com/ferranbt/fastssz"
 )

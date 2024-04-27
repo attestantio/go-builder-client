@@ -16,6 +16,7 @@ package spec
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/attestantio/go-builder-client/api/electra"
 
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
@@ -97,7 +98,6 @@ func (v *VersionedSubmitBlockRequest) MarshalJSON() ([]byte, error) {
 			*versionJSON
 			*electraVersionedSubmitBlockRequestJSON
 		}{version, data}
-
 		return json.Marshal(payload)
 	default:
 		return nil, fmt.Errorf("unsupported data version %v", v.Version)

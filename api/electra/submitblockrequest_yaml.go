@@ -16,10 +16,10 @@ package electra
 import (
 	"bytes"
 	"fmt"
+	"github.com/attestantio/go-eth2-client/spec/electra"
 
 	"github.com/attestantio/go-builder-client/api/deneb"
 	v1 "github.com/attestantio/go-builder-client/api/v1"
-	"github.com/attestantio/go-eth2-client/spec/electra"
 	"github.com/goccy/go-yaml"
 )
 
@@ -42,7 +42,6 @@ func (s *SubmitBlockRequest) MarshalYAML() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return bytes.ReplaceAll(yamlBytes, []byte(`"`), []byte(`'`)), nil
 }
 
@@ -53,6 +52,5 @@ func (s *SubmitBlockRequest) UnmarshalYAML(input []byte) error {
 	if err := yaml.Unmarshal(input, &data); err != nil {
 		return err
 	}
-
 	return s.unpack(&data)
 }

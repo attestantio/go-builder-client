@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/attestantio/go-builder-client/api/electra"
 	client "github.com/attestantio/go-builder-client"
 	"github.com/attestantio/go-builder-client/api"
 	"github.com/attestantio/go-builder-client/api/bellatrix"

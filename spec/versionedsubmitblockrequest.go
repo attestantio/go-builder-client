@@ -17,12 +17,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
 	"github.com/attestantio/go-builder-client/api/deneb"
 	"github.com/attestantio/go-builder-client/api/electra"
 	apiv1 "github.com/attestantio/go-builder-client/api/v1"
+	"github.com/attestantio/go-builder-client/api/electra"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	consensusbellatrix "github.com/attestantio/go-eth2-client/spec/bellatrix"
 	consensuscapella "github.com/attestantio/go-eth2-client/spec/capella"
@@ -97,7 +97,6 @@ func (v *VersionedSubmitBlockRequest) Slot() (uint64, error) {
 		if v.Electra.Message == nil {
 			return 0, errors.New("no data message")
 		}
-
 		return v.Electra.Message.Slot, nil
 	default:
 		return 0, errors.New("unsupported version")
@@ -144,7 +143,6 @@ func (v *VersionedSubmitBlockRequest) BlockHash() (phase0.Hash32, error) {
 		if v.Electra.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
-
 		return v.Electra.Message.BlockHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
@@ -191,7 +189,6 @@ func (v *VersionedSubmitBlockRequest) Builder() (phase0.BLSPubKey, error) {
 		if v.Electra.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
-
 		return v.Electra.Message.BuilderPubkey, nil
 	default:
 		return phase0.BLSPubKey{}, errors.New("unsupported version")
@@ -238,7 +235,6 @@ func (v *VersionedSubmitBlockRequest) ProposerFeeRecipient() (consensusbellatrix
 		if v.Electra.Message == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message")
 		}
-
 		return v.Electra.Message.ProposerFeeRecipient, nil
 	default:
 		return consensusbellatrix.ExecutionAddress{}, errors.New("unsupported version")
@@ -285,7 +281,6 @@ func (v *VersionedSubmitBlockRequest) ProposerPubKey() (phase0.BLSPubKey, error)
 		if v.Electra.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
-
 		return v.Electra.Message.ProposerPubkey, nil
 	default:
 		return phase0.BLSPubKey{}, errors.New("unsupported version")
@@ -332,7 +327,6 @@ func (v *VersionedSubmitBlockRequest) ParentHash() (phase0.Hash32, error) {
 		if v.Electra.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
-
 		return v.Electra.Message.ParentHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
@@ -379,7 +373,6 @@ func (v *VersionedSubmitBlockRequest) Value() (*uint256.Int, error) {
 		if v.Electra.Message == nil {
 			return nil, errors.New("no data message")
 		}
-
 		return v.Electra.Message.Value, nil
 	default:
 		return nil, errors.New("unsupported version")
@@ -426,7 +419,6 @@ func (v *VersionedSubmitBlockRequest) BidTrace() (*apiv1.BidTrace, error) {
 		if v.Electra.Message == nil {
 			return nil, errors.New("no data message")
 		}
-
 		return v.Electra.Message, nil
 	default:
 		return nil, errors.New("unsupported version")
@@ -461,7 +453,6 @@ func (v *VersionedSubmitBlockRequest) Signature() (phase0.BLSSignature, error) {
 		if v.Electra == nil {
 			return phase0.BLSSignature{}, errors.New("no data")
 		}
-
 		return v.Electra.Signature, nil
 	default:
 		return phase0.BLSSignature{}, errors.New("unsupported version")
@@ -508,7 +499,6 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadBlockHash() (phase0.Hash32
 		if v.Electra.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
-
 		return v.Electra.ExecutionPayload.BlockHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
@@ -555,7 +545,6 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadParentHash() (phase0.Hash3
 		if v.Electra.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
-
 		return v.Electra.ExecutionPayload.ParentHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
@@ -602,7 +591,6 @@ func (v *VersionedSubmitBlockRequest) PrevRandao() (phase0.Hash32, error) {
 		if v.Electra.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
-
 		return v.Electra.ExecutionPayload.PrevRandao, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
@@ -649,7 +637,6 @@ func (v *VersionedSubmitBlockRequest) GasLimit() (uint64, error) {
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
-
 		return v.Electra.ExecutionPayload.GasLimit, nil
 	default:
 		return 0, errors.New("unsupported version")
@@ -696,7 +683,6 @@ func (v *VersionedSubmitBlockRequest) GasUsed() (uint64, error) {
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
-
 		return v.Electra.ExecutionPayload.GasUsed, nil
 	default:
 		return 0, errors.New("unsupported version")
@@ -743,7 +729,6 @@ func (v *VersionedSubmitBlockRequest) BlockNumber() (uint64, error) {
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
-
 		return v.Electra.ExecutionPayload.BlockNumber, nil
 	default:
 		return 0, errors.New("unsupported version")
@@ -790,7 +775,6 @@ func (v *VersionedSubmitBlockRequest) Timestamp() (uint64, error) {
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
-
 		return v.Electra.ExecutionPayload.Timestamp, nil
 	default:
 		return 0, errors.New("unsupported version")
@@ -837,7 +821,6 @@ func (v *VersionedSubmitBlockRequest) Transactions() ([]consensusbellatrix.Trans
 		if v.Electra.ExecutionPayload == nil {
 			return nil, errors.New("no data execution payload")
 		}
-
 		return v.Electra.ExecutionPayload.Transactions, nil
 	default:
 		return nil, errors.New("unsupported version")
@@ -875,7 +858,6 @@ func (v *VersionedSubmitBlockRequest) Withdrawals() ([]*consensuscapella.Withdra
 		if v.Electra.ExecutionPayload == nil {
 			return nil, errors.New("no data execution payload")
 		}
-
 		return v.Electra.ExecutionPayload.Withdrawals, nil
 	default:
 		return nil, errors.New("unsupported version")
@@ -895,7 +877,6 @@ func (v *VersionedSubmitBlockRequest) Blobs() ([]consensusdeneb.Blob, error) {
 		if v.Deneb.BlobsBundle == nil {
 			return nil, errors.New("no data blobs bundle")
 		}
-
 		return v.Deneb.BlobsBundle.Blobs, nil
 	case consensusspec.DataVersionElectra:
 		if v.Electra == nil {
@@ -904,7 +885,6 @@ func (v *VersionedSubmitBlockRequest) Blobs() ([]consensusdeneb.Blob, error) {
 		if v.Electra.BlobsBundle == nil {
 			return nil, errors.New("no data blobs bundle")
 		}
-
 		return v.Electra.BlobsBundle.Blobs, nil
 	default:
 		return nil, errors.New("unsupported version")
@@ -924,7 +904,6 @@ func (v *VersionedSubmitBlockRequest) BlobGasUsed() (uint64, error) {
 		if v.Deneb.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
-
 		return v.Deneb.ExecutionPayload.BlobGasUsed, nil
 	case consensusspec.DataVersionElectra:
 		if v.Electra == nil {
@@ -933,7 +912,6 @@ func (v *VersionedSubmitBlockRequest) BlobGasUsed() (uint64, error) {
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
-
 		return v.Electra.ExecutionPayload.BlobGasUsed, nil
 	default:
 		return 0, errors.New("unsupported version")
@@ -953,7 +931,6 @@ func (v *VersionedSubmitBlockRequest) ExcessBlobGas() (uint64, error) {
 		if v.Deneb.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
-
 		return v.Deneb.ExecutionPayload.ExcessBlobGas, nil
 	case consensusspec.DataVersionElectra:
 		if v.Electra == nil {
@@ -962,7 +939,6 @@ func (v *VersionedSubmitBlockRequest) ExcessBlobGas() (uint64, error) {
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
-
 		return v.Electra.ExecutionPayload.ExcessBlobGas, nil
 	default:
 		return 0, errors.New("unsupported version")
@@ -982,7 +958,6 @@ func (v *VersionedSubmitBlockRequest) DepositReceipts() ([]*consensuselectra.Dep
 		if v.Electra.ExecutionPayload == nil {
 			return nil, errors.New("no data execution payload")
 		}
-
 		return v.Electra.ExecutionPayload.DepositReceipts, nil
 	default:
 		return nil, errors.New("unsupported version")
@@ -1002,7 +977,6 @@ func (v *VersionedSubmitBlockRequest) WithdrawalRequests() ([]*consensuselectra.
 		if v.Electra.ExecutionPayload == nil {
 			return nil, errors.New("no data execution payload")
 		}
-
 		return v.Electra.ExecutionPayload.WithdrawalRequests, nil
 	default:
 		return nil, errors.New("unsupported version")

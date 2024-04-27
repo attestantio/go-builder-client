@@ -17,11 +17,11 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/attestantio/go-eth2-client/spec/electra"
 	"strings"
 
 	"github.com/attestantio/go-builder-client/api/deneb"
 	v1 "github.com/attestantio/go-builder-client/api/v1"
-	"github.com/attestantio/go-eth2-client/spec/electra"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/pkg/errors"
 )
@@ -50,7 +50,6 @@ func (s *SubmitBlockRequest) UnmarshalJSON(input []byte) error {
 	if err := json.Unmarshal(input, &data); err != nil {
 		return errors.Wrap(err, "invalid JSON")
 	}
-
 	return s.unpack(&data)
 }
 
@@ -81,6 +80,5 @@ func (s *SubmitBlockRequest) unpack(data *submitBlockRequestJSON) error {
 		return errors.New("blobs bundle missing")
 	}
 	s.BlobsBundle = data.BlobsBundle
-
 	return nil
 }

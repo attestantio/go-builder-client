@@ -1,4 +1,4 @@
-// Copyright © 2024 Attestant Limited.
+// Copyright © 2022 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -11,31 +11,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package deneb
+package electra
 
 import (
 	"fmt"
+	"github.com/attestantio/go-eth2-client/spec/electra"
 
-	v1 "github.com/attestantio/go-builder-client/api/v1"
 	"github.com/attestantio/go-eth2-client/spec/deneb"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/goccy/go-yaml"
+	"github.com/holiman/uint256"
 )
 
-// SubmitBlockRequest is the request from the builder to submit a block.
-type SubmitBlockRequest struct {
-	Message          *v1.BidTrace
-	ExecutionPayload *deneb.ExecutionPayload
-	BlobsBundle      *BlobsBundle
-	Signature        phase0.BLSSignature `ssz-size:"96"`
+// BuilderBid represents a BuilderBid.
+type BuilderBid struct {
+	Header             *electra.ExecutionPayloadHeader
+	BlobKZGCommitments []deneb.KZGCommitment `ssz-max:"4096" ssz-size:"?,48"`
+	Value              *uint256.Int          `ssz-size:"32"`
+	Pubkey             phase0.BLSPubKey      `ssz-size:"48"`
 }
 
 // String returns a string version of the structure.
-func (s *SubmitBlockRequest) String() string {
-	data, err := yaml.Marshal(s)
+func (b *BuilderBid) String() string {
+	data, err := yaml.Marshal(b)
 	if err != nil {
 		return fmt.Sprintf("ERR: %v", err)
 	}
-
 	return string(data)
 }

@@ -11,47 +11,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package deneb
+package electra
 
 import (
 	"bytes"
-	"fmt"
+	"github.com/attestantio/go-eth2-client/spec/electra"
+	"math/big"
 
-	v1 "github.com/attestantio/go-builder-client/api/v1"
 	"github.com/attestantio/go-eth2-client/spec/deneb"
 	"github.com/goccy/go-yaml"
 )
 
-// submitBlockRequestYAML is the spec representation of the struct.
-type submitBlockRequestYAML struct {
-	Message          *v1.BidTrace            `yaml:"message"`
-	ExecutionPayload *deneb.ExecutionPayload `yaml:"execution_payload"`
-	BlobsBundle      *BlobsBundle            `yaml:"blobs_bundle"`
-	Signature        string                  `yaml:"signature"`
+// builderBidYAML is the spec representation of the struct.
+type builderBidYAML struct {
+	Header             *electra.ExecutionPayloadHeader `yaml:"header"`
+	BlobKZGCommitments []deneb.KZGCommitment           `yaml:"blob_kzg_commitments"`
+	Value              *big.Int                        `yaml:"value"`
+	Pubkey             string                          `yaml:"pubkey"`
 }
 
 // MarshalYAML implements yaml.Marshaler.
-func (s *SubmitBlockRequest) MarshalYAML() ([]byte, error) {
-	yamlBytes, err := yaml.MarshalWithOptions(&submitBlockRequestYAML{
-		Message:          s.Message,
-		Signature:        fmt.Sprintf("%#x", s.Signature),
-		ExecutionPayload: s.ExecutionPayload,
-		BlobsBundle:      s.BlobsBundle,
+func (b *BuilderBid) MarshalYAML() ([]byte, error) {
+	yamlBytes, err := yaml.MarshalWithOptions(&builderBidYAML{
+		Header:             b.Header,
+		BlobKZGCommitments: b.BlobKZGCommitments,
+		Value:              b.Value.ToBig(),
+		Pubkey:             b.Pubkey.String(),
 	}, yaml.Flow(true))
 	if err != nil {
 		return nil, err
 	}
-
 	return bytes.ReplaceAll(yamlBytes, []byte(`"`), []byte(`'`)), nil
 }
 
 // UnmarshalYAML implements yaml.Unmarshaler.
-func (s *SubmitBlockRequest) UnmarshalYAML(input []byte) error {
+func (b *BuilderBid) UnmarshalYAML(input []byte) error {
 	// We unmarshal to the JSON struct to save on duplicate code.
-	var data submitBlockRequestJSON
+	var data builderBidJSON
 	if err := yaml.Unmarshal(input, &data); err != nil {
 		return err
 	}
-
-	return s.unpack(&data)
+	return b.unpack(&data)
 }

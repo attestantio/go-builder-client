@@ -17,6 +17,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/attestantio/go-builder-client/api/electra"
 	"time"
 
 	"github.com/attestantio/go-builder-client/api/bellatrix"
@@ -92,6 +93,14 @@ func (s *Service) BuilderBid(ctx context.Context,
 				return nil, errors.Wrap(err, "failed to parse deneb builder bid")
 			}
 			if !bytes.Equal(res.Deneb.Message.Header.ParentHash[:], parentHash[:]) {
+				return nil, errors.New("parent hash mismatch")
+			}
+		case consensusspec.DataVersionElectra:
+			res.Electra, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &electra.SignedBuilderBid{})
+			if err != nil {
+				return nil, errors.Wrap(err, "failed to parse electra builder bid")
+			}
+			if !bytes.Equal(res.Electra.Message.Header.ParentHash[:], parentHash[:]) {
 				return nil, errors.New("parent hash mismatch")
 			}
 		default:

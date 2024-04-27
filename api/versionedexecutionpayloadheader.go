@@ -18,6 +18,7 @@ import (
 	"github.com/attestantio/go-eth2-client/spec/bellatrix"
 	"github.com/attestantio/go-eth2-client/spec/capella"
 	"github.com/attestantio/go-eth2-client/spec/deneb"
+	"github.com/attestantio/go-eth2-client/spec/electra"
 )
 
 // VersionedExecutionPayloadHeader contains a versioned ExecutionPayloadHeaderV1.
@@ -26,6 +27,7 @@ type VersionedExecutionPayloadHeader struct {
 	Bellatrix *bellatrix.ExecutionPayloadHeader `json:"bellatrix,omitempty"`
 	Capella   *capella.ExecutionPayloadHeader   `json:"capella,omitempty"`
 	Deneb     *deneb.ExecutionPayloadHeader     `json:"deneb,omitempty"`
+	Electra   *electra.ExecutionPayloadHeader   `json:"electra,omitempty"`
 }
 
 // IsEmpty returns true if there is no payload.
@@ -37,6 +39,8 @@ func (v *VersionedExecutionPayloadHeader) IsEmpty() bool {
 		return v.Capella == nil
 	case consensusspec.DataVersionDeneb:
 		return v.Deneb == nil
+	case consensusspec.DataVersionElectra:
+		return v.Electra == nil
 	default:
 		return true
 	}

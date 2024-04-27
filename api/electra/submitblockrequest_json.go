@@ -11,26 +11,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package deneb
+package electra
 
 import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/attestantio/go-eth2-client/spec/electra"
 	"strings"
 
+	"github.com/attestantio/go-builder-client/api/deneb"
 	v1 "github.com/attestantio/go-builder-client/api/v1"
-	"github.com/attestantio/go-eth2-client/spec/deneb"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/pkg/errors"
 )
 
 // submitBlockRequestJSON is the spec representation of the struct.
 type submitBlockRequestJSON struct {
-	Message          *v1.BidTrace            `json:"message"`
-	ExecutionPayload *deneb.ExecutionPayload `json:"execution_payload"`
-	BlobsBundle      *BlobsBundle            `json:"blobs_bundle"`
-	Signature        string                  `json:"signature"`
+	Message          *v1.BidTrace              `json:"message"`
+	ExecutionPayload *electra.ExecutionPayload `json:"execution_payload"`
+	BlobsBundle      *deneb.BlobsBundle        `json:"blobs_bundle"`
+	Signature        string                    `json:"signature"`
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -49,7 +50,6 @@ func (s *SubmitBlockRequest) UnmarshalJSON(input []byte) error {
 	if err := json.Unmarshal(input, &data); err != nil {
 		return errors.Wrap(err, "invalid JSON")
 	}
-
 	return s.unpack(&data)
 }
 
@@ -80,6 +80,5 @@ func (s *SubmitBlockRequest) unpack(data *submitBlockRequestJSON) error {
 		return errors.New("blobs bundle missing")
 	}
 	s.BlobsBundle = data.BlobsBundle
-
 	return nil
 }

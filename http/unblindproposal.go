@@ -20,8 +20,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/attestantio/go-eth2-client/spec/electra"
-
 	apideneb "github.com/attestantio/go-builder-client/api/deneb"
 	apielectra "github.com/attestantio/go-builder-client/api/electra"
 	consensusapi "github.com/attestantio/go-eth2-client/api"
@@ -33,6 +31,7 @@ import (
 	"github.com/attestantio/go-eth2-client/spec/bellatrix"
 	"github.com/attestantio/go-eth2-client/spec/capella"
 	"github.com/attestantio/go-eth2-client/spec/deneb"
+	"github.com/attestantio/go-eth2-client/spec/electra"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"

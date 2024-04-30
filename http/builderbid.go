@@ -19,11 +19,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/attestantio/go-builder-client/api/electra"
-
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
 	"github.com/attestantio/go-builder-client/api/deneb"
+	"github.com/attestantio/go-builder-client/api/electra"
 	"github.com/attestantio/go-builder-client/spec"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/attestantio/go-eth2-client/spec/phase0"

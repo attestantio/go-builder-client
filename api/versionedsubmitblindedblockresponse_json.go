@@ -17,8 +17,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/attestantio/go-builder-client/api/electra"
-
 	"github.com/attestantio/go-builder-client/api/deneb"
 	"github.com/attestantio/go-builder-client/api/electra"
 	"github.com/attestantio/go-eth2-client/spec"

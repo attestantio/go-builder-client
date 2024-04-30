@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/attestantio/go-eth2-client/spec/electra"
 
 	client "github.com/attestantio/go-builder-client"
 	"github.com/attestantio/go-builder-client/api"

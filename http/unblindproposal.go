@@ -18,8 +18,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/attestantio/go-eth2-client/spec/electra"
 	"time"
+
+	"github.com/attestantio/go-eth2-client/spec/electra"
 
 	apideneb "github.com/attestantio/go-builder-client/api/deneb"
 	apielectra "github.com/attestantio/go-builder-client/api/electra"

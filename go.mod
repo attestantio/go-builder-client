@@ -6,7 +6,7 @@ require (
 	github.com/attestantio/go-eth2-client v0.21.1
 	github.com/ferranbt/fastssz v0.1.3
 	// go-yaml after 1.9.2 has memory issues due to https://github.com/goccy/go-yaml/issues/325; avoid.
-	github.com/goccy/go-yaml v1.9.2
+	github.com/goccy/go-yaml v1.11.3
 	github.com/holiman/uint256 v1.2.4
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.16.0
@@ -38,10 +38,10 @@ require (
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.10.1 // indirect
-	github.com/prysmaticlabs/go-bitfield v0.0.0-20210809151128-385d8c5e3fb7 // indirect
+	github.com/prysmaticlabs/go-bitfield v0.0.0-20240328144219-a1caa50c3a1e // indirect
 	go.opentelemetry.io/otel/metric v1.16.0 // indirect
-	golang.org/x/crypto v0.21.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/crypto v0.22.0 // indirect
+	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

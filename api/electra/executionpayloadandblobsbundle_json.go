@@ -15,6 +15,7 @@ package electra
 
 import (
 	"encoding/json"
+
 	"github.com/attestantio/go-builder-client/api/deneb"
 	"github.com/attestantio/go-eth2-client/spec/electra"
 	"github.com/pkg/errors"

@@ -17,6 +17,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"github.com/attestantio/go-builder-client/api/electra"
 
 	"github.com/attestantio/go-builder-client/api/bellatrix"

@@ -15,8 +15,9 @@ package electra
 
 import (
 	"bytes"
-	"github.com/attestantio/go-eth2-client/spec/electra"
 	"math/big"
+
+	"github.com/attestantio/go-eth2-client/spec/electra"
 
 	"github.com/attestantio/go-eth2-client/spec/deneb"
 	"github.com/goccy/go-yaml"

@@ -30,8 +30,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TODO(JWT): add tests for electra.
-
 func TestVersionedSubmitBlockRequestEmpty(t *testing.T) {
 	empty := &spec.VersionedSubmitBlockRequest{
 		Version: consensusspec.DataVersionBellatrix,

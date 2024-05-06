@@ -11,8 +11,6 @@ import (
 )
 
 // SubmitBlockRequest is the v2 request from the builder to submit a block.
-//
-// JWT: why is this still using the Capella header?
 type SubmitBlockRequest struct {
 	Message                *apiv1.BidTrace
 	ExecutionPayloadHeader *capella.ExecutionPayloadHeader

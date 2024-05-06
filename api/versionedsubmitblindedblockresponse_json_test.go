@@ -8,8 +8,6 @@ import (
 	"gotest.tools/assert"
 )
 
-// TODO(JWT): add tests for electra.
-
 func TestVersionedSubmitBlindedBlockResponseJSON(t *testing.T) {
 	tests := []struct {
 		name  string

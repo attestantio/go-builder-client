@@ -22,8 +22,6 @@ import (
 	"gotest.tools/assert"
 )
 
-// TODO(JWT): add tests for electra.
-
 func TestVersionedSubmitBlockRequestJSON(t *testing.T) {
 	tests := []struct {
 		name  string

@@ -29,8 +29,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TODO(JWT): add tests for electra.
-
 func TestVersionedSignedBuilderBidEmpty(t *testing.T) {
 	empty := &spec.VersionedSignedBuilderBid{
 		Version: consensusspec.DataVersionBellatrix,

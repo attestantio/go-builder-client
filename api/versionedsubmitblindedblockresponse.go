@@ -34,6 +34,7 @@ type VersionedSubmitBlindedBlockResponse struct {
 func (v *VersionedSubmitBlindedBlockResponse) IsEmpty() bool {
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
+
 		return v.Bellatrix == nil
 	case consensusspec.DataVersionCapella:
 		return v.Capella == nil
@@ -53,11 +54,13 @@ func (v *VersionedSubmitBlindedBlockResponse) BlockHash() (phase0.Hash32, error)
 		if v.Bellatrix == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		return v.Bellatrix.BlockHash, nil
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		return v.Capella.BlockHash, nil
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
@@ -66,6 +69,7 @@ func (v *VersionedSubmitBlindedBlockResponse) BlockHash() (phase0.Hash32, error)
 		if v.Deneb.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no execution payload")
 		}
+
 		return v.Deneb.ExecutionPayload.BlockHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
@@ -82,11 +86,13 @@ func (v *VersionedSubmitBlindedBlockResponse) Transactions() ([]bellatrix.Transa
 		if v.Bellatrix == nil {
 			return nil, errors.New("no data")
 		}
+
 		return v.Bellatrix.Transactions, nil
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
 			return nil, errors.New("no data")
 		}
+
 		return v.Capella.Transactions, nil
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
@@ -95,6 +101,7 @@ func (v *VersionedSubmitBlindedBlockResponse) Transactions() ([]bellatrix.Transa
 		if v.Deneb.ExecutionPayload == nil {
 			return nil, errors.New("no execution payload")
 		}
+
 		return v.Deneb.ExecutionPayload.Transactions, nil
 	default:
 		return nil, errors.New("unsupported version")

@@ -52,11 +52,14 @@ func (s *Service) BuilderBid(ctx context.Context,
 	if err != nil {
 		log.Trace().Str("endpoint", endpoint).Err(err).Msg("Request failed")
 		monitorOperation(s.Address(), "builder bid", "failed", time.Since(started))
+
 		return nil, errors.Wrap(err, "failed to request execution payload header")
 	}
 
 	if len(httpResponse.body) == 0 {
 		monitorOperation(s.Address(), "builder bid", "no response", time.Since(started))
+
+		//nolint:nilnil
 		return nil, nil
 	}
 

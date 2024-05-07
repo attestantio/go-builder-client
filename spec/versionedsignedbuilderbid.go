@@ -62,6 +62,7 @@ func (v *VersionedSignedBuilderBid) Builder() (phase0.BLSPubKey, error) {
 		if v.Bellatrix.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
+
 		return v.Bellatrix.Message.Pubkey, nil
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
@@ -70,6 +71,7 @@ func (v *VersionedSignedBuilderBid) Builder() (phase0.BLSPubKey, error) {
 		if v.Capella.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
+
 		return v.Capella.Message.Pubkey, nil
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
@@ -78,6 +80,7 @@ func (v *VersionedSignedBuilderBid) Builder() (phase0.BLSPubKey, error) {
 		if v.Deneb.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
+
 		return v.Deneb.Message.Pubkey, nil
 	default:
 		return phase0.BLSPubKey{}, errors.New("unsupported version")
@@ -97,6 +100,7 @@ func (v *VersionedSignedBuilderBid) Value() (*uint256.Int, error) {
 		if v.Bellatrix.Message == nil {
 			return nil, errors.New("no data message")
 		}
+
 		return v.Bellatrix.Message.Value, nil
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
@@ -105,6 +109,7 @@ func (v *VersionedSignedBuilderBid) Value() (*uint256.Int, error) {
 		if v.Capella.Message == nil {
 			return nil, errors.New("no data message")
 		}
+
 		return v.Capella.Message.Value, nil
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
@@ -113,6 +118,7 @@ func (v *VersionedSignedBuilderBid) Value() (*uint256.Int, error) {
 		if v.Deneb.Message == nil {
 			return nil, errors.New("no data message")
 		}
+
 		return v.Deneb.Message.Value, nil
 	default:
 		return nil, errors.New("unsupported version")
@@ -135,6 +141,7 @@ func (v *VersionedSignedBuilderBid) BlockNumber() (uint64, error) {
 		if v.Bellatrix.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
+
 		return v.Bellatrix.Message.Header.BlockNumber, nil
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
@@ -146,6 +153,7 @@ func (v *VersionedSignedBuilderBid) BlockNumber() (uint64, error) {
 		if v.Capella.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
+
 		return v.Capella.Message.Header.BlockNumber, nil
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
@@ -157,6 +165,7 @@ func (v *VersionedSignedBuilderBid) BlockNumber() (uint64, error) {
 		if v.Deneb.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
+
 		return v.Deneb.Message.Header.BlockNumber, nil
 	default:
 		return 0, errors.New("unsupported version")
@@ -179,6 +188,7 @@ func (v *VersionedSignedBuilderBid) BlockHash() (phase0.Hash32, error) {
 		if v.Bellatrix.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
+
 		return v.Bellatrix.Message.Header.BlockHash, nil
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
@@ -190,6 +200,7 @@ func (v *VersionedSignedBuilderBid) BlockHash() (phase0.Hash32, error) {
 		if v.Capella.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
+
 		return v.Capella.Message.Header.BlockHash, nil
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
@@ -201,6 +212,7 @@ func (v *VersionedSignedBuilderBid) BlockHash() (phase0.Hash32, error) {
 		if v.Deneb.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
+
 		return v.Deneb.Message.Header.BlockHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
@@ -223,6 +235,7 @@ func (v *VersionedSignedBuilderBid) ParentHash() (phase0.Hash32, error) {
 		if v.Bellatrix.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
+
 		return v.Bellatrix.Message.Header.ParentHash, nil
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
@@ -234,6 +247,7 @@ func (v *VersionedSignedBuilderBid) ParentHash() (phase0.Hash32, error) {
 		if v.Capella.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
+
 		return v.Capella.Message.Header.ParentHash, nil
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
@@ -245,6 +259,7 @@ func (v *VersionedSignedBuilderBid) ParentHash() (phase0.Hash32, error) {
 		if v.Deneb.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
+
 		return v.Deneb.Message.Header.ParentHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
@@ -267,6 +282,7 @@ func (v *VersionedSignedBuilderBid) StateRoot() (phase0.Root, error) {
 		if v.Bellatrix.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
+
 		return v.Bellatrix.Message.Header.StateRoot, nil
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
@@ -278,6 +294,7 @@ func (v *VersionedSignedBuilderBid) StateRoot() (phase0.Root, error) {
 		if v.Capella.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
+
 		return v.Capella.Message.Header.StateRoot, nil
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
@@ -289,6 +306,7 @@ func (v *VersionedSignedBuilderBid) StateRoot() (phase0.Root, error) {
 		if v.Deneb.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
+
 		return v.Deneb.Message.Header.StateRoot, nil
 	default:
 		return phase0.Root{}, errors.New("unsupported version")
@@ -311,6 +329,7 @@ func (v *VersionedSignedBuilderBid) FeeRecipient() (consensusbellatrix.Execution
 		if v.Bellatrix.Message.Header == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message header")
 		}
+
 		return v.Bellatrix.Message.Header.FeeRecipient, nil
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
@@ -322,6 +341,7 @@ func (v *VersionedSignedBuilderBid) FeeRecipient() (consensusbellatrix.Execution
 		if v.Capella.Message.Header == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message header")
 		}
+
 		return v.Capella.Message.Header.FeeRecipient, nil
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
@@ -333,6 +353,7 @@ func (v *VersionedSignedBuilderBid) FeeRecipient() (consensusbellatrix.Execution
 		if v.Deneb.Message.Header == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message header")
 		}
+
 		return v.Deneb.Message.Header.FeeRecipient, nil
 	default:
 		return consensusbellatrix.ExecutionAddress{}, errors.New("unsupported version")
@@ -355,6 +376,7 @@ func (v *VersionedSignedBuilderBid) Timestamp() (uint64, error) {
 		if v.Bellatrix.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
+
 		return v.Bellatrix.Message.Header.Timestamp, nil
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
@@ -366,6 +388,7 @@ func (v *VersionedSignedBuilderBid) Timestamp() (uint64, error) {
 		if v.Capella.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
+
 		return v.Capella.Message.Header.Timestamp, nil
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
@@ -377,6 +400,7 @@ func (v *VersionedSignedBuilderBid) Timestamp() (uint64, error) {
 		if v.Deneb.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
+
 		return v.Deneb.Message.Header.Timestamp, nil
 	default:
 		return 0, errors.New("unsupported version")
@@ -399,6 +423,7 @@ func (v *VersionedSignedBuilderBid) TransactionsRoot() (phase0.Root, error) {
 		if v.Bellatrix.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
+
 		return v.Bellatrix.Message.Header.TransactionsRoot, nil
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
@@ -410,6 +435,7 @@ func (v *VersionedSignedBuilderBid) TransactionsRoot() (phase0.Root, error) {
 		if v.Capella.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
+
 		return v.Capella.Message.Header.TransactionsRoot, nil
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
@@ -421,6 +447,7 @@ func (v *VersionedSignedBuilderBid) TransactionsRoot() (phase0.Root, error) {
 		if v.Deneb.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
+
 		return v.Deneb.Message.Header.TransactionsRoot, nil
 	default:
 		return phase0.Root{}, errors.New("unsupported version")
@@ -440,6 +467,7 @@ func (v *VersionedSignedBuilderBid) MessageHashTreeRoot() (phase0.Root, error) {
 		if v.Bellatrix.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		return v.Bellatrix.Message.HashTreeRoot()
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
@@ -448,6 +476,7 @@ func (v *VersionedSignedBuilderBid) MessageHashTreeRoot() (phase0.Root, error) {
 		if v.Capella.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		return v.Capella.Message.HashTreeRoot()
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
@@ -456,6 +485,7 @@ func (v *VersionedSignedBuilderBid) MessageHashTreeRoot() (phase0.Root, error) {
 		if v.Deneb.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		return v.Deneb.Message.HashTreeRoot()
 	default:
 		return phase0.Root{}, errors.New("unsupported version")
@@ -478,6 +508,7 @@ func (v *VersionedSignedBuilderBid) HeaderHashTreeRoot() (phase0.Root, error) {
 		if v.Bellatrix.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
+
 		return v.Bellatrix.Message.Header.HashTreeRoot()
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
@@ -489,6 +520,7 @@ func (v *VersionedSignedBuilderBid) HeaderHashTreeRoot() (phase0.Root, error) {
 		if v.Capella.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
+
 		return v.Capella.Message.Header.HashTreeRoot()
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
@@ -500,6 +532,7 @@ func (v *VersionedSignedBuilderBid) HeaderHashTreeRoot() (phase0.Root, error) {
 		if v.Deneb.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
+
 		return v.Deneb.Message.Header.HashTreeRoot()
 	default:
 		return phase0.Root{}, errors.New("unsupported version")
@@ -516,16 +549,19 @@ func (v *VersionedSignedBuilderBid) Signature() (phase0.BLSSignature, error) {
 		if v.Bellatrix == nil {
 			return phase0.BLSSignature{}, errors.New("no data")
 		}
+
 		return v.Bellatrix.Signature, nil
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
 			return phase0.BLSSignature{}, errors.New("no data")
 		}
+
 		return v.Capella.Signature, nil
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
 			return phase0.BLSSignature{}, errors.New("no data")
 		}
+
 		return v.Deneb.Signature, nil
 	default:
 		return phase0.BLSSignature{}, errors.New("unsupported version")
@@ -541,5 +577,6 @@ func (v *VersionedSignedBuilderBid) String() string {
 	if err != nil {
 		return fmt.Sprintf("ERR: %v", err)
 	}
+
 	return string(data)
 }

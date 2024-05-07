@@ -53,16 +53,19 @@ func (v *VersionedExecutionPayload) BlockHash() (phase0.Hash32, error) {
 		if v.Bellatrix == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		return v.Bellatrix.BlockHash, nil
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		return v.Capella.BlockHash, nil
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		return v.Deneb.BlockHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
@@ -79,16 +82,19 @@ func (v *VersionedExecutionPayload) Transactions() ([]bellatrix.Transaction, err
 		if v.Bellatrix == nil {
 			return nil, errors.New("no data")
 		}
+
 		return v.Bellatrix.Transactions, nil
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
 			return nil, errors.New("no data")
 		}
+
 		return v.Capella.Transactions, nil
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
 			return nil, errors.New("no data")
 		}
+
 		return v.Deneb.Transactions, nil
 	default:
 		return nil, errors.New("unsupported version")

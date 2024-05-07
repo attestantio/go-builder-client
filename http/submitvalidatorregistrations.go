@@ -52,6 +52,7 @@ func (s *Service) SubmitValidatorRegistrations(ctx context.Context,
 
 	if err != nil {
 		monitorOperation(s.Address(), "submit validator registrations", "failed", time.Since(started))
+
 		return err
 	}
 	monitorOperation(s.Address(), "submit validator registrations", "succeeded", time.Since(started))
@@ -64,7 +65,7 @@ func (s *Service) submitValidatorRegistrations(ctx context.Context,
 ) error {
 	// Unwrap versioned registrations.
 	var version *spec.BuilderVersion
-	var unversionedRegistrations []interface{}
+	var unversionedRegistrations []any
 
 	for _, registration := range registrations {
 		if registration == nil {
@@ -116,5 +117,6 @@ func (s *Service) submitChunkedValidatorRegistrations(ctx context.Context,
 			return errors.Wrap(err, "failed to submit chunk")
 		}
 	}
+
 	return nil
 }

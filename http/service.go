@@ -127,7 +127,7 @@ func (s *Service) Address() string {
 }
 
 // close closes the service, freeing up resources.
-func (s *Service) close() {}
+func (*Service) close() {}
 
 // Pubkey returns the public key of the builder (if any).
 func (s *Service) Pubkey() *phase0.BLSPubKey {

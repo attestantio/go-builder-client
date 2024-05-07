@@ -34,7 +34,10 @@ func decodeJSONResponse[T any](body io.Reader, res T) (T, map[string]any, error)
 	}
 
 	//nolint:forcetypeassert
-	data := clone.Clone(res).(T)
+	data, isCorrectType := clone.Clone(res).(T)
+	if !isCorrectType {
+		return res, nil, ErrIncorrectType
+	}
 	metadata := make(map[string]any)
 	for k, v := range decoded {
 		switch k {

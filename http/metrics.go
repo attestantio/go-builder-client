@@ -38,6 +38,7 @@ func registerMetrics(ctx context.Context, monitor metrics.Service) error {
 	if monitor.Presenter() == "prometheus" {
 		return registerPrometheusMetrics(ctx)
 	}
+
 	return nil
 }
 
@@ -64,6 +65,7 @@ func registerPrometheusMetrics(_ context.Context) error {
 			3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.0,
 		},
 	}, []string{"server", "operation"})
+
 	return prometheus.Register(operationsTimer)
 }
 

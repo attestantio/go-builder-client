@@ -40,6 +40,7 @@ func (e *ExecutionPayloadAndBlobsBundle) UnmarshalJSON(input []byte) error {
 	if err := json.Unmarshal(input, &data); err != nil {
 		return errors.Wrap(err, "invalid JSON")
 	}
+
 	return e.unpack(&data)
 }
 

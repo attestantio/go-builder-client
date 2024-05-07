@@ -28,6 +28,7 @@ func (s *SubmitBlockRequest) MarshalJSON() ([]byte, error) {
 	for i := range s.Transactions {
 		transactions[i] = fmt.Sprintf("%#x", s.Transactions[i])
 	}
+
 	return json.Marshal(&submitBlockRequestJSON{
 		Message:                s.Message,
 		ExecutionPayloadHeader: s.ExecutionPayloadHeader,
@@ -43,6 +44,7 @@ func (s *SubmitBlockRequest) UnmarshalJSON(input []byte) error {
 	if err := json.Unmarshal(input, &data); err != nil {
 		return errors.Wrap(err, "invalid JSON")
 	}
+
 	return s.unpack(&data)
 }
 

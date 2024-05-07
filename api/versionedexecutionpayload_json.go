@@ -52,6 +52,7 @@ func (v *VersionedExecutionPayload) MarshalJSON() ([]byte, error) {
 			*versionJSON
 			*bellatrixVersionedExecutionPayloadJSON
 		}{version, data}
+
 		return json.Marshal(payload)
 	case spec.DataVersionCapella:
 		if v.Capella == nil {
@@ -64,6 +65,7 @@ func (v *VersionedExecutionPayload) MarshalJSON() ([]byte, error) {
 			*versionJSON
 			*capellaVersionedExecutionPayloadJSON
 		}{version, data}
+
 		return json.Marshal(payload)
 	default:
 		return nil, fmt.Errorf("unsupported data version %v", v.Version)
@@ -93,5 +95,6 @@ func (v *VersionedExecutionPayload) UnmarshalJSON(input []byte) error {
 	default:
 		return fmt.Errorf("unsupported data version %v", metadata.Version)
 	}
+
 	return nil
 }

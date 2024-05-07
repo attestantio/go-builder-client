@@ -57,16 +57,19 @@ func (s *Service) UnblindProposal(ctx context.Context,
 		if proposal.Bellatrix == nil {
 			return nil, errors.New("bellatrix proposal without payload")
 		}
+
 		return s.unblindBellatrixProposal(ctx, started, proposal.Bellatrix)
 	case consensusspec.DataVersionCapella:
 		if proposal.Capella == nil {
 			return nil, errors.New("capella proposal without payload")
 		}
+
 		return s.unblindCapellaProposal(ctx, started, proposal.Capella)
 	case consensusspec.DataVersionDeneb:
 		if proposal.Deneb == nil {
 			return nil, errors.New("deneb proposal without payload")
 		}
+
 		return s.unblindDenebProposal(ctx, started, proposal.Deneb)
 	default:
 		return nil, fmt.Errorf("unhandled data version %v", proposal.Version)
@@ -83,12 +86,14 @@ func (s *Service) unblindBellatrixProposal(ctx context.Context,
 	specJSON, err := json.Marshal(proposal)
 	if err != nil {
 		monitorOperation(s.Address(), "unblind proposal", "failed", time.Since(started))
+
 		return nil, errors.Wrap(err, "failed to marshal JSON")
 	}
 
 	httpResponse, err := s.post(ctx, "/eth/v1/builder/blinded_blocks", "", bytes.NewBuffer(specJSON), ContentTypeJSON, map[string]string{})
 	if err != nil {
 		monitorOperation(s.Address(), "unblind proposal", "failed", time.Since(started))
+
 		return nil, errors.Wrap(err, "failed to submit unblind proposal request")
 	}
 
@@ -138,6 +143,7 @@ func (s *Service) unblindBellatrixProposal(ctx context.Context,
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
 	}
 	monitorOperation(s.Address(), "unblind proposal", "succeeded", time.Since(started))
+
 	return res, nil
 }
 
@@ -151,12 +157,14 @@ func (s *Service) unblindCapellaProposal(ctx context.Context,
 	specJSON, err := json.Marshal(proposal)
 	if err != nil {
 		monitorOperation(s.Address(), "unblind proposal", "failed", time.Since(started))
+
 		return nil, errors.Wrap(err, "failed to marshal JSON")
 	}
 
 	httpResponse, err := s.post(ctx, "/eth/v1/builder/blinded_blocks", "", bytes.NewBuffer(specJSON), ContentTypeJSON, map[string]string{})
 	if err != nil {
 		monitorOperation(s.Address(), "unblind proposal", "failed", time.Since(started))
+
 		return nil, errors.Wrap(err, "failed to submit unblind proposal request")
 	}
 
@@ -207,6 +215,7 @@ func (s *Service) unblindCapellaProposal(ctx context.Context,
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
 	}
 	monitorOperation(s.Address(), "unblind proposal", "succeeded", time.Since(started))
+
 	return res, nil
 }
 
@@ -220,12 +229,14 @@ func (s *Service) unblindDenebProposal(ctx context.Context,
 	specJSON, err := json.Marshal(proposal)
 	if err != nil {
 		monitorOperation(s.Address(), "unblind proposal", "failed", time.Since(started))
+
 		return nil, errors.Wrap(err, "failed to marshal JSON")
 	}
 
 	httpResponse, err := s.post(ctx, "/eth/v1/builder/blinded_blocks", "", bytes.NewBuffer(specJSON), ContentTypeJSON, map[string]string{})
 	if err != nil {
 		monitorOperation(s.Address(), "unblind proposal", "failed", time.Since(started))
+
 		return nil, errors.Wrap(err, "failed to submit unblind proposal request")
 	}
 
@@ -293,5 +304,6 @@ func (s *Service) unblindDenebProposal(ctx context.Context,
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
 	}
 	monitorOperation(s.Address(), "unblind proposal", "succeeded", time.Since(started))
+
 	return res, nil
 }

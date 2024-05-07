@@ -60,15 +60,16 @@ func (s *Service) get(ctx context.Context,
 	log := log.With().Str("id", fmt.Sprintf("%02x", rand.Int31())).Str("address", s.address).Str("endpoint", endpoint).Logger()
 	log.Trace().Msg("GET request")
 
-	url := urlForCall(s.base, endpoint, query)
-	log.Trace().Str("url", url.String()).Msg("URL to GET")
-	span.SetAttributes(attribute.String("url", url.String()))
+	callURL := urlForCall(s.base, endpoint, query)
+	log.Trace().Str("url", callURL.String()).Msg("URL to GET")
+	span.SetAttributes(attribute.String("url", callURL.String()))
 
 	opCtx, cancel := context.WithTimeout(ctx, s.timeout)
 	defer cancel()
-	req, err := http.NewRequestWithContext(opCtx, http.MethodGet, url.String(), nil)
+	req, err := http.NewRequestWithContext(opCtx, http.MethodGet, callURL.String(), nil)
 	if err != nil {
 		span.SetStatus(codes.Error, "Failed to create request")
+
 		return nil, errors.Join(errors.New("failed to create GET request"), err)
 	}
 
@@ -180,13 +181,13 @@ func (s *Service) post(ctx context.Context,
 		}
 	}
 
-	url := urlForCall(s.base, endpoint, query)
-	log.Trace().Str("url", url.String()).Msg("URL to POST")
-	span.SetAttributes(attribute.String("url", url.String()))
+	callURL := urlForCall(s.base, endpoint, query)
+	log.Trace().Str("url", callURL.String()).Msg("URL to POST")
+	span.SetAttributes(attribute.String("url", callURL.String()))
 
 	opCtx, cancel := context.WithTimeout(ctx, s.timeout)
 	defer cancel()
-	req, err := http.NewRequestWithContext(opCtx, http.MethodPost, url.String(), body)
+	req, err := http.NewRequestWithContext(opCtx, http.MethodPost, callURL.String(), body)
 	if err != nil {
 		return nil, errors.Join(errors.New("failed to create POST request"), err)
 	}

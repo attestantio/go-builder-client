@@ -56,11 +56,13 @@ func (s *Service) UnblindBlock(ctx context.Context,
 		if block.Bellatrix == nil {
 			return nil, errors.New("bellatrix block without payload")
 		}
+
 		return s.unblindBellatrixBlock(ctx, started, block.Bellatrix)
 	case consensusspec.DataVersionCapella:
 		if block.Capella == nil {
 			return nil, errors.New("capella block without payload")
 		}
+
 		return s.unblindCapellaBlock(ctx, started, block.Capella)
 	case consensusspec.DataVersionDeneb:
 		return nil, errors.New("deneb not supported; use UnblindProposal()")
@@ -79,12 +81,14 @@ func (s *Service) unblindBellatrixBlock(ctx context.Context,
 	specJSON, err := json.Marshal(block)
 	if err != nil {
 		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
+
 		return nil, errors.Wrap(err, "failed to marshal JSON")
 	}
 
 	httpResponse, err := s.post(ctx, "/eth/v1/builder/blinded_blocks", "", bytes.NewBuffer(specJSON), ContentTypeJSON, map[string]string{})
 	if err != nil {
 		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
+
 		return nil, errors.Wrap(err, "failed to submit unblind block request")
 	}
 
@@ -134,6 +138,7 @@ func (s *Service) unblindBellatrixBlock(ctx context.Context,
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
 	}
 	monitorOperation(s.Address(), "unblind block", "succeeded", time.Since(started))
+
 	return res, nil
 }
 
@@ -147,12 +152,14 @@ func (s *Service) unblindCapellaBlock(ctx context.Context,
 	specJSON, err := json.Marshal(block)
 	if err != nil {
 		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
+
 		return nil, errors.Wrap(err, "failed to marshal JSON")
 	}
 
 	httpResponse, err := s.post(ctx, "/eth/v1/builder/blinded_blocks", "", bytes.NewBuffer(specJSON), ContentTypeJSON, map[string]string{})
 	if err != nil {
 		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
+
 		return nil, errors.Wrap(err, "failed to submit unblind block request")
 	}
 
@@ -203,5 +210,6 @@ func (s *Service) unblindCapellaBlock(ctx context.Context,
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
 	}
 	monitorOperation(s.Address(), "unblind block", "succeeded", time.Since(started))
+
 	return res, nil
 }

@@ -50,6 +50,7 @@ func (s *SubmitBlockRequest) UnmarshalJSON(input []byte) error {
 	if err := json.Unmarshal(input, &data); err != nil {
 		return errors.Wrap(err, "invalid JSON")
 	}
+
 	return s.unpack(&data)
 }
 
@@ -80,5 +81,6 @@ func (s *SubmitBlockRequest) unpack(data *submitBlockRequestJSON) error {
 		return errors.New("blobs bundle missing")
 	}
 	s.BlobsBundle = data.BlobsBundle
+
 	return nil
 }

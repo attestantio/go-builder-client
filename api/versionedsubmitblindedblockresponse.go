@@ -84,6 +84,7 @@ func (v *VersionedSubmitBlindedBlockResponse) BlockHash() (phase0.Hash32, error)
 		if v.Electra.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no execution payload")
 		}
+
 		return v.Electra.ExecutionPayload.BlockHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
@@ -124,6 +125,7 @@ func (v *VersionedSubmitBlindedBlockResponse) Transactions() ([]bellatrix.Transa
 		if v.Electra.ExecutionPayload == nil {
 			return nil, errors.New("no execution payload")
 		}
+
 		return v.Electra.ExecutionPayload.Transactions, nil
 	default:
 		return nil, errors.New("unsupported version")
@@ -143,6 +145,7 @@ func (v *VersionedSubmitBlindedBlockResponse) Blobs() ([]consensusdeneb.Blob, er
 		if v.Deneb.BlobsBundle == nil {
 			return nil, errors.New("no data blobs bundle")
 		}
+
 		return v.Deneb.BlobsBundle.Blobs, nil
 	case consensusspec.DataVersionElectra:
 		if v.Electra == nil {
@@ -151,6 +154,7 @@ func (v *VersionedSubmitBlindedBlockResponse) Blobs() ([]consensusdeneb.Blob, er
 		if v.Electra.BlobsBundle == nil {
 			return nil, errors.New("no data blobs bundle")
 		}
+
 		return v.Electra.BlobsBundle.Blobs, nil
 	default:
 		return nil, errors.New("unsupported version")
@@ -170,6 +174,7 @@ func (v *VersionedSubmitBlindedBlockResponse) BlobGasUsed() (uint64, error) {
 		if v.Deneb.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
+
 		return v.Deneb.ExecutionPayload.BlobGasUsed, nil
 	case consensusspec.DataVersionElectra:
 		if v.Electra == nil {
@@ -178,6 +183,7 @@ func (v *VersionedSubmitBlindedBlockResponse) BlobGasUsed() (uint64, error) {
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
+
 		return v.Electra.ExecutionPayload.BlobGasUsed, nil
 	default:
 		return 0, errors.New("unsupported version")
@@ -197,6 +203,7 @@ func (v *VersionedSubmitBlindedBlockResponse) ExcessBlobGas() (uint64, error) {
 		if v.Deneb.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
+
 		return v.Deneb.ExecutionPayload.ExcessBlobGas, nil
 	case consensusspec.DataVersionElectra:
 		if v.Electra == nil {
@@ -205,6 +212,7 @@ func (v *VersionedSubmitBlindedBlockResponse) ExcessBlobGas() (uint64, error) {
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
+
 		return v.Electra.ExecutionPayload.ExcessBlobGas, nil
 	default:
 		return 0, errors.New("unsupported version")
@@ -224,6 +232,7 @@ func (v *VersionedSubmitBlindedBlockResponse) DepositReceipts() ([]*consensusele
 		if v.Electra.ExecutionPayload == nil {
 			return nil, errors.New("no data execution payload")
 		}
+
 		return v.Electra.ExecutionPayload.DepositReceipts, nil
 	default:
 		return nil, errors.New("unsupported version")
@@ -243,6 +252,7 @@ func (v *VersionedSubmitBlindedBlockResponse) WithdrawalRequests() ([]*consensus
 		if v.Electra.ExecutionPayload == nil {
 			return nil, errors.New("no data execution payload")
 		}
+
 		return v.Electra.ExecutionPayload.WithdrawalRequests, nil
 	default:
 		return nil, errors.New("unsupported version")

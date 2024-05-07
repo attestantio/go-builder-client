@@ -88,6 +88,7 @@ func (v *VersionedExecutionPayload) MarshalJSON() ([]byte, error) {
 			*versionJSON
 			*denebVersionedExecutionPayloadJSON
 		}{version, data}
+
 		return json.Marshal(payload)
 	case spec.DataVersionElectra:
 		if v.Electra == nil {
@@ -100,6 +101,7 @@ func (v *VersionedExecutionPayload) MarshalJSON() ([]byte, error) {
 			*versionJSON
 			*electraVersionedExecutionPayloadJSON
 		}{version, data}
+
 		return json.Marshal(payload)
 	default:
 		return nil, fmt.Errorf("unsupported data version %v", v.Version)

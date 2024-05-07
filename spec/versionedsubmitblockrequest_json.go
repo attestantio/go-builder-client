@@ -97,6 +97,7 @@ func (v *VersionedSubmitBlockRequest) MarshalJSON() ([]byte, error) {
 			*versionJSON
 			*electraVersionedSubmitBlockRequestJSON
 		}{version, data}
+
 		return json.Marshal(payload)
 	default:
 		return nil, fmt.Errorf("unsupported data version %v", v.Version)

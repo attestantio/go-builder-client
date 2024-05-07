@@ -3,11 +3,12 @@ module github.com/attestantio/go-builder-client
 go 1.20
 
 require (
-	github.com/attestantio/go-eth2-client v0.21.4-0.20240506185515-2ff35ee939f2
+	github.com/attestantio/go-eth2-client v0.21.4-0.20240506195511-4654a8b8bc37
 	github.com/ferranbt/fastssz v0.1.3
 	// go-yaml after 1.9.2 has memory issues due to https://github.com/goccy/go-yaml/issues/325; avoid.
 	github.com/goccy/go-yaml v1.9.2
 	github.com/holiman/uint256 v1.2.4
+	github.com/huandu/go-clone v1.6.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.16.0
 	github.com/rs/zerolog v1.32.0
@@ -16,8 +17,6 @@ require (
 	go.opentelemetry.io/otel/trace v1.16.0
 	gotest.tools v2.2.0+incompatible
 )
-
-require github.com/huandu/go-clone v1.6.0
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect

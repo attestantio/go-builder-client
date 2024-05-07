@@ -101,6 +101,7 @@ func (v *VersionedSignedBuilderBid) MarshalJSON() ([]byte, error) {
 			*versionJSON
 			*electraVersionedSignedBuilderBidJSON
 		}{version, data}
+
 		return json.Marshal(payload)
 	default:
 		return nil, fmt.Errorf("unsupported data version %v", v.Version)

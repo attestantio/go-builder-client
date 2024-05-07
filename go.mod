@@ -6,7 +6,7 @@ require (
 	github.com/attestantio/go-eth2-client v0.21.4-0.20240506185515-2ff35ee939f2
 	github.com/ferranbt/fastssz v0.1.3
 	// go-yaml after 1.9.2 has memory issues due to https://github.com/goccy/go-yaml/issues/325; avoid.
-	github.com/goccy/go-yaml v1.11.3
+	github.com/goccy/go-yaml v1.9.2
 	github.com/holiman/uint256 v1.2.4
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.16.0

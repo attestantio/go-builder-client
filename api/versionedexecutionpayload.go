@@ -75,6 +75,7 @@ func (v *VersionedExecutionPayload) BlockHash() (phase0.Hash32, error) {
 		if v.Electra == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		return v.Electra.BlockHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
@@ -109,6 +110,7 @@ func (v *VersionedExecutionPayload) Transactions() ([]bellatrix.Transaction, err
 		if v.Electra == nil {
 			return nil, errors.New("no data")
 		}
+
 		return v.Electra.Transactions, nil
 	default:
 		return nil, errors.New("unsupported version")

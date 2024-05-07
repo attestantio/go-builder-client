@@ -359,12 +359,14 @@ func (s *Service) unblindElectraProposal(ctx context.Context,
 	specJSON, err := json.Marshal(proposal)
 	if err != nil {
 		monitorOperation(s.Address(), "unblind proposal", "failed", time.Since(started))
+
 		return nil, errors.Wrap(err, "failed to marshal JSON")
 	}
 
 	httpResponse, err := s.post(ctx, "/eth/v1/builder/blinded_blocks", "", bytes.NewBuffer(specJSON), ContentTypeJSON, map[string]string{})
 	if err != nil {
 		monitorOperation(s.Address(), "unblind proposal", "failed", time.Since(started))
+
 		return nil, errors.Wrap(err, "failed to submit unblind proposal request")
 	}
 
@@ -433,5 +435,6 @@ func (s *Service) unblindElectraProposal(ctx context.Context,
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
 	}
 	monitorOperation(s.Address(), "unblind proposal", "succeeded", time.Since(started))
+
 	return res, nil
 }

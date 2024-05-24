@@ -78,7 +78,7 @@ func (s *Service) get(ctx context.Context,
 	// req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
 	req.Header.Set("Accept", "application/json")
 	if req.Header.Get("User-Agent") == "" {
-		req.Header.Set("User-Agent", "go-builder-client/0.4.5")
+		req.Header.Set("User-Agent", "go-builder-client/0.4.6")
 	}
 
 	resp, err := s.client.Do(req)

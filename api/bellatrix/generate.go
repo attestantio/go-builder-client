@@ -15,5 +15,6 @@ package bellatrix
 
 // Need to `go install github.com/ferranbt/fastssz/sszgen@latest` for this to work.
 //go:generate rm -f builderbid_encoding.go signedbuilderbid_encoding.go
+//nolint:revive
 //go:generate sszgen -include ../../../go-eth2-client/spec/bellatrix,../../../go-eth2-client/spec/phase0 --path . --objs BuilderBid,SignedBuilderBid
 //go:generate goimports -w builderbid_encoding.go signedbuilderbid_encoding.go

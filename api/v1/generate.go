@@ -15,5 +15,6 @@ package v1
 
 // Need to `go install github.com/ferranbt/fastssz/sszgen@latest` for this to work.
 //go:generate rm -f signedvalidatorregistration_encoding.go validatorregistration_encoding.go
+//nolint:revive
 //go:generate sszgen -include ../../../go-eth2-client/spec/bellatrix,../../../go-eth2-client/spec/phase0 --path . --objs SignedValidatorRegistration,ValidatorRegistration
 //go:generate goimports -w signedvalidatorregistration_encoding.go validatorregistration_encoding.go

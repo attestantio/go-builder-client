@@ -85,7 +85,13 @@ func (s *Service) unblindBellatrixBlock(ctx context.Context,
 		return nil, errors.Wrap(err, "failed to marshal JSON")
 	}
 
-	httpResponse, err := s.post(ctx, "/eth/v1/builder/blinded_blocks", "", bytes.NewBuffer(specJSON), ContentTypeJSON, map[string]string{})
+	httpResponse, err := s.post(ctx,
+		"/eth/v1/builder/blinded_blocks",
+		"",
+		bytes.NewBuffer(specJSON),
+		ContentTypeJSON,
+		map[string]string{},
+	)
 	if err != nil {
 		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
 
@@ -118,7 +124,9 @@ func (s *Service) unblindBellatrixBlock(ctx context.Context,
 
 	switch httpResponse.contentType {
 	case ContentTypeJSON:
-		res.Bellatrix.Message.Body.ExecutionPayload, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &bellatrix.ExecutionPayload{})
+		res.Bellatrix.Message.Body.ExecutionPayload, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body),
+			&bellatrix.ExecutionPayload{},
+		)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to parse bellatrix response")
 		}
@@ -132,7 +140,10 @@ func (s *Service) unblindBellatrixBlock(ctx context.Context,
 			return nil, errors.Wrap(err, "failed to generate hash tree root for the received execution payload")
 		}
 		if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
-			return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:], ourExecutionPayloadHash[:])
+			return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x",
+				receivedExecutionPayloadHash[:],
+				ourExecutionPayloadHash[:],
+			)
 		}
 	default:
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
@@ -156,7 +167,12 @@ func (s *Service) unblindCapellaBlock(ctx context.Context,
 		return nil, errors.Wrap(err, "failed to marshal JSON")
 	}
 
-	httpResponse, err := s.post(ctx, "/eth/v1/builder/blinded_blocks", "", bytes.NewBuffer(specJSON), ContentTypeJSON, map[string]string{})
+	httpResponse, err := s.post(ctx,
+		"/eth/v1/builder/blinded_blocks",
+		"",
+		bytes.NewBuffer(specJSON),
+		ContentTypeJSON, map[string]string{},
+	)
 	if err != nil {
 		monitorOperation(s.Address(), "unblind block", "failed", time.Since(started))
 
@@ -190,7 +206,9 @@ func (s *Service) unblindCapellaBlock(ctx context.Context,
 
 	switch httpResponse.contentType {
 	case ContentTypeJSON:
-		res.Capella.Message.Body.ExecutionPayload, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &capella.ExecutionPayload{})
+		res.Capella.Message.Body.ExecutionPayload, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body),
+			&capella.ExecutionPayload{},
+		)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to parse capella response")
 		}
@@ -204,7 +222,10 @@ func (s *Service) unblindCapellaBlock(ctx context.Context,
 			return nil, errors.Wrap(err, "failed to generate hash tree root for the received execution payload")
 		}
 		if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
-			return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:], ourExecutionPayloadHash[:])
+			return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x",
+				receivedExecutionPayloadHash[:],
+				ourExecutionPayloadHash[:],
+			)
 		}
 	default:
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)

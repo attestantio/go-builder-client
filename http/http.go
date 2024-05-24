@@ -323,9 +323,12 @@ func populateContentType(res *httpResponse, resp *http.Response) error {
 }
 
 // urlForCall patches together a URL for a call.
-func urlForCall(base *url.URL, endpoint string, query string) *url.URL {
+func urlForCall(base *url.URL,
+	endpoint string,
+	query string,
+) *url.URL {
 	callURL := *base
-	callURL.Path = endpoint
+	callURL.Path += endpoint
 	if callURL.RawQuery == "" {
 		callURL.RawQuery = query
 	} else if query != "" {

@@ -201,7 +201,7 @@ func (s *Service) post(ctx context.Context,
 		req.Header.Set(k, v)
 	}
 	if req.Header.Get("User-Agent") == "" {
-		req.Header.Set("User-Agent", "go-builder-client/0.4.5")
+		req.Header.Set("User-Agent", "go-builder-client/0.4.6")
 	}
 
 	resp, err := s.client.Do(req)

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	v2 "github.com/attestantio/go-builder-client/api/v2"
+	apiv2 "github.com/attestantio/go-builder-client/api/v2"
 	"github.com/stretchr/testify/require"
 	"gotest.tools/assert"
 )
@@ -116,7 +116,7 @@ func TestSubmitBlockRequestJSON(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			var res v2.SubmitBlockRequest
+			var res apiv2.SubmitBlockRequest
 			err := json.Unmarshal(test.input, &res)
 			if test.err != "" {
 				require.EqualError(t, err, test.err)

@@ -17,11 +17,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"time"
+	"errors"
 
+	client "github.com/attestantio/go-builder-client"
 	"github.com/attestantio/go-builder-client/api"
 	"github.com/attestantio/go-builder-client/spec"
-	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -31,43 +31,43 @@ var submitValidatorRegistrationsChunkSize = 500
 
 // SubmitValidatorRegistrations submits a validator registration.
 func (s *Service) SubmitValidatorRegistrations(ctx context.Context,
-	registrations []*api.VersionedSignedValidatorRegistration,
+	opts *api.SubmitValidatorRegistrationsOpts,
 ) error {
-	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "SubmitValidatorRegistrations", trace.WithAttributes(
-		attribute.Int("validators", len(registrations)),
-	))
-	defer span.End()
-	started := time.Now()
-
-	if len(registrations) == 0 {
-		return errors.New("no registrations supplied")
+	if opts == nil {
+		return client.ErrNoOptions
+	}
+	if len(opts.Registrations) == 0 {
+		return errors.Join(errors.New("no validator registrations specified"), client.ErrInvalidOptions)
 	}
 
+	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "SubmitValidatorRegistrations", trace.WithAttributes(
+		attribute.Int("validators", len(opts.Registrations)),
+	))
+	defer span.End()
+
 	var err error
-	if len(registrations) <= submitValidatorRegistrationsChunkSize {
-		err = s.submitValidatorRegistrations(ctx, registrations)
+	if len(opts.Registrations) <= submitValidatorRegistrationsChunkSize {
+		err = s.submitValidatorRegistrations(ctx, opts)
 	} else {
-		err = s.submitChunkedValidatorRegistrations(ctx, registrations)
+		err = s.submitChunkedValidatorRegistrations(ctx, opts)
 	}
 
 	if err != nil {
-		monitorOperation(s.Address(), "submit validator registrations", "failed", time.Since(started))
-
-		return err
+		return errors.Join(errors.New("failed to submit validator registrations"), err)
 	}
-	monitorOperation(s.Address(), "submit validator registrations", "succeeded", time.Since(started))
 
 	return nil
 }
 
+//nolint:revive
 func (s *Service) submitValidatorRegistrations(ctx context.Context,
-	registrations []*api.VersionedSignedValidatorRegistration,
+	opts *api.SubmitValidatorRegistrationsOpts,
 ) error {
 	// Unwrap versioned registrations.
 	var version *spec.BuilderVersion
 	var unversionedRegistrations []any
 
-	for _, registration := range registrations {
+	for _, registration := range opts.Registrations {
 		if registration == nil {
 			return errors.New("nil registration supplied")
 		}
@@ -90,11 +90,19 @@ func (s *Service) submitValidatorRegistrations(ctx context.Context,
 
 	specJSON, err := json.Marshal(unversionedRegistrations)
 	if err != nil {
-		return errors.Wrap(err, "failed to marshal JSON")
+		return errors.Join(errors.New("failed to marshal JSON"), err)
 	}
-	_, err = s.post(ctx, "/eth/v1/builder/validators", "", bytes.NewBuffer(specJSON), ContentTypeJSON, map[string]string{})
+	_, err = s.post(ctx,
+		"/eth/v1/builder/validators",
+		"",
+		&opts.Common,
+		bytes.NewBuffer(specJSON),
+		ContentTypeJSON,
+		map[string]string{},
+		false,
+	)
 	if err != nil {
-		return errors.Wrap(err, "failed to submit validator registration")
+		return errors.Join(errors.New("failed to submit validator registration"), err)
 	}
 
 	return nil
@@ -102,19 +110,21 @@ func (s *Service) submitValidatorRegistrations(ctx context.Context,
 
 // submitChunkedValidatorRegistrations submits validator registrations in chunks.
 func (s *Service) submitChunkedValidatorRegistrations(ctx context.Context,
-	registrations []*api.VersionedSignedValidatorRegistration,
+	opts *api.SubmitValidatorRegistrationsOpts,
 ) error {
 	chunkSize := submitValidatorRegistrationsChunkSize
-	for i := 0; i < len(registrations); i += chunkSize {
+	for i := 0; i < len(opts.Registrations); i += chunkSize {
 		chunkStart := i
 		chunkEnd := i + chunkSize
-		if len(registrations) < chunkEnd {
-			chunkEnd = len(registrations)
+		if len(opts.Registrations) < chunkEnd {
+			chunkEnd = len(opts.Registrations)
 		}
-		chunk := registrations[chunkStart:chunkEnd]
-		err := s.submitValidatorRegistrations(ctx, chunk)
+		err := s.submitValidatorRegistrations(ctx, &api.SubmitValidatorRegistrationsOpts{
+			Common:        opts.Common,
+			Registrations: opts.Registrations[chunkStart:chunkEnd],
+		})
 		if err != nil {
-			return errors.Wrap(err, "failed to submit chunk")
+			return errors.Join(errors.New("failed to submit chunk"), err)
 		}
 	}
 

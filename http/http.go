@@ -25,6 +25,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/attestantio/go-builder-client/api"
 	"github.com/attestantio/go-eth2-client/spec"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -45,10 +46,168 @@ type responseMetadata struct {
 	Version spec.DataVersion `json:"version"`
 }
 
+// defaultUserAgent is sent with requests if no other user agent has been supplied.
+const defaultUserAgent = "go-builder-client/0.5.0"
+
+// post sends an HTTP post request and returns the body.
+//
+//nolint:revive,unparam
+func (s *Service) post(ctx context.Context,
+	endpoint string,
+	query string,
+	opts *api.CommonOpts,
+	body io.Reader,
+	contentType ContentType,
+	headers map[string]string,
+	supportsSSZ bool,
+) (
+	*httpResponse,
+	error,
+) {
+	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "post")
+	defer span.End()
+
+	// #nosec G404
+	log := s.log.With().Str("id", fmt.Sprintf("%02x", rand.Int31())).Str("address", s.address).Str("endpoint", endpoint).Logger()
+	if e := log.Trace(); e.Enabled() {
+		switch contentType {
+		case ContentTypeJSON:
+			bodyBytes, err := io.ReadAll(body)
+			if err != nil {
+				return nil, errors.New("failed to read request body")
+			}
+			body = bytes.NewReader(bodyBytes)
+
+			e.RawJSON("body", bodyBytes).Msg("POST request")
+		default:
+			e.Str("content_type", contentType.String()).Msg("POST request")
+		}
+	}
+
+	callURL := urlForCall(s.base, endpoint, query)
+	log.Trace().Str("url", callURL.String()).Msg("URL to POST")
+	span.SetAttributes(attribute.String("url", callURL.String()))
+
+	timeout := s.timeout
+	if opts.Timeout != 0 {
+		timeout = opts.Timeout
+	}
+
+	opCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+	req, err := http.NewRequestWithContext(opCtx, http.MethodPost, callURL.String(), body)
+	if err != nil {
+		return nil, errors.Join(errors.New("failed to create POST request"), err)
+	}
+
+	s.addExtraHeaders(req)
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+	req.Header.Set("Content-Type", contentType.MediaType())
+	if s.enforceJSON || !supportsSSZ {
+		// JSON only.
+		req.Header.Set("Accept", "application/json")
+	} else {
+		// Prefer SSZ, JSON if not.
+		req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
+	}
+	if req.Header.Get("User-Agent") == "" {
+		req.Header.Set("User-Agent", defaultUserAgent)
+	}
+
+	resp, err := s.client.Do(req)
+	if err != nil {
+		span.SetStatus(codes.Error, err.Error())
+		s.monitorPostComplete(ctx, callURL.Path, "failed")
+
+		return nil, errors.Join(errors.New("failed to call POST endpoint"), err)
+	}
+	defer resp.Body.Close()
+	log = log.With().Int("status_code", resp.StatusCode).Logger()
+
+	res := &httpResponse{
+		statusCode: resp.StatusCode,
+	}
+	populateHeaders(res, resp)
+
+	res.body, err = io.ReadAll(resp.Body)
+	if err != nil {
+		switch {
+		case errors.Is(err, context.Canceled):
+			// We don't consider context canceled to be worth logging, as the user canceled the context.
+		case errors.Is(err, context.DeadlineExceeded):
+			// We don't consider context deadline exceeded to be worth logging, as the user selected the deadline.
+		default:
+			log.Warn().Err(err).Msg("Failed to read POST response")
+		}
+
+		span.SetStatus(codes.Error, err.Error())
+		s.monitorPostComplete(ctx, callURL.Path, "failed")
+
+		return nil, errors.Join(errors.New("failed to read POST response"), err)
+	}
+
+	if resp.StatusCode == http.StatusNoContent {
+		// Nothing returned.  This is not considered an error.
+		span.AddEvent("Received empty response")
+		log.Trace().Msg("Endpoint returned no content")
+		s.monitorPostComplete(ctx, callURL.Path, "succeeded")
+
+		return res, nil
+	}
+
+	if err := populateContentType(res, resp); err != nil {
+		// For now, assume that unknown type is JSON.
+		log.Debug().Err(err).Msg("Failed to obtain content type; assuming JSON")
+		res.contentType = ContentTypeJSON
+	}
+	span.AddEvent("Received response", trace.WithAttributes(
+		attribute.Int("size", len(res.body)),
+		attribute.String("content-type", res.contentType.String()),
+	))
+
+	if res.contentType == ContentTypeJSON {
+		if e := log.Trace(); e.Enabled() {
+			trimmedResponse := bytes.ReplaceAll(bytes.ReplaceAll(res.body, []byte{0x0a}, []byte{}), []byte{0x0d}, []byte{})
+			e.RawJSON("body", trimmedResponse).Msg("POST response")
+		}
+	}
+
+	statusFamily := statusCodeFamily(resp.StatusCode)
+	if statusFamily != 2 {
+		if res.contentType == ContentTypeJSON {
+			trimmedResponse := bytes.ReplaceAll(bytes.ReplaceAll(res.body, []byte{0x0a}, []byte{}), []byte{0x0d}, []byte{})
+			log.Debug().Int("status_code", resp.StatusCode).RawJSON("response", trimmedResponse).Msg("POST failed")
+		} else {
+			log.Debug().Int("status_code", resp.StatusCode).Msg("POST failed")
+		}
+
+		span.SetStatus(codes.Error, fmt.Sprintf("Status code %d", resp.StatusCode))
+		s.monitorPostComplete(ctx, callURL.Path, "failed")
+
+		return nil, &api.Error{
+			Method:     http.MethodPost,
+			StatusCode: resp.StatusCode,
+			Endpoint:   endpoint,
+			Data:       res.body,
+		}
+	}
+
+	s.monitorPostComplete(ctx, callURL.Path, "succeeded")
+
+	return res, nil
+}
+
 // get sends an HTTP get request and returns the response.
+//
+//nolint:revive
 func (s *Service) get(ctx context.Context,
 	endpoint string,
 	query string,
+	opts *api.CommonOpts,
+	headers map[string]string,
+	supportsSSZ bool,
 ) (
 	*httpResponse,
 	error,
@@ -57,14 +216,19 @@ func (s *Service) get(ctx context.Context,
 	defer span.End()
 
 	// #nosec G404
-	log := log.With().Str("id", fmt.Sprintf("%02x", rand.Int31())).Str("address", s.address).Str("endpoint", endpoint).Logger()
+	log := s.log.With().Str("id", fmt.Sprintf("%02x", rand.Int31())).Str("address", s.address).Str("endpoint", endpoint).Logger()
 	log.Trace().Msg("GET request")
 
 	callURL := urlForCall(s.base, endpoint, query)
 	log.Trace().Str("url", callURL.String()).Msg("URL to GET")
 	span.SetAttributes(attribute.String("url", callURL.String()))
 
-	opCtx, cancel := context.WithTimeout(ctx, s.timeout)
+	timeout := s.timeout
+	if opts.Timeout != 0 {
+		timeout = opts.Timeout
+	}
+
+	opCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 	req, err := http.NewRequestWithContext(opCtx, http.MethodGet, callURL.String(), nil)
 	if err != nil {
@@ -74,16 +238,21 @@ func (s *Service) get(ctx context.Context,
 	}
 
 	s.addExtraHeaders(req)
-	// Prefer SSZ if available (enable when we support SSZ) .
-	// req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
-	req.Header.Set("Accept", "application/json")
-	if req.Header.Get("User-Agent") == "" {
-		req.Header.Set("User-Agent", "go-builder-client/0.4.6")
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+	if s.enforceJSON || !supportsSSZ {
+		// JSON only.
+		req.Header.Set("Accept", "application/json")
+	} else {
+		// Prefer SSZ, JSON if not.
+		req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
 	}
 
 	resp, err := s.client.Do(req)
 	if err != nil {
 		span.SetStatus(codes.Error, err.Error())
+		s.monitorGetComplete(ctx, callURL.Path, "failed")
 
 		return nil, errors.Join(errors.New("failed to call GET endpoint"), err)
 	}
@@ -101,15 +270,26 @@ func (s *Service) get(ctx context.Context,
 	// body as a byte array.
 	res.body, err = io.ReadAll(resp.Body)
 	if err != nil {
+		switch {
+		case errors.Is(err, context.Canceled):
+			// We don't consider context canceled to be worth logging, as the user canceled the context.
+		case errors.Is(err, context.DeadlineExceeded):
+			// We don't consider context deadline exceeded to be worth logging, as the user selected the deadline.
+		default:
+			log.Warn().Err(err).Msg("Failed to read GET response")
+		}
+
 		span.SetStatus(codes.Error, err.Error())
+		s.monitorGetComplete(ctx, callURL.Path, "failed")
 
 		return nil, errors.Join(errors.New("failed to read GET response"), err)
 	}
 
-	if resp.StatusCode == http.StatusNoContent || len(res.body) == 0 {
+	if resp.StatusCode == http.StatusNoContent {
 		// Nothing returned.  This is not considered an error.
 		span.AddEvent("Received empty response")
 		log.Trace().Msg("Endpoint returned no content")
+		s.monitorGetComplete(ctx, callURL.Path, "succeeded")
 
 		return res, nil
 	}
@@ -131,134 +311,27 @@ func (s *Service) get(ctx context.Context,
 		}
 	}
 
-	statusFamily := resp.StatusCode / 100
+	statusFamily := statusCodeFamily(resp.StatusCode)
 	if statusFamily != 2 {
 		trimmedResponse := bytes.ReplaceAll(bytes.ReplaceAll(res.body, []byte{0x0a}, []byte{}), []byte{0x0d}, []byte{})
 		log.Debug().Int("status_code", resp.StatusCode).RawJSON("response", trimmedResponse).Msg("GET failed")
 
 		span.SetStatus(codes.Error, fmt.Sprintf("Status code %d", resp.StatusCode))
+		s.monitorGetComplete(ctx, callURL.Path, "failed")
 
-		return nil, fmt.Errorf("GET failed with status %d: %s", resp.StatusCode, string(res.body))
+		return nil, &api.Error{
+			Method:     http.MethodGet,
+			StatusCode: resp.StatusCode,
+			Endpoint:   endpoint,
+			Data:       res.body,
+		}
 	}
 
 	if err := populateConsensusVersion(res, resp); err != nil {
 		return nil, errors.Join(errors.New("failed to parse consensus version"), err)
 	}
 
-	return res, nil
-}
-
-// post sends an HTTP post request and returns the body.
-//
-//nolint:unparam
-func (s *Service) post(ctx context.Context,
-	endpoint string,
-	query string,
-	body io.Reader,
-	contentType ContentType,
-	headers map[string]string,
-) (
-	*httpResponse,
-	error,
-) {
-	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "post")
-	defer span.End()
-
-	// #nosec G404
-	log := log.With().Str("id", fmt.Sprintf("%02x", rand.Int31())).Str("endpoint", endpoint).Str("address", s.address).Logger()
-	if e := log.Trace(); e.Enabled() {
-		switch contentType {
-		case ContentTypeJSON:
-			bodyBytes, err := io.ReadAll(body)
-			if err != nil {
-				return nil, errors.New("failed to read request body")
-			}
-			body = bytes.NewReader(bodyBytes)
-
-			e.Str("body", string(bodyBytes)).Msg("POST request")
-		default:
-			e.Str("content_type", contentType.String()).Msg("POST request")
-		}
-	}
-
-	callURL := urlForCall(s.base, endpoint, query)
-	log.Trace().Str("url", callURL.String()).Msg("URL to POST")
-	span.SetAttributes(attribute.String("url", callURL.String()))
-
-	opCtx, cancel := context.WithTimeout(ctx, s.timeout)
-	defer cancel()
-	req, err := http.NewRequestWithContext(opCtx, http.MethodPost, callURL.String(), body)
-	if err != nil {
-		return nil, errors.Join(errors.New("failed to create POST request"), err)
-	}
-
-	s.addExtraHeaders(req)
-	req.Header.Set("Content-Type", contentType.MediaType())
-	// Prefer SSZ if available (enable when we support SSZ) .
-	// req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
-	req.Header.Set("Accept", "application/json")
-	for k, v := range headers {
-		req.Header.Set(k, v)
-	}
-	if req.Header.Get("User-Agent") == "" {
-		req.Header.Set("User-Agent", "go-builder-client/0.4.6")
-	}
-
-	resp, err := s.client.Do(req)
-	if err != nil {
-		span.SetStatus(codes.Error, "Request failed")
-
-		return nil, errors.Join(errors.New("failed to call POST endpoint"), err)
-	}
-	defer resp.Body.Close()
-	log = log.With().Int("status_code", resp.StatusCode).Logger()
-
-	res := &httpResponse{
-		statusCode: resp.StatusCode,
-	}
-	populateHeaders(res, resp)
-
-	res.body, err = io.ReadAll(resp.Body)
-	if err != nil {
-		span.SetStatus(codes.Error, err.Error())
-
-		return nil, errors.Join(errors.New("failed to read POST response"), err)
-	}
-
-	if resp.StatusCode == http.StatusNoContent || len(res.body) == 0 {
-		// Nothing returned.  This is not considered an error.
-		span.AddEvent("Received empty response")
-		log.Trace().Msg("Endpoint returned no content")
-
-		return res, nil
-	}
-
-	if err := populateContentType(res, resp); err != nil {
-		// For now, assume that unknown type is JSON.
-		log.Debug().Err(err).Msg("Failed to obtain content type; assuming JSON")
-		res.contentType = ContentTypeJSON
-	}
-	span.AddEvent("Received response", trace.WithAttributes(
-		attribute.Int("size", len(res.body)),
-		attribute.String("content-type", res.contentType.String()),
-	))
-
-	if res.contentType == ContentTypeJSON {
-		if e := log.Trace(); e.Enabled() {
-			trimmedResponse := bytes.ReplaceAll(bytes.ReplaceAll(res.body, []byte{0x0a}, []byte{}), []byte{0x0d}, []byte{})
-			e.RawJSON("body", trimmedResponse).Msg("GET response")
-		}
-	}
-
-	statusFamily := resp.StatusCode / 100
-	if statusFamily != 2 {
-		trimmedResponse := bytes.ReplaceAll(bytes.ReplaceAll(res.body, []byte{0x0a}, []byte{}), []byte{0x0d}, []byte{})
-		log.Debug().Int("status_code", resp.StatusCode).RawJSON("response", trimmedResponse).Msg("POST failed")
-
-		span.SetStatus(codes.Error, fmt.Sprintf("Status code %d", resp.StatusCode))
-
-		return nil, fmt.Errorf("POST failed with status %d: %s", resp.StatusCode, string(res.body))
-	}
+	s.monitorGetComplete(ctx, callURL.Path, "succeeded")
 
 	return res, nil
 }
@@ -305,6 +378,14 @@ func populateHeaders(res *httpResponse, resp *http.Response) {
 }
 
 func populateContentType(res *httpResponse, resp *http.Response) error {
+	if len(res.body) == 0 {
+		// There's no body to decode.  Some servers don't send a content type in this
+		// situation, but it doesn't matter anyway; set it to JSON and return.
+		res.contentType = ContentTypeJSON
+
+		return nil
+	}
+
 	respContentTypes, exists := resp.Header["Content-Type"]
 	if !exists {
 		return errors.New("no content type supplied in response")
@@ -322,6 +403,15 @@ func populateContentType(res *httpResponse, resp *http.Response) error {
 	return nil
 }
 
+func metadataFromHeaders(headers map[string]string) map[string]any {
+	metadata := make(map[string]any)
+	for k, v := range headers {
+		metadata[k] = v
+	}
+
+	return metadata
+}
+
 // urlForCall patches together a URL for a call.
 func urlForCall(base *url.URL,
 	endpoint string,
@@ -336,4 +426,8 @@ func urlForCall(base *url.URL,
 	}
 
 	return &callURL
+}
+
+func statusCodeFamily(status int) int {
+	return status / 100
 }

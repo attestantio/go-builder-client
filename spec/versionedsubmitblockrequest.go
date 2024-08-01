@@ -21,7 +21,7 @@ import (
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
 	"github.com/attestantio/go-builder-client/api/deneb"
-	v1 "github.com/attestantio/go-builder-client/api/v1"
+	apiv1 "github.com/attestantio/go-builder-client/api/v1"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	consensusbellatrix "github.com/attestantio/go-eth2-client/spec/bellatrix"
 	consensuscapella "github.com/attestantio/go-eth2-client/spec/capella"
@@ -318,7 +318,7 @@ func (v *VersionedSubmitBlockRequest) Value() (*uint256.Int, error) {
 }
 
 // BidTrace returns the bid trace of the request.
-func (v *VersionedSubmitBlockRequest) BidTrace() (*v1.BidTrace, error) {
+func (v *VersionedSubmitBlockRequest) BidTrace() (*apiv1.BidTrace, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}

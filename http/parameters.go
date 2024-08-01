@@ -27,6 +27,7 @@ type parameters struct {
 	address      string
 	timeout      time.Duration
 	extraHeaders map[string]string
+	enforceJSON  bool
 }
 
 // Parameter is the interface for service parameters.
@@ -72,6 +73,13 @@ func WithTimeout(timeout time.Duration) Parameter {
 func WithExtraHeaders(headers map[string]string) Parameter {
 	return parameterFunc(func(p *parameters) {
 		p.extraHeaders = headers
+	})
+}
+
+// WithEnforceJSON forces all requests and responses to be in JSON, not sending or requesting SSZ.
+func WithEnforceJSON(enforceJSON bool) Parameter {
+	return parameterFunc(func(p *parameters) {
+		p.enforceJSON = enforceJSON
 	})
 }
 

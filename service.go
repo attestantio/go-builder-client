@@ -1,4 +1,4 @@
-// Copyright © 2022, 2023 Attestant Limited.
+// Copyright © 2022  2024 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -40,11 +40,9 @@ type BuilderBidProvider interface {
 
 	// BuilderBidProvider obtains a builder bid.
 	BuilderBid(ctx context.Context,
-		slot phase0.Slot,
-		parentHash phase0.Hash32,
-		pubKey phase0.BLSPubKey,
+		opts *api.BuilderBidOpts,
 	) (
-		*spec.VersionedSignedBuilderBid,
+		*api.Response[*spec.VersionedSignedBuilderBid],
 		error,
 	)
 }
@@ -54,22 +52,9 @@ type ValidatorRegistrationsSubmitter interface {
 	Service
 
 	// SubmitValidatorRegistrations submits validator registrations.
-	SubmitValidatorRegistrations(ctx context.Context, registrations []*api.VersionedSignedValidatorRegistration) error
-}
-
-// UnblindedBlockProvider is the interface for a provider of unblinded blocks.
-type UnblindedBlockProvider interface {
-	Service
-
-	// UnblindBlock unblinds a block.
-	//
-	// Deprecated: this will not work from the deneb hard-fork onwards.  Use UnblindedProposalProvider.UnblindProposal() instead.
-	UnblindBlock(ctx context.Context,
-		block *consensusapi.VersionedSignedBlindedBeaconBlock,
-	) (
-		*consensusapi.VersionedSignedProposal,
-		error,
-	)
+	SubmitValidatorRegistrations(ctx context.Context,
+		opts *api.SubmitValidatorRegistrationsOpts,
+	) error
 }
 
 // UnblindedProposalProvider is the interface for unblinded proposals.
@@ -78,9 +63,9 @@ type UnblindedProposalProvider interface {
 
 	// UnblindProposal unblinds a proposal.
 	UnblindProposal(ctx context.Context,
-		proposal *consensusapi.VersionedSignedBlindedProposal,
+		opts *api.UnblindProposalOpts,
 	) (
-		*consensusapi.VersionedSignedProposal,
+		*api.Response[*consensusapi.VersionedSignedProposal],
 		error,
 	)
 }

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	v1 "github.com/attestantio/go-builder-client/api/v1"
+	apiv1 "github.com/attestantio/go-builder-client/api/v1"
 	"github.com/attestantio/go-eth2-client/spec/bellatrix"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/goccy/go-yaml"
@@ -16,21 +16,21 @@ import (
 
 // SubmitBlockRequest is the request from the builder to submit a block.
 type SubmitBlockRequest struct {
-	Message          *v1.BidTrace
+	Message          *apiv1.BidTrace
 	ExecutionPayload *bellatrix.ExecutionPayload
 	Signature        phase0.BLSSignature `ssz-size:"96"`
 }
 
 // submitBlockRequestJSON is the spec representation of the struct.
 type submitBlockRequestJSON struct {
-	Message          *v1.BidTrace                `json:"message"`
+	Message          *apiv1.BidTrace             `json:"message"`
 	ExecutionPayload *bellatrix.ExecutionPayload `json:"execution_payload"`
 	Signature        string                      `json:"signature"`
 }
 
 // submitBlockRequestYAML is the spec representation of the struct.
 type submitBlockRequestYAML struct {
-	Message          *v1.BidTrace                `yaml:"message"`
+	Message          *apiv1.BidTrace             `yaml:"message"`
 	ExecutionPayload *bellatrix.ExecutionPayload `yaml:"execution_payload"`
 	Signature        string                      `yaml:"signature"`
 }

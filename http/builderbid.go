@@ -16,16 +16,17 @@ package http
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
-	"time"
 
+	client "github.com/attestantio/go-builder-client"
+	"github.com/attestantio/go-builder-client/api"
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
 	"github.com/attestantio/go-builder-client/api/deneb"
 	"github.com/attestantio/go-builder-client/spec"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
-	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -33,77 +34,65 @@ import (
 
 // BuilderBid obtains a builder bid.
 func (s *Service) BuilderBid(ctx context.Context,
-	slot phase0.Slot,
-	parentHash phase0.Hash32,
-	pubKey phase0.BLSPubKey,
+	opts *api.BuilderBidOpts,
 ) (
-	*spec.VersionedSignedBuilderBid,
+	*api.Response[*spec.VersionedSignedBuilderBid],
 	error,
 ) {
 	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "BuilderBid", trace.WithAttributes(
 		attribute.String("relay", s.Address()),
-		attribute.Int64("slot", int64(slot)),
 	))
 	defer span.End()
-	started := time.Now()
 
-	endpoint := fmt.Sprintf("/eth/v1/builder/header/%d/%#x/%#x", slot, parentHash[:], pubKey[:])
-	httpResponse, err := s.get(ctx, endpoint, "")
+	if opts == nil {
+		return nil, client.ErrNoOptions
+	}
+
+	span.SetAttributes(attribute.Int64("slot", int64(opts.Slot)))
+
+	var emptyHash phase0.Hash32
+	if bytes.Equal(opts.ParentHash[:], emptyHash[:]) {
+		return nil, errors.Join(errors.New("no parent hash specified"), client.ErrInvalidOptions)
+	}
+	var emptyPubKey phase0.BLSPubKey
+	if bytes.Equal(opts.PubKey[:], emptyPubKey[:]) {
+		return nil, errors.Join(errors.New("no public key specified"), client.ErrInvalidOptions)
+	}
+
+	endpoint := fmt.Sprintf("/eth/v1/builder/header/%d/%#x/%#x", opts.Slot, opts.ParentHash[:], opts.PubKey[:])
+	httpResponse, err := s.get(ctx,
+		endpoint,
+		"",
+		&opts.Common,
+		map[string]string{},
+		false,
+	)
 	if err != nil {
-		log.Trace().Str("endpoint", endpoint).Err(err).Msg("Request failed")
-		monitorOperation(s.Address(), "builder bid", "failed", time.Since(started))
-
-		return nil, errors.Wrap(err, "failed to request execution payload header")
+		return nil, errors.Join(errors.New("failed to request execution payload header"), err)
 	}
 
-	if len(httpResponse.body) == 0 {
-		monitorOperation(s.Address(), "builder bid", "no response", time.Since(started))
-
-		//nolint:nilnil
-		return nil, nil
-	}
-
-	res := &spec.VersionedSignedBuilderBid{
-		Version: httpResponse.consensusVersion,
-	}
-
+	var response *api.Response[*spec.VersionedSignedBuilderBid]
 	switch httpResponse.contentType {
+	case ContentTypeSSZ:
+		response, err = s.signedBuilderBidFromSSZ(ctx, httpResponse)
 	case ContentTypeJSON:
-		switch httpResponse.consensusVersion {
-		case consensusspec.DataVersionBellatrix:
-			res.Bellatrix, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &bellatrix.SignedBuilderBid{})
-			if err != nil {
-				return nil, errors.Wrap(err, "failed to parse bellatrix builder bid")
-			}
-			if !bytes.Equal(res.Bellatrix.Message.Header.ParentHash[:], parentHash[:]) {
-				return nil, errors.New("parent hash mismatch")
-			}
-		case consensusspec.DataVersionCapella:
-			res.Capella, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &capella.SignedBuilderBid{})
-			if err != nil {
-				return nil, errors.Wrap(err, "failed to parse capella builder bid")
-			}
-			if !bytes.Equal(res.Capella.Message.Header.ParentHash[:], parentHash[:]) {
-				return nil, errors.New("parent hash mismatch")
-			}
-		case consensusspec.DataVersionDeneb:
-			res.Deneb, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &deneb.SignedBuilderBid{})
-			if err != nil {
-				return nil, errors.Wrap(err, "failed to parse deneb builder bid")
-			}
-			if !bytes.Equal(res.Deneb.Message.Header.ParentHash[:], parentHash[:]) {
-				return nil, errors.New("parent hash mismatch")
-			}
-		default:
-			return nil, fmt.Errorf("unsupported block version %s", httpResponse.consensusVersion)
-		}
+		response, err = s.signedBuilderBidFromJSON(httpResponse)
 	default:
-		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
+		return nil, fmt.Errorf("unhandled content type %v", httpResponse.contentType)
+	}
+	if err != nil {
+		return nil, err
 	}
 
-	monitorOperation(s.Address(), "builder bid", "succeeded", time.Since(started))
+	parentHash, err := response.Data.ParentHash()
+	if err != nil {
+		return nil, errors.Join(errors.New("could not obtain parent hash of bid"), err)
+	}
+	if !bytes.Equal(parentHash[:], opts.ParentHash[:]) {
+		return nil, errors.New("parent hash mismatch")
+	}
 
-	value, err := res.Value()
+	value, err := response.Data.Value()
 	if err == nil {
 		span.SetAttributes(
 			// Has to be a string due to the potential size being >maxint64.
@@ -111,5 +100,49 @@ func (s *Service) BuilderBid(ctx context.Context,
 		)
 	}
 
-	return res, nil
+	return response, nil
+}
+
+func (*Service) signedBuilderBidFromJSON(res *httpResponse) (
+	*api.Response[*spec.VersionedSignedBuilderBid],
+	error,
+) {
+	response := &api.Response[*spec.VersionedSignedBuilderBid]{
+		Data: &spec.VersionedSignedBuilderBid{
+			Version: res.consensusVersion,
+		},
+		Metadata: metadataFromHeaders(res.headers),
+	}
+
+	var err error
+	switch res.consensusVersion {
+	case consensusspec.DataVersionBellatrix:
+		response.Data.Bellatrix, _, err = decodeJSONResponse(bytes.NewReader(res.body),
+			&bellatrix.SignedBuilderBid{},
+		)
+	case consensusspec.DataVersionCapella:
+		response.Data.Capella, _, err = decodeJSONResponse(bytes.NewReader(res.body),
+			&capella.SignedBuilderBid{},
+		)
+	case consensusspec.DataVersionDeneb:
+		response.Data.Deneb, _, err = decodeJSONResponse(bytes.NewReader(res.body),
+			&deneb.SignedBuilderBid{},
+		)
+	default:
+		return nil, fmt.Errorf("unsupported block version %s", res.consensusVersion)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (*Service) signedBuilderBidFromSSZ(_ context.Context,
+	_ *httpResponse,
+) (
+	*api.Response[*spec.VersionedSignedBuilderBid],
+	error,
+) {
+	return nil, errors.New("not implemented")
 }

@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"fmt"
 
-	v1 "github.com/attestantio/go-builder-client/api/v1"
+	apiv1 "github.com/attestantio/go-builder-client/api/v1"
 	"github.com/attestantio/go-eth2-client/spec/deneb"
 	"github.com/goccy/go-yaml"
 )
 
 // submitBlockRequestYAML is the spec representation of the struct.
 type submitBlockRequestYAML struct {
-	Message          *v1.BidTrace            `yaml:"message"`
+	Message          *apiv1.BidTrace         `yaml:"message"`
 	ExecutionPayload *deneb.ExecutionPayload `yaml:"execution_payload"`
 	BlobsBundle      *BlobsBundle            `yaml:"blobs_bundle"`
 	Signature        string                  `yaml:"signature"`

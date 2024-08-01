@@ -33,16 +33,15 @@ import (
 
 // Service is a builder client service.
 type Service struct {
+	log          zerolog.Logger
 	base         *url.URL
 	address      string
 	client       *http.Client
 	timeout      time.Duration
 	pubkey       *phase0.BLSPubKey
 	extraHeaders map[string]string
+	enforceJSON  bool
 }
-
-// log is a service-wide logger.
-var log zerolog.Logger
 
 // New creates a new builder client service, connecting with HTTP.
 func New(ctx context.Context, params ...Parameter) (builderclient.Service, error) {
@@ -52,7 +51,7 @@ func New(ctx context.Context, params ...Parameter) (builderclient.Service, error
 	}
 
 	// Set logging.
-	log = zerologger.With().Str("service", "client").Str("impl", "http").Logger()
+	log := zerologger.With().Str("service", "client").Str("impl", "http").Logger()
 	if parameters.logLevel != log.GetLevel() {
 		log = log.Level(parameters.logLevel)
 	}
@@ -98,12 +97,14 @@ func New(ctx context.Context, params ...Parameter) (builderclient.Service, error
 		base.User = nil
 	}
 	s := &Service{
+		log:          log,
 		base:         base,
 		address:      address.String(),
 		client:       client,
 		timeout:      parameters.timeout,
 		pubkey:       pubkey,
 		extraHeaders: parameters.extraHeaders,
+		enforceJSON:  parameters.enforceJSON,
 	}
 
 	// Close the service on context done.
@@ -136,7 +137,7 @@ func (s *Service) Pubkey() *phase0.BLSPubKey {
 
 func parseAddress(address string) (*url.URL, *url.URL, error) {
 	if !strings.HasPrefix(address, "http") {
-		address = "http://" + address
+		address = fmt.Sprintf("http://%s", address)
 	}
 	base, err := url.Parse(address)
 	if err != nil {
@@ -145,17 +146,21 @@ func parseAddress(address string) (*url.URL, *url.URL, error) {
 	// Remove any trailing slash from the path.
 	base.Path = strings.TrimSuffix(base.Path, "/")
 
+	// Attempt to mask any sensitive information in the URL, for logging purposes.
 	baseAddress := *base
 	if _, pwExists := baseAddress.User.Password(); pwExists {
+		// Mask the password.
 		user := baseAddress.User.Username()
-		baseAddress.User = url.UserPassword(user, "***")
+		baseAddress.User = url.UserPassword(user, "xxxxx")
 	}
 	if baseAddress.Path != "" {
-		baseAddress.Path = "***"
+		// Mask the path.
+		baseAddress.Path = "xxxxx"
 	}
 	if baseAddress.RawQuery != "" {
+		// Mask all query values.
 		sensitiveRegex := regexp.MustCompile("=([^&]*)(&)?")
-		baseAddress.RawQuery = sensitiveRegex.ReplaceAllString(baseAddress.RawQuery, "=***$2")
+		baseAddress.RawQuery = sensitiveRegex.ReplaceAllString(baseAddress.RawQuery, "=xxxxx$2")
 	}
 
 	return base, &baseAddress, nil

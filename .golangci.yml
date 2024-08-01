@@ -123,8 +123,6 @@ linters-settings:
         disabled: true
       - name: cognitive-complexity
         disabled: true
-      - name: confusing-naming
-        disabled: true
       - name: confusing-results
       - name: function-length
         disabled: true
@@ -133,8 +131,6 @@ linters-settings:
       - name: max-public-structs
         disabled: true
       - name: package-comments
-        disabled: true
-      - name: redundant-import-alias
         disabled: true
       - name: struct-tag
         arguments: ["json,allowempty"]
@@ -161,12 +157,10 @@ linters:
   # https://golangci-lint.run/usage/linters/#disabled-by-default
   disable:
     - cyclop
-    - deadcode
     - depguard
     - dupl
     - execinquery
     - exhaustive
-    - exhaustivestruct
     - exhaustruct
     - forcetypeassert
     - funlen
@@ -176,21 +170,13 @@ linters:
     - gocognit
     - goconst
     - err113
-    - golint
     - gomnd
-    - ifshort
-    - interfacer
     - ireturn
     - lll
     - maintidx
-    - maligned
     - mnd
     - musttag
-    - nosnakecase
     - perfsprint
-    - scopelint
-    - structcheck
-    - varcheck
     - varnamelen
     - wrapcheck
     - wsl

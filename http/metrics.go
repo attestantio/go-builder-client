@@ -68,7 +68,7 @@ func registerPrometheusMetrics(_ context.Context) error {
 	return prometheus.Register(requestsTimer)
 }
 
-func (s *Service) monitorGetComplete(_ context.Context, endpoint string, result string) {
+func (s *Service) monitorGetComplete(_ context.Context, endpoint, result string) {
 	if requestsCounter == nil {
 		return
 	}
@@ -76,7 +76,7 @@ func (s *Service) monitorGetComplete(_ context.Context, endpoint string, result 
 	requestsCounter.WithLabelValues(s.address, "GET", reduceEndpoint(endpoint), result).Inc()
 }
 
-func (s *Service) monitorPostComplete(_ context.Context, endpoint string, result string) {
+func (s *Service) monitorPostComplete(_ context.Context, endpoint, result string) {
 	if requestsCounter == nil {
 		return
 	}

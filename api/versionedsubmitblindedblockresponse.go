@@ -219,8 +219,8 @@ func (v *VersionedSubmitBlindedBlockResponse) ExcessBlobGas() (uint64, error) {
 	}
 }
 
-// DepositReceipts returns the deposit receipts of the execution payload.
-func (v *VersionedSubmitBlindedBlockResponse) DepositReceipts() ([]*consensuselectra.DepositReceipt, error) {
+// DepositRequests returns the deposit receipts of the execution payload.
+func (v *VersionedSubmitBlindedBlockResponse) DepositRequests() ([]*consensuselectra.DepositRequest, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
@@ -233,14 +233,14 @@ func (v *VersionedSubmitBlindedBlockResponse) DepositReceipts() ([]*consensusele
 			return nil, errors.New("no data execution payload")
 		}
 
-		return v.Electra.ExecutionPayload.DepositReceipts, nil
+		return v.Electra.ExecutionPayload.DepositRequests, nil
 	default:
 		return nil, errors.New("unsupported version")
 	}
 }
 
 // WithdrawalRequests returns the execution layer withdrawal requests of the execution payload.
-func (v *VersionedSubmitBlindedBlockResponse) WithdrawalRequests() ([]*consensuselectra.ExecutionLayerWithdrawalRequest, error) {
+func (v *VersionedSubmitBlindedBlockResponse) WithdrawalRequests() ([]*consensuselectra.WithdrawalRequest, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}

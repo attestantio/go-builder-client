@@ -5,7 +5,7 @@ package electra
 
 import (
 	"github.com/attestantio/go-builder-client/api/deneb"
-	v1 "github.com/attestantio/go-builder-client/api/v1"
+	apiv1 "github.com/attestantio/go-builder-client/api/v1"
 	"github.com/attestantio/go-eth2-client/spec/electra"
 	ssz "github.com/ferranbt/fastssz"
 )
@@ -22,7 +22,7 @@ func (s *SubmitBlockRequest) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 
 	// Field (0) 'Message'
 	if s.Message == nil {
-		s.Message = new(v1.BidTrace)
+		s.Message = new(apiv1.BidTrace)
 	}
 	if dst, err = s.Message.MarshalSSZTo(dst); err != nil {
 		return
@@ -71,7 +71,7 @@ func (s *SubmitBlockRequest) UnmarshalSSZ(buf []byte) error {
 
 	// Field (0) 'Message'
 	if s.Message == nil {
-		s.Message = new(v1.BidTrace)
+		s.Message = new(apiv1.BidTrace)
 	}
 	if err = s.Message.UnmarshalSSZ(buf[0:236]); err != nil {
 		return err
@@ -148,7 +148,7 @@ func (s *SubmitBlockRequest) HashTreeRootWith(hh ssz.HashWalker) (err error) {
 
 	// Field (0) 'Message'
 	if s.Message == nil {
-		s.Message = new(v1.BidTrace)
+		s.Message = new(apiv1.BidTrace)
 	}
 	if err = s.Message.HashTreeRootWith(hh); err != nil {
 		return

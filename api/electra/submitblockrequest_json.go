@@ -20,7 +20,7 @@ import (
 	"strings"
 
 	"github.com/attestantio/go-builder-client/api/deneb"
-	v1 "github.com/attestantio/go-builder-client/api/v1"
+	apiv1 "github.com/attestantio/go-builder-client/api/v1"
 	"github.com/attestantio/go-eth2-client/spec/electra"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/pkg/errors"
@@ -28,7 +28,7 @@ import (
 
 // submitBlockRequestJSON is the spec representation of the struct.
 type submitBlockRequestJSON struct {
-	Message          *v1.BidTrace              `json:"message"`
+	Message          *apiv1.BidTrace           `json:"message"`
 	ExecutionPayload *electra.ExecutionPayload `json:"execution_payload"`
 	BlobsBundle      *deneb.BlobsBundle        `json:"blobs_bundle"`
 	Signature        string                    `json:"signature"`

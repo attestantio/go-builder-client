@@ -969,8 +969,8 @@ func (v *VersionedSubmitBlockRequest) ExcessBlobGas() (uint64, error) {
 	}
 }
 
-// DepositReceipts returns the deposit receipts of the execution payload.
-func (v *VersionedSubmitBlockRequest) DepositReceipts() ([]*consensuselectra.DepositReceipt, error) {
+// DepositRequests returns the deposit receipts of the execution payload.
+func (v *VersionedSubmitBlockRequest) DepositRequests() ([]*consensuselectra.DepositRequest, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
@@ -983,14 +983,14 @@ func (v *VersionedSubmitBlockRequest) DepositReceipts() ([]*consensuselectra.Dep
 			return nil, errors.New("no data execution payload")
 		}
 
-		return v.Electra.ExecutionPayload.DepositReceipts, nil
+		return v.Electra.ExecutionPayload.DepositRequests, nil
 	default:
 		return nil, errors.New("unsupported version")
 	}
 }
 
 // WithdrawalRequests returns the execution layer withdrawal requests of the execution payload.
-func (v *VersionedSubmitBlockRequest) WithdrawalRequests() ([]*consensuselectra.ExecutionLayerWithdrawalRequest, error) {
+func (v *VersionedSubmitBlockRequest) WithdrawalRequests() ([]*consensuselectra.WithdrawalRequest, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
@@ -1004,6 +1004,26 @@ func (v *VersionedSubmitBlockRequest) WithdrawalRequests() ([]*consensuselectra.
 		}
 
 		return v.Electra.ExecutionPayload.WithdrawalRequests, nil
+	default:
+		return nil, errors.New("unsupported version")
+	}
+}
+
+// ConsolidationRequests returns the consolidation requests of the execution payload.
+func (v *VersionedSubmitBlockRequest) ConsolidationRequests() ([]*consensuselectra.ConsolidationRequest, error) {
+	if v == nil {
+		return nil, errors.New("nil struct")
+	}
+	switch v.Version {
+	case consensusspec.DataVersionElectra:
+		if v.Electra == nil {
+			return nil, errors.New("no data")
+		}
+		if v.Electra.ExecutionPayload == nil {
+			return nil, errors.New("no data execution payload")
+		}
+
+		return v.Electra.ExecutionPayload.ConsolidationRequests, nil
 	default:
 		return nil, errors.New("unsupported version")
 	}

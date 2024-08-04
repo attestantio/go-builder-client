@@ -421,7 +421,9 @@ func (s *Service) unblindElectraProposal(ctx context.Context,
 			return nil, errors.Join(errors.New("failed to generate hash tree root for the received execution payload header"), err)
 		}
 		if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
-			return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:], ourExecutionPayloadHash[:])
+			return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:],
+				ourExecutionPayloadHash[:],
+			)
 		}
 		res.Electra.SignedBlock.Message.Body.ExecutionPayload = bundle.ExecutionPayload
 

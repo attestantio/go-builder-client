@@ -15,5 +15,6 @@ package electra
 
 // Need to `go install github.com/ferranbt/fastssz/sszgen@latest` for this to work.
 //go:generate rm -f builderbid_ssz.go executionpayloadandblobsbundle_ssz.go signedbuilderbid_ssz.go submitblockrequest_ssz.go
+//nolint:revive
 //go:generate sszgen --suffix ssz --include ../../../go-eth2-client/spec/phase0,../../../go-eth2-client/spec/bellatrix,../../../go-eth2-client/spec/capella,../../../go-eth2-client/spec/deneb,../../../go-eth2-client/spec/electra,../v1,../deneb --path . --objs BuilderBid,ExecutionPayloadAndBlobsBundle,SignedBuilderBid,SubmitBlockRequest
 //go:generate goimports -w builderbid_ssz.go executionpayloadandblobsbundle_ssz.go signedbuilderbid_ssz.go submitblockrequest_ssz.go

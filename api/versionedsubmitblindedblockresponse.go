@@ -15,12 +15,10 @@ package api
 
 import (
 	"github.com/attestantio/go-builder-client/api/deneb"
-	"github.com/attestantio/go-builder-client/api/electra"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/attestantio/go-eth2-client/spec/bellatrix"
 	"github.com/attestantio/go-eth2-client/spec/capella"
 	consensusdeneb "github.com/attestantio/go-eth2-client/spec/deneb"
-	consensuselectra "github.com/attestantio/go-eth2-client/spec/electra"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/pkg/errors"
 )
@@ -31,7 +29,7 @@ type VersionedSubmitBlindedBlockResponse struct {
 	Bellatrix *bellatrix.ExecutionPayload
 	Capella   *capella.ExecutionPayload
 	Deneb     *deneb.ExecutionPayloadAndBlobsBundle
-	Electra   *electra.ExecutionPayloadAndBlobsBundle
+	Electra   *deneb.ExecutionPayloadAndBlobsBundle
 }
 
 // IsEmpty returns true if there is no payload.
@@ -216,45 +214,5 @@ func (v *VersionedSubmitBlindedBlockResponse) ExcessBlobGas() (uint64, error) {
 		return v.Electra.ExecutionPayload.ExcessBlobGas, nil
 	default:
 		return 0, errors.New("unsupported version")
-	}
-}
-
-// DepositRequests returns the deposit receipts of the execution payload.
-func (v *VersionedSubmitBlindedBlockResponse) DepositRequests() ([]*consensuselectra.DepositRequest, error) {
-	if v == nil {
-		return nil, errors.New("nil struct")
-	}
-	switch v.Version {
-	case consensusspec.DataVersionElectra:
-		if v.Electra == nil {
-			return nil, errors.New("no data")
-		}
-		if v.Electra.ExecutionPayload == nil {
-			return nil, errors.New("no data execution payload")
-		}
-
-		return v.Electra.ExecutionPayload.DepositRequests, nil
-	default:
-		return nil, errors.New("unsupported version")
-	}
-}
-
-// WithdrawalRequests returns the execution layer withdrawal requests of the execution payload.
-func (v *VersionedSubmitBlindedBlockResponse) WithdrawalRequests() ([]*consensuselectra.WithdrawalRequest, error) {
-	if v == nil {
-		return nil, errors.New("nil struct")
-	}
-	switch v.Version {
-	case consensusspec.DataVersionElectra:
-		if v.Electra == nil {
-			return nil, errors.New("no data")
-		}
-		if v.Electra.ExecutionPayload == nil {
-			return nil, errors.New("no data execution payload")
-		}
-
-		return v.Electra.ExecutionPayload.WithdrawalRequests, nil
-	default:
-		return nil, errors.New("unsupported version")
 	}
 }

@@ -21,7 +21,6 @@ import (
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
 	"github.com/attestantio/go-builder-client/api/deneb"
-	"github.com/attestantio/go-builder-client/api/electra"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	consensusbellatrix "github.com/attestantio/go-eth2-client/spec/bellatrix"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
@@ -34,7 +33,7 @@ type VersionedSignedBuilderBid struct {
 	Bellatrix *bellatrix.SignedBuilderBid
 	Capella   *capella.SignedBuilderBid
 	Deneb     *deneb.SignedBuilderBid
-	Electra   *electra.SignedBuilderBid
+	Electra   *deneb.SignedBuilderBid
 }
 
 // IsEmpty returns true if there is no bid.

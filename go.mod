@@ -3,7 +3,7 @@ module github.com/attestantio/go-builder-client
 go 1.20
 
 require (
-	github.com/attestantio/go-eth2-client v0.21.7-0.20240701211822-0a60485fce68
+	github.com/attestantio/go-eth2-client v0.21.12-0.20240925220056-393fff117304
 	github.com/ferranbt/fastssz v0.1.3
 	// go-yaml after 1.9.2 has memory issues due to https://github.com/goccy/go-yaml/issues/325; avoid.
 	github.com/goccy/go-yaml v1.9.2
@@ -46,6 +46,3 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-// Remove this when attestantio merge's pk's PR.
-replace github.com/attestantio/go-eth2-client => github.com/pk910/go-eth2-client v0.0.0-20240923174943-8d64565c83ca

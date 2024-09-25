@@ -18,7 +18,6 @@ import (
 	"fmt"
 
 	"github.com/attestantio/go-builder-client/api/deneb"
-	"github.com/attestantio/go-builder-client/api/electra"
 	"github.com/attestantio/go-eth2-client/spec"
 	"github.com/pkg/errors"
 )
@@ -28,7 +27,7 @@ type denebVersionedExecutionPayloadAndBlobsBundleJSON struct {
 }
 
 type electraVersionedExecutionPayloadAndBlobsBundleJSON struct {
-	Data *electra.ExecutionPayloadAndBlobsBundle `json:"data"`
+	Data *deneb.ExecutionPayloadAndBlobsBundle `json:"data"`
 }
 
 // MarshalJSON implements json.Marshaler.

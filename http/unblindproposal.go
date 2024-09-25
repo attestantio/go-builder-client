@@ -23,7 +23,6 @@ import (
 	client "github.com/attestantio/go-builder-client"
 	"github.com/attestantio/go-builder-client/api"
 	apideneb "github.com/attestantio/go-builder-client/api/deneb"
-	apielectra "github.com/attestantio/go-builder-client/api/electra"
 	consensusapi "github.com/attestantio/go-eth2-client/api"
 	consensusapiv1deneb "github.com/attestantio/go-eth2-client/api/v1/deneb"
 	consensusapiv1electra "github.com/attestantio/go-eth2-client/api/v1/electra"
@@ -407,7 +406,7 @@ func (s *Service) unblindElectraProposal(ctx context.Context,
 
 	switch httpResponse.contentType {
 	case ContentTypeJSON:
-		bundle, _, err := decodeJSONResponse(bytes.NewReader(httpResponse.body), &apielectra.ExecutionPayloadAndBlobsBundle{})
+		bundle, _, err := decodeJSONResponse(bytes.NewReader(httpResponse.body), &apideneb.ExecutionPayloadAndBlobsBundle{})
 		if err != nil {
 			return nil, errors.Join(errors.New("failed to parse electra response"), err)
 		}

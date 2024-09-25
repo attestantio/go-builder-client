@@ -21,7 +21,6 @@ import (
 	"github.com/attestantio/go-eth2-client/spec/bellatrix"
 	"github.com/attestantio/go-eth2-client/spec/capella"
 	"github.com/attestantio/go-eth2-client/spec/deneb"
-	"github.com/attestantio/go-eth2-client/spec/electra"
 	"github.com/pkg/errors"
 )
 
@@ -39,10 +38,6 @@ type capellaVersionedExecutionPayloadJSON struct {
 
 type denebVersionedExecutionPayloadJSON struct {
 	Data *deneb.ExecutionPayload `json:"data"`
-}
-
-type electraVersionedExecutionPayloadJSON struct {
-	Data *electra.ExecutionPayload `json:"data"`
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -94,12 +89,12 @@ func (v *VersionedExecutionPayload) MarshalJSON() ([]byte, error) {
 		if v.Electra == nil {
 			return nil, errors.New("no electra data")
 		}
-		data := &electraVersionedExecutionPayloadJSON{
+		data := &denebVersionedExecutionPayloadJSON{
 			Data: v.Electra,
 		}
 		payload := struct {
 			*versionJSON
-			*electraVersionedExecutionPayloadJSON
+			*denebVersionedExecutionPayloadJSON
 		}{version, data}
 
 		return json.Marshal(payload)
@@ -135,7 +130,7 @@ func (v *VersionedExecutionPayload) UnmarshalJSON(input []byte) error {
 		}
 		v.Deneb = data.Data
 	case spec.DataVersionElectra:
-		var data electraVersionedExecutionPayloadJSON
+		var data denebVersionedExecutionPayloadJSON
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}

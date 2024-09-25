@@ -20,7 +20,6 @@ import (
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
 	"github.com/attestantio/go-builder-client/api/deneb"
-	"github.com/attestantio/go-builder-client/api/electra"
 	"github.com/attestantio/go-eth2-client/spec"
 	"github.com/pkg/errors"
 )
@@ -37,7 +36,7 @@ type denebVersionedSubmitBlockRequestJSON struct {
 }
 
 type electraVersionedSubmitBlockRequestJSON struct {
-	Data *electra.SubmitBlockRequest `json:"data"`
+	Data *deneb.SubmitBlockRequest `json:"data"`
 }
 
 // MarshalJSON implements json.Marshaler.

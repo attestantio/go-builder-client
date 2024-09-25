@@ -18,7 +18,6 @@ import (
 	"github.com/attestantio/go-eth2-client/spec/bellatrix"
 	"github.com/attestantio/go-eth2-client/spec/capella"
 	"github.com/attestantio/go-eth2-client/spec/deneb"
-	"github.com/attestantio/go-eth2-client/spec/electra"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/pkg/errors"
 )
@@ -29,7 +28,7 @@ type VersionedExecutionPayload struct {
 	Bellatrix *bellatrix.ExecutionPayload
 	Capella   *capella.ExecutionPayload
 	Deneb     *deneb.ExecutionPayload
-	Electra   *electra.ExecutionPayload
+	Electra   *deneb.ExecutionPayload
 }
 
 // IsEmpty returns true if there is no payload.

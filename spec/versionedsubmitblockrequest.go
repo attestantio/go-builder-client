@@ -21,13 +21,11 @@ import (
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
 	"github.com/attestantio/go-builder-client/api/deneb"
-	"github.com/attestantio/go-builder-client/api/electra"
 	apiv1 "github.com/attestantio/go-builder-client/api/v1"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	consensusbellatrix "github.com/attestantio/go-eth2-client/spec/bellatrix"
 	consensuscapella "github.com/attestantio/go-eth2-client/spec/capella"
 	consensusdeneb "github.com/attestantio/go-eth2-client/spec/deneb"
-	consensuselectra "github.com/attestantio/go-eth2-client/spec/electra"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/holiman/uint256"
 )
@@ -38,7 +36,7 @@ type VersionedSubmitBlockRequest struct {
 	Bellatrix *bellatrix.SubmitBlockRequest
 	Capella   *capella.SubmitBlockRequest
 	Deneb     *deneb.SubmitBlockRequest
-	Electra   *electra.SubmitBlockRequest
+	Electra   *deneb.SubmitBlockRequest
 }
 
 // IsEmpty returns true if there is no request.
@@ -966,66 +964,6 @@ func (v *VersionedSubmitBlockRequest) ExcessBlobGas() (uint64, error) {
 		return v.Electra.ExecutionPayload.ExcessBlobGas, nil
 	default:
 		return 0, errors.New("unsupported version")
-	}
-}
-
-// DepositRequests returns the deposit receipts of the execution payload.
-func (v *VersionedSubmitBlockRequest) DepositRequests() ([]*consensuselectra.DepositRequest, error) {
-	if v == nil {
-		return nil, errors.New("nil struct")
-	}
-	switch v.Version {
-	case consensusspec.DataVersionElectra:
-		if v.Electra == nil {
-			return nil, errors.New("no data")
-		}
-		if v.Electra.ExecutionPayload == nil {
-			return nil, errors.New("no data execution payload")
-		}
-
-		return v.Electra.ExecutionPayload.DepositRequests, nil
-	default:
-		return nil, errors.New("unsupported version")
-	}
-}
-
-// WithdrawalRequests returns the execution layer withdrawal requests of the execution payload.
-func (v *VersionedSubmitBlockRequest) WithdrawalRequests() ([]*consensuselectra.WithdrawalRequest, error) {
-	if v == nil {
-		return nil, errors.New("nil struct")
-	}
-	switch v.Version {
-	case consensusspec.DataVersionElectra:
-		if v.Electra == nil {
-			return nil, errors.New("no data")
-		}
-		if v.Electra.ExecutionPayload == nil {
-			return nil, errors.New("no data execution payload")
-		}
-
-		return v.Electra.ExecutionPayload.WithdrawalRequests, nil
-	default:
-		return nil, errors.New("unsupported version")
-	}
-}
-
-// ConsolidationRequests returns the consolidation requests of the execution payload.
-func (v *VersionedSubmitBlockRequest) ConsolidationRequests() ([]*consensuselectra.ConsolidationRequest, error) {
-	if v == nil {
-		return nil, errors.New("nil struct")
-	}
-	switch v.Version {
-	case consensusspec.DataVersionElectra:
-		if v.Electra == nil {
-			return nil, errors.New("no data")
-		}
-		if v.Electra.ExecutionPayload == nil {
-			return nil, errors.New("no data execution payload")
-		}
-
-		return v.Electra.ExecutionPayload.ConsolidationRequests, nil
-	default:
-		return nil, errors.New("unsupported version")
 	}
 }
 

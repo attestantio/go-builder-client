@@ -24,7 +24,6 @@ import (
 	"github.com/attestantio/go-builder-client/api/bellatrix"
 	"github.com/attestantio/go-builder-client/api/capella"
 	"github.com/attestantio/go-builder-client/api/deneb"
-	"github.com/attestantio/go-builder-client/api/electra"
 	"github.com/attestantio/go-builder-client/spec"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/attestantio/go-eth2-client/spec/phase0"
@@ -131,7 +130,7 @@ func (*Service) signedBuilderBidFromJSON(res *httpResponse) (
 		)
 	case consensusspec.DataVersionElectra:
 		response.Data.Electra, _, err = decodeJSONResponse(bytes.NewReader(res.body),
-			&electra.SignedBuilderBid{},
+			&deneb.SignedBuilderBid{},
 		)
 	default:
 		return nil, fmt.Errorf("unsupported block version %s", res.consensusVersion)

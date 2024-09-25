@@ -33,7 +33,6 @@ func decodeJSONResponse[T any](body io.Reader, res T) (T, map[string]any, error)
 		return res, nil, errors.Join(errors.New("failed to parse JSON"), err)
 	}
 
-	//nolint:forcetypeassert
 	data, isCorrectType := clone.Clone(res).(T)
 	if !isCorrectType {
 		return res, nil, ErrIncorrectType

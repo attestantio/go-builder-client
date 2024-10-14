@@ -3,7 +3,7 @@ module github.com/attestantio/go-builder-client
 go 1.20
 
 require (
-	github.com/attestantio/go-eth2-client v0.21.12-0.20240925220056-393fff117304
+	github.com/attestantio/go-eth2-client v0.21.12-0.20241006200801-8fa702e3a895
 	github.com/ferranbt/fastssz v0.1.3
 	// go-yaml after 1.9.2 has memory issues due to https://github.com/goccy/go-yaml/issues/325; avoid.
 	github.com/goccy/go-yaml v1.9.2

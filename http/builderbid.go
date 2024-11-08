@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 
 	client "github.com/attestantio/go-builder-client"
 	"github.com/attestantio/go-builder-client/api"
@@ -71,7 +72,16 @@ func (s *Service) BuilderBid(ctx context.Context,
 		return nil, errors.Join(errors.New("failed to request execution payload header"), err)
 	}
 
+	if httpResponse.statusCode == http.StatusNoContent {
+		// This is a valid response when the relay has no suitable bid.
+		return &api.Response[*spec.VersionedSignedBuilderBid]{
+			Data:     nil,
+			Metadata: metadataFromHeaders(httpResponse.headers),
+		}, nil
+	}
+
 	var response *api.Response[*spec.VersionedSignedBuilderBid]
+
 	switch httpResponse.contentType {
 	case ContentTypeSSZ:
 		response, err = s.signedBuilderBidFromSSZ(ctx, httpResponse)

@@ -304,7 +304,7 @@ func (s *Service) get(ctx context.Context,
 		attribute.String("content-type", res.contentType.String()),
 	))
 
-	if res.contentType == ContentTypeJSON {
+	if res.contentType == ContentTypeJSON || res.contentType == ContentTypeText {
 		if e := log.Trace(); e.Enabled() {
 			trimmedResponse := bytes.ReplaceAll(bytes.ReplaceAll(res.body, []byte{0x0a}, []byte{}), []byte{0x0d}, []byte{})
 			e.RawJSON("body", trimmedResponse).Msg("GET response")

@@ -30,6 +30,8 @@ const (
 	ContentTypeSSZ
 	// ContentTypeJSON implies a JSON content type.
 	ContentTypeJSON
+	// ContentTypeText implies a text content type (usually for errors).
+	ContentTypeText
 )
 
 var contentTypeStrings = [...]string{
@@ -80,6 +82,8 @@ func ParseFromMediaType(input string) (ContentType, error) {
 		return ContentTypeSSZ, nil
 	case "application/json":
 		return ContentTypeJSON, nil
+	case "text/plain":
+		return ContentTypeText, nil
 	default:
 		return ContentTypeUnknown, fmt.Errorf("unrecognised content type %s", input)
 	}

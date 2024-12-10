@@ -19,6 +19,8 @@ import (
 )
 
 // BuilderVersion defines the builder spec version.
+//
+//nolint:recvcheck
 type BuilderVersion int
 
 const (

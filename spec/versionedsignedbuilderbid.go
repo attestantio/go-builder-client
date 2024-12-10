@@ -539,6 +539,53 @@ func (v *VersionedSignedBuilderBid) HeaderHashTreeRoot() (phase0.Root, error) {
 	}
 }
 
+// BlockGasLimit returns the block gas limit of the header of the bid.
+func (v *VersionedSignedBuilderBid) BlockGasLimit() (uint64, error) {
+	if v == nil {
+		return 0, errors.New("nil struct")
+	}
+	switch v.Version {
+	case consensusspec.DataVersionBellatrix:
+		if v.Bellatrix == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Bellatrix.Message == nil {
+			return 0, errors.New("no data message")
+		}
+		if v.Bellatrix.Message.Header == nil {
+			return 0, errors.New("no data message header")
+		}
+
+		return v.Bellatrix.Message.Header.GasLimit, nil
+	case consensusspec.DataVersionCapella:
+		if v.Capella == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Capella.Message == nil {
+			return 0, errors.New("no data message")
+		}
+		if v.Capella.Message.Header == nil {
+			return 0, errors.New("no data message header")
+		}
+
+		return v.Capella.Message.Header.GasLimit, nil
+	case consensusspec.DataVersionDeneb:
+		if v.Deneb == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Deneb.Message == nil {
+			return 0, errors.New("no data message")
+		}
+		if v.Deneb.Message.Header == nil {
+			return 0, errors.New("no data message header")
+		}
+
+		return v.Deneb.Message.Header.GasLimit, nil
+	default:
+		return 0, errors.New("unsupported version")
+	}
+}
+
 // Signature returns the signature of the bid.
 func (v *VersionedSignedBuilderBid) Signature() (phase0.BLSSignature, error) {
 	if v == nil {

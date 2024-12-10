@@ -21,6 +21,8 @@ import (
 )
 
 // ContentType defines the builder spec version.
+//
+//nolint:recvcheck
 type ContentType int
 
 const (

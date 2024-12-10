@@ -163,7 +163,6 @@ linters:
     - cyclop
     - depguard
     - dupl
-    - execinquery
     - exhaustive
     - exhaustruct
     - exportloopref
@@ -171,7 +170,6 @@ linters:
     - gci
     - gochecknoglobals
     - err113
-    - gomnd
     - ireturn
     - mnd
     - perfsprint

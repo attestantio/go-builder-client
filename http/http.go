@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/attestantio/go-builder-client/api"
 	"github.com/attestantio/go-eth2-client/spec"
@@ -116,10 +117,11 @@ func (s *Service) post(ctx context.Context,
 		req.Header.Set("User-Agent", defaultUserAgent)
 	}
 
+	started := time.Now()
 	resp, err := s.client.Do(req)
 	if err != nil {
 		span.SetStatus(codes.Error, err.Error())
-		s.monitorPostComplete(ctx, callURL.Path, "failed")
+		s.monitorPostComplete(ctx, callURL.Path, "failed", time.Since(started))
 
 		return nil, errors.Join(errors.New("failed to call POST endpoint"), err)
 	}
@@ -143,7 +145,7 @@ func (s *Service) post(ctx context.Context,
 		}
 
 		span.SetStatus(codes.Error, err.Error())
-		s.monitorPostComplete(ctx, callURL.Path, "failed")
+		s.monitorPostComplete(ctx, callURL.Path, "failed", time.Since(started))
 
 		return nil, errors.Join(errors.New("failed to read POST response"), err)
 	}
@@ -152,7 +154,7 @@ func (s *Service) post(ctx context.Context,
 		// Nothing returned.  This is not considered an error.
 		span.AddEvent("Received empty response")
 		log.Trace().Msg("Endpoint returned no content")
-		s.monitorPostComplete(ctx, callURL.Path, "succeeded")
+		s.monitorPostComplete(ctx, callURL.Path, "succeeded", time.Since(started))
 
 		return res, nil
 	}
@@ -184,7 +186,7 @@ func (s *Service) post(ctx context.Context,
 		}
 
 		span.SetStatus(codes.Error, fmt.Sprintf("Status code %d", resp.StatusCode))
-		s.monitorPostComplete(ctx, callURL.Path, "failed")
+		s.monitorPostComplete(ctx, callURL.Path, "failed", time.Since(started))
 
 		return nil, &api.Error{
 			Method:     http.MethodPost,
@@ -194,7 +196,7 @@ func (s *Service) post(ctx context.Context,
 		}
 	}
 
-	s.monitorPostComplete(ctx, callURL.Path, "succeeded")
+	s.monitorPostComplete(ctx, callURL.Path, "succeeded", time.Since(started))
 
 	return res, nil
 }
@@ -249,10 +251,11 @@ func (s *Service) get(ctx context.Context,
 		req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
 	}
 
+	started := time.Now()
 	resp, err := s.client.Do(req)
 	if err != nil {
 		span.SetStatus(codes.Error, err.Error())
-		s.monitorGetComplete(ctx, callURL.Path, "failed")
+		s.monitorGetComplete(ctx, callURL.Path, "failed", time.Since(started))
 
 		return nil, errors.Join(errors.New("failed to call GET endpoint"), err)
 	}
@@ -280,7 +283,7 @@ func (s *Service) get(ctx context.Context,
 		}
 
 		span.SetStatus(codes.Error, err.Error())
-		s.monitorGetComplete(ctx, callURL.Path, "failed")
+		s.monitorGetComplete(ctx, callURL.Path, "failed", time.Since(started))
 
 		return nil, errors.Join(errors.New("failed to read GET response"), err)
 	}
@@ -289,7 +292,7 @@ func (s *Service) get(ctx context.Context,
 		// Nothing returned.  This is not considered an error.
 		span.AddEvent("Received empty response")
 		log.Trace().Msg("Endpoint returned no content")
-		s.monitorGetComplete(ctx, callURL.Path, "succeeded")
+		s.monitorGetComplete(ctx, callURL.Path, "succeeded", time.Since(started))
 
 		return res, nil
 	}
@@ -317,7 +320,7 @@ func (s *Service) get(ctx context.Context,
 		log.Debug().Int("status_code", resp.StatusCode).RawJSON("response", trimmedResponse).Msg("GET failed")
 
 		span.SetStatus(codes.Error, fmt.Sprintf("Status code %d", resp.StatusCode))
-		s.monitorGetComplete(ctx, callURL.Path, "failed")
+		s.monitorGetComplete(ctx, callURL.Path, "failed", time.Since(started))
 
 		return nil, &api.Error{
 			Method:     http.MethodGet,
@@ -331,7 +334,7 @@ func (s *Service) get(ctx context.Context,
 		return nil, errors.Join(errors.New("failed to parse consensus version"), err)
 	}
 
-	s.monitorGetComplete(ctx, callURL.Path, "succeeded")
+	s.monitorGetComplete(ctx, callURL.Path, "succeeded", time.Since(started))
 
 	return res, nil
 }

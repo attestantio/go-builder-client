@@ -1,4 +1,4 @@
-// Copyright © 2022 - 2024 Attestant Limited.
+// Copyright © 2022 - 2025 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -48,7 +48,7 @@ type responseMetadata struct {
 }
 
 // defaultUserAgent is sent with requests if no other user agent has been supplied.
-const defaultUserAgent = "go-builder-client/0.5.2"
+const defaultUserAgent = "go-builder-client/0.5.3"
 
 // post sends an HTTP post request and returns the body.
 //

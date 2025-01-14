@@ -5,8 +5,9 @@ go 1.22
 toolchain go1.23.2
 
 require (
-	github.com/attestantio/go-eth2-client v0.21.11
+	github.com/attestantio/go-eth2-client v0.23.1-0.20250114123312-5a900c7c87e7
 	github.com/ferranbt/fastssz v0.1.4
+	// go-yaml after 1.9.2 has memory issues due to https://github.com/goccy/go-yaml/issues/325; avoid.
 	github.com/goccy/go-yaml v1.9.2
 	github.com/holiman/uint256 v1.3.2
 	github.com/huandu/go-clone v1.7.2

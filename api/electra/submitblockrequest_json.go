@@ -85,5 +85,10 @@ func (s *SubmitBlockRequest) unpack(data *submitBlockRequestJSON) error {
 	}
 	s.BlobsBundle = data.BlobsBundle
 
+	if data.ExecutionRequests == nil {
+		return errors.New("execution requests missing")
+	}
+	s.ExecutionRequests = data.ExecutionRequests
+
 	return nil
 }

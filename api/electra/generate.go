@@ -13,6 +13,7 @@
 
 package electra
 
+//nolint:revive
 // Need to `go install github.com/ferranbt/fastssz/sszgen@latest` for this to work.
 //go:generate rm -f builderbid_ssz.go signedbuilderbid_ssz.go submitblockrequest_ssz.go
 //go:generate sszgen --suffix ssz --include ../../../go-eth2-client/spec/electra,../../../go-eth2-client/spec/deneb,../../../go-eth2-client/spec/capella,../../../go-eth2-client/spec/bellatrix,../../../go-eth2-client/spec/phase0,../v1,../deneb --path . --objs BuilderBid,SignedBuilderBid,SubmitBlockRequest

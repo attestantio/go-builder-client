@@ -121,7 +121,7 @@ func (v *ValidatorRegistration) MarshalYAML() ([]byte, error) {
 		FeeRecipient: v.FeeRecipient.String(),
 		GasLimit:     v.GasLimit,
 		Timestamp:    uint64(v.Timestamp.Unix()),
-		Pubkey:       fmt.Sprintf("%#x", v.Pubkey),
+		Pubkey:       v.Pubkey.String(),
 	}, yaml.Flow(true))
 	if err != nil {
 		return nil, err

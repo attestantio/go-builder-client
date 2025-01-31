@@ -16,6 +16,7 @@ package http
 import (
 	"context"
 	"regexp"
+	"time"
 
 	"github.com/attestantio/go-eth2-client/metrics"
 	"github.com/prometheus/client_golang/prometheus"
@@ -68,20 +69,28 @@ func registerPrometheusMetrics(_ context.Context) error {
 	return prometheus.Register(requestsTimer)
 }
 
-func (s *Service) monitorGetComplete(_ context.Context, endpoint string, result string) {
+func (s *Service) monitorGetComplete(_ context.Context, endpoint string, result string, duration time.Duration) {
 	if requestsCounter == nil {
 		return
 	}
 
-	requestsCounter.WithLabelValues(s.address, "GET", reduceEndpoint(endpoint), result).Inc()
+	endpoint = reduceEndpoint(endpoint)
+	requestsCounter.WithLabelValues(s.address, "GET", endpoint, result).Inc()
+	if result == "succeeded" {
+		requestsTimer.WithLabelValues(s.address, "GET", endpoint).Observe(duration.Seconds())
+	}
 }
 
-func (s *Service) monitorPostComplete(_ context.Context, endpoint string, result string) {
+func (s *Service) monitorPostComplete(_ context.Context, endpoint string, result string, duration time.Duration) {
 	if requestsCounter == nil {
 		return
 	}
 
-	requestsCounter.WithLabelValues(s.address, "POST", reduceEndpoint(endpoint), result).Inc()
+	endpoint = reduceEndpoint(endpoint)
+	requestsCounter.WithLabelValues(s.address, "POST", endpoint, result).Inc()
+	if result == "succeeded" {
+		requestsTimer.WithLabelValues(s.address, "POST", endpoint).Observe(duration.Seconds())
+	}
 }
 
 type templateReplacement struct {

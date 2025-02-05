@@ -2,13 +2,15 @@ package v1
 
 import (
 	"encoding/json"
+	"fmt"
+
 	"github.com/goccy/go-yaml"
 	"github.com/pkg/errors"
 )
 
 // SignedValidatorRegistrationList represents a list of SignedValidatorRegistration.
 type SignedValidatorRegistrationList struct {
-	Items []*SignedValidatorRegistration `ssz-max:"1099511627776" json:"items" yaml:"items"`
+	Items []*SignedValidatorRegistration `json:"items" ssz-max:"1099511627776" yaml:"items"`
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -23,6 +25,7 @@ func (s *SignedValidatorRegistrationList) UnmarshalJSON(input []byte) error {
 		return errors.Wrap(err, "invalid JSON")
 	}
 	s.Items = data
+
 	return nil
 }
 
@@ -38,6 +41,7 @@ func (s *SignedValidatorRegistrationList) UnmarshalYAML(input []byte) error {
 		return err
 	}
 	s.Items = data
+
 	return nil
 }
 
@@ -45,7 +49,8 @@ func (s *SignedValidatorRegistrationList) UnmarshalYAML(input []byte) error {
 func (s *SignedValidatorRegistrationList) String() string {
 	data, err := yaml.Marshal(s)
 	if err != nil {
-		return "ERR: " + err.Error()
+		return fmt.Sprintf("ERR: %v", err)
 	}
+
 	return string(data)
 }

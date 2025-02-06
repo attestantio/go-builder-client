@@ -216,3 +216,25 @@ func (v *VersionedSubmitBlindedBlockResponse) ExcessBlobGas() (uint64, error) {
 		return 0, errors.New("unsupported version")
 	}
 }
+
+// BlobsBundle returns the blobs bundle
+func (v *VersionedSubmitBlindedBlockResponse) BlobsBundle() (*deneb.BlobsBundle, error) {
+	if v == nil {
+		return nil, errors.New("nil struct")
+	}
+	switch v.Version {
+	case consensusspec.DataVersionDeneb:
+		if v.Deneb == nil {
+			return nil, errors.New("no data")
+		}
+
+		return v.Deneb.BlobsBundle, nil
+	case consensusspec.DataVersionElectra:
+		if v.Electra == nil {
+			return nil, errors.New("no data")
+		}
+		return v.Electra.BlobsBundle, nil
+	default:
+		return nil, errors.New("unsupported version")
+	}
+}

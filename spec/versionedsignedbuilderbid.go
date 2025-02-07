@@ -708,6 +708,18 @@ func (v *VersionedSignedBuilderBid) BlockGasLimit() (uint64, error) {
 		}
 
 		return v.Deneb.Message.Header.GasLimit, nil
+	case consensusspec.DataVersionElectra:
+		if v.Electra == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Electra.Message == nil {
+			return 0, errors.New("no data message")
+		}
+		if v.Electra.Message.Header == nil {
+			return 0, errors.New("no data message header")
+		}
+
+		return v.Electra.Message.Header.GasLimit, nil
 	default:
 		return 0, errors.New("unsupported version")
 	}

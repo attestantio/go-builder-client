@@ -1,4 +1,4 @@
-// Copyright © 2022, 2024 Attestant Limited.
+// Copyright © 2022 - 2025 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	client "github.com/attestantio/go-builder-client"
 	"github.com/attestantio/go-builder-client/api"
@@ -61,12 +62,15 @@ func (s *Service) BuilderBid(ctx context.Context,
 		return nil, errors.Join(errors.New("no public key specified"), client.ErrInvalidOptions)
 	}
 
+	headers := make(map[string]string)
+	headers["Date-Milliseconds"] = fmt.Sprintf("%d", time.Now().UnixMilli())
+
 	endpoint := fmt.Sprintf("/eth/v1/builder/header/%d/%#x/%#x", opts.Slot, opts.ParentHash[:], opts.PubKey[:])
 	httpResponse, err := s.get(ctx,
 		endpoint,
 		"",
 		&opts.Common,
-		map[string]string{},
+		headers,
 		false,
 	)
 	if err != nil {

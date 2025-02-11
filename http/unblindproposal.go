@@ -25,10 +25,12 @@ import (
 	apideneb "github.com/attestantio/go-builder-client/api/deneb"
 	consensusapi "github.com/attestantio/go-eth2-client/api"
 	consensusapiv1deneb "github.com/attestantio/go-eth2-client/api/v1/deneb"
+	consensusapiv1electra "github.com/attestantio/go-eth2-client/api/v1/electra"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/attestantio/go-eth2-client/spec/bellatrix"
 	"github.com/attestantio/go-eth2-client/spec/capella"
 	"github.com/attestantio/go-eth2-client/spec/deneb"
+	"github.com/attestantio/go-eth2-client/spec/electra"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -72,6 +74,12 @@ func (s *Service) UnblindProposal(ctx context.Context,
 		}
 
 		return s.unblindDenebProposal(ctx, opts)
+	case consensusspec.DataVersionElectra:
+		if opts.Proposal.Electra == nil {
+			return nil, errors.New("electra proposal without payload")
+		}
+
+		return s.unblindElectraProposal(ctx, opts)
 	default:
 		return nil, fmt.Errorf("unhandled data version %v", opts.Proposal.Version)
 	}
@@ -330,6 +338,104 @@ func (s *Service) unblindDenebProposal(ctx context.Context,
 
 			res.Deneb.KZGProofs[i] = bundle.BlobsBundle.Proofs[i]
 			res.Deneb.Blobs[i] = bundle.BlobsBundle.Blobs[i]
+		}
+	default:
+		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
+	}
+
+	return &api.Response[*consensusapi.VersionedSignedProposal]{
+		Data:     res,
+		Metadata: metadataFromHeaders(httpResponse.headers),
+	}, nil
+}
+
+func (s *Service) unblindElectraProposal(ctx context.Context,
+	opts *api.UnblindProposalOpts,
+) (
+	*api.Response[*consensusapi.VersionedSignedProposal],
+	error,
+) {
+	proposal := opts.Proposal.Electra
+
+	specJSON, err := json.Marshal(proposal)
+	if err != nil {
+		return nil, errors.Join(errors.New("failed to marshal JSON"), err)
+	}
+
+	httpResponse, err := s.post(ctx,
+		"/eth/v1/builder/blinded_blocks",
+		"",
+		&opts.Common,
+		bytes.NewBuffer(specJSON),
+		ContentTypeJSON,
+		map[string]string{},
+		false,
+	)
+	if err != nil {
+		return nil, errors.Join(errors.New("failed to submit unblind proposal request"), err)
+	}
+
+	// Reconstruct proposal.
+	res := &consensusapi.VersionedSignedProposal{
+		Version: consensusspec.DataVersionElectra,
+		Electra: &consensusapiv1electra.SignedBlockContents{
+			SignedBlock: &electra.SignedBeaconBlock{
+				Message: &electra.BeaconBlock{
+					Slot:          proposal.Message.Slot,
+					ProposerIndex: proposal.Message.ProposerIndex,
+					ParentRoot:    proposal.Message.ParentRoot,
+					StateRoot:     proposal.Message.StateRoot,
+					Body: &electra.BeaconBlockBody{
+						RANDAOReveal:          proposal.Message.Body.RANDAOReveal,
+						ETH1Data:              proposal.Message.Body.ETH1Data,
+						Graffiti:              proposal.Message.Body.Graffiti,
+						ProposerSlashings:     proposal.Message.Body.ProposerSlashings,
+						AttesterSlashings:     proposal.Message.Body.AttesterSlashings,
+						Attestations:          proposal.Message.Body.Attestations,
+						Deposits:              proposal.Message.Body.Deposits,
+						VoluntaryExits:        proposal.Message.Body.VoluntaryExits,
+						SyncAggregate:         proposal.Message.Body.SyncAggregate,
+						BLSToExecutionChanges: proposal.Message.Body.BLSToExecutionChanges,
+						BlobKZGCommitments:    proposal.Message.Body.BlobKZGCommitments,
+					},
+				},
+				Signature: proposal.Signature,
+			},
+		},
+	}
+
+	switch httpResponse.contentType {
+	case ContentTypeJSON:
+		bundle, _, err := decodeJSONResponse(bytes.NewReader(httpResponse.body), &apideneb.ExecutionPayloadAndBlobsBundle{})
+		if err != nil {
+			return nil, errors.Join(errors.New("failed to parse electra response"), err)
+		}
+		// Ensure that the data returned is what we expect.
+		ourExecutionPayloadHash, err := proposal.Message.Body.ExecutionPayloadHeader.HashTreeRoot()
+		if err != nil {
+			return nil, errors.Join(errors.New("failed to generate hash tree root for our execution payload header"), err)
+		}
+		receivedExecutionPayloadHash, err := bundle.ExecutionPayload.HashTreeRoot()
+		if err != nil {
+			return nil, errors.Join(errors.New("failed to generate hash tree root for the received execution payload header"), err)
+		}
+		if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
+			return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:],
+				ourExecutionPayloadHash[:],
+			)
+		}
+		res.Electra.SignedBlock.Message.Body.ExecutionPayload = bundle.ExecutionPayload
+
+		// Reconstruct blobs.
+		res.Electra.KZGProofs = make([]deneb.KZGProof, len(bundle.BlobsBundle.Proofs))
+		res.Electra.Blobs = make([]deneb.Blob, len(bundle.BlobsBundle.Blobs))
+		for i := range bundle.BlobsBundle.Blobs {
+			if !bytes.Equal(bundle.BlobsBundle.Commitments[i][:], res.Electra.SignedBlock.Message.Body.BlobKZGCommitments[i][:]) {
+				return nil, fmt.Errorf("blob %d commitment mismatch", i)
+			}
+
+			res.Electra.KZGProofs[i] = bundle.BlobsBundle.Proofs[i]
+			res.Electra.Blobs[i] = bundle.BlobsBundle.Blobs[i]
 		}
 	default:
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)

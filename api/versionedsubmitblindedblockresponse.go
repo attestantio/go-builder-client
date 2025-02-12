@@ -217,7 +217,7 @@ func (v *VersionedSubmitBlindedBlockResponse) ExcessBlobGas() (uint64, error) {
 	}
 }
 
-// BlobsBundle returns the blobs bundle
+// BlobsBundle returns the blobs bundle.
 func (v *VersionedSubmitBlindedBlockResponse) BlobsBundle() (*deneb.BlobsBundle, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")
@@ -233,6 +233,7 @@ func (v *VersionedSubmitBlindedBlockResponse) BlobsBundle() (*deneb.BlobsBundle,
 		if v.Electra == nil {
 			return nil, errors.New("no data")
 		}
+
 		return v.Electra.BlobsBundle, nil
 	default:
 		return nil, errors.New("unsupported version")

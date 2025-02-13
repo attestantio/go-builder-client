@@ -8,45 +8,45 @@ import (
 	"github.com/pkg/errors"
 )
 
-// SignedValidatorRegistrationList represents a list of SignedValidatorRegistration.
-type SignedValidatorRegistrationList struct {
-	Items []*SignedValidatorRegistration `json:"items" ssz-max:"1099511627776" yaml:"items"`
+// SignedValidatorRegistrations represents a list of SignedValidatorRegistration.
+type SignedValidatorRegistrations struct {
+	Registrations []*SignedValidatorRegistration `json:"registrations" ssz-max:"1099511627776" yaml:"registrations"`
 }
 
 // MarshalJSON implements json.Marshaler.
-func (s *SignedValidatorRegistrationList) MarshalJSON() ([]byte, error) {
-	return json.Marshal(s.Items)
+func (s *SignedValidatorRegistrations) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s.Registrations)
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (s *SignedValidatorRegistrationList) UnmarshalJSON(input []byte) error {
+func (s *SignedValidatorRegistrations) UnmarshalJSON(input []byte) error {
 	var data []*SignedValidatorRegistration
 	if err := json.Unmarshal(input, &data); err != nil {
 		return errors.Wrap(err, "invalid JSON")
 	}
-	s.Items = data
+	s.Registrations = data
 
 	return nil
 }
 
 // MarshalYAML implements yaml.Marshaler.
-func (s *SignedValidatorRegistrationList) MarshalYAML() ([]byte, error) {
-	return yaml.Marshal(s.Items)
+func (s *SignedValidatorRegistrations) MarshalYAML() ([]byte, error) {
+	return yaml.Marshal(s.Registrations)
 }
 
 // UnmarshalYAML implements yaml.Unmarshaler.
-func (s *SignedValidatorRegistrationList) UnmarshalYAML(input []byte) error {
+func (s *SignedValidatorRegistrations) UnmarshalYAML(input []byte) error {
 	var data []*SignedValidatorRegistration
 	if err := yaml.Unmarshal(input, &data); err != nil {
 		return err
 	}
-	s.Items = data
+	s.Registrations = data
 
 	return nil
 }
 
 // String returns a YAML representation of the list.
-func (s *SignedValidatorRegistrationList) String() string {
+func (s *SignedValidatorRegistrations) String() string {
 	data, err := yaml.Marshal(s)
 	if err != nil {
 		return fmt.Sprintf("ERR: %v", err)

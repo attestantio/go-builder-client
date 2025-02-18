@@ -98,7 +98,7 @@ func (b *BuilderBid) UnmarshalSSZ(buf []byte) error {
 	// Field (3) 'Value'
 	value := make([]byte, 32)
 	for i := 0; i < 32; i++ {
-		value[i] = buf[44-i]
+		value[i] = buf[43-i]
 	}
 	if b.Value == nil {
 		b.Value = new(uint256.Int)

@@ -135,6 +135,7 @@ func (s *Service) Pubkey() *phase0.BLSPubKey {
 	return s.pubkey
 }
 
+//nolint:revive
 func parseAddress(address string) (*url.URL, *url.URL, error) {
 	if !strings.HasPrefix(address, "http") {
 		address = fmt.Sprintf("http://%s", address)

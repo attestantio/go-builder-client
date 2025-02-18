@@ -165,7 +165,6 @@ linters:
     - dupl
     - exhaustive
     - exhaustruct
-    - exportloopref
     - funlen
     - gci
     - gochecknoglobals
@@ -173,6 +172,7 @@ linters:
     - ireturn
     - mnd
     - perfsprint
+    - tenv
     - varnamelen
     - wrapcheck
     - wsl

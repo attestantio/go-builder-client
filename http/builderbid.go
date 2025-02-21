@@ -71,7 +71,7 @@ func (s *Service) BuilderBid(ctx context.Context,
 		"",
 		&opts.Common,
 		headers,
-		false,
+		true,
 	)
 	if err != nil {
 		return nil, errors.Join(errors.New("failed to request execution payload header"), err)
@@ -158,10 +158,38 @@ func (*Service) signedBuilderBidFromJSON(res *httpResponse) (
 }
 
 func (*Service) signedBuilderBidFromSSZ(_ context.Context,
-	_ *httpResponse,
+	res *httpResponse,
 ) (
 	*api.Response[*spec.VersionedSignedBuilderBid],
 	error,
 ) {
-	return nil, errors.New("not implemented")
+	response := &api.Response[*spec.VersionedSignedBuilderBid]{
+		Data: &spec.VersionedSignedBuilderBid{
+			Version: res.consensusVersion,
+		},
+		Metadata: metadataFromHeaders(res.headers),
+	}
+
+	var err error
+	switch res.consensusVersion {
+	case consensusspec.DataVersionBellatrix:
+		response.Data.Bellatrix = &bellatrix.SignedBuilderBid{}
+		err = response.Data.Bellatrix.UnmarshalSSZ(res.body)
+	case consensusspec.DataVersionCapella:
+		response.Data.Capella = &capella.SignedBuilderBid{}
+		err = response.Data.Capella.UnmarshalSSZ(res.body)
+	case consensusspec.DataVersionDeneb:
+		response.Data.Deneb = &deneb.SignedBuilderBid{}
+		err = response.Data.Deneb.UnmarshalSSZ(res.body)
+	case consensusspec.DataVersionElectra:
+		response.Data.Electra = &electra.SignedBuilderBid{}
+		err = response.Data.Electra.UnmarshalSSZ(res.body)
+	default:
+		return nil, fmt.Errorf("unsupported block version %s", res.consensusVersion)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }

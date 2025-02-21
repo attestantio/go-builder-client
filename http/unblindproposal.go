@@ -271,7 +271,7 @@ func (s *Service) unblindDenebProposal(ctx context.Context,
 		bytes.NewBuffer(specJSON),
 		ContentTypeJSON,
 		map[string]string{},
-		false,
+		true,
 	)
 	if err != nil {
 		return nil, errors.Join(errors.New("failed to submit unblind proposal request"), err)
@@ -306,47 +306,65 @@ func (s *Service) unblindDenebProposal(ctx context.Context,
 		},
 	}
 
+	var bundle *apideneb.ExecutionPayloadAndBlobsBundle
 	switch httpResponse.contentType {
 	case ContentTypeJSON:
-		bundle, _, err := decodeJSONResponse(bytes.NewReader(httpResponse.body), &apideneb.ExecutionPayloadAndBlobsBundle{})
-		if err != nil {
-			return nil, errors.Join(errors.New("failed to parse deneb response"), err)
-		}
-		// Ensure that the data returned is what we expect.
-		ourExecutionPayloadHash, err := proposal.Message.Body.ExecutionPayloadHeader.HashTreeRoot()
-		if err != nil {
-			return nil, errors.Join(errors.New("failed to generate hash tree root for our execution payload header"), err)
-		}
-		receivedExecutionPayloadHash, err := bundle.ExecutionPayload.HashTreeRoot()
-		if err != nil {
-			return nil, errors.Join(errors.New("failed to generate hash tree root for the received execution payload"), err)
-		}
-		if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
-			return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:],
-				ourExecutionPayloadHash[:],
-			)
-		}
-		res.Deneb.SignedBlock.Message.Body.ExecutionPayload = bundle.ExecutionPayload
-
-		// Reconstruct blobs.
-		res.Deneb.KZGProofs = make([]deneb.KZGProof, len(bundle.BlobsBundle.Proofs))
-		res.Deneb.Blobs = make([]deneb.Blob, len(bundle.BlobsBundle.Blobs))
-		for i := range bundle.BlobsBundle.Blobs {
-			if !bytes.Equal(bundle.BlobsBundle.Commitments[i][:], res.Deneb.SignedBlock.Message.Body.BlobKZGCommitments[i][:]) {
-				return nil, fmt.Errorf("blob %d commitment mismatch", i)
-			}
-
-			res.Deneb.KZGProofs[i] = bundle.BlobsBundle.Proofs[i]
-			res.Deneb.Blobs[i] = bundle.BlobsBundle.Blobs[i]
-		}
+		bundle, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &apideneb.ExecutionPayloadAndBlobsBundle{})
+	case ContentTypeSSZ:
+		bundle, err = s.denebExecutionPayloadAndBlobsBundleFromSSZ(ctx, httpResponse)
 	default:
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
+	}
+
+	if err != nil {
+		return nil, errors.Join(errors.New("failed to parse deneb response"), err)
+	}
+	// Ensure that the data returned is what we expect.
+	ourExecutionPayloadHash, err := proposal.Message.Body.ExecutionPayloadHeader.HashTreeRoot()
+	if err != nil {
+		return nil, errors.Join(errors.New("failed to generate hash tree root for our execution payload header"), err)
+	}
+	receivedExecutionPayloadHash, err := bundle.ExecutionPayload.HashTreeRoot()
+	if err != nil {
+		return nil, errors.Join(errors.New("failed to generate hash tree root for the received execution payload"), err)
+	}
+	if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
+		return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:],
+			ourExecutionPayloadHash[:],
+		)
+	}
+	res.Deneb.SignedBlock.Message.Body.ExecutionPayload = bundle.ExecutionPayload
+
+	// Reconstruct blobs.
+	res.Deneb.KZGProofs = make([]deneb.KZGProof, len(bundle.BlobsBundle.Proofs))
+	res.Deneb.Blobs = make([]deneb.Blob, len(bundle.BlobsBundle.Blobs))
+	for i := range bundle.BlobsBundle.Blobs {
+		if !bytes.Equal(bundle.BlobsBundle.Commitments[i][:], res.Deneb.SignedBlock.Message.Body.BlobKZGCommitments[i][:]) {
+			return nil, fmt.Errorf("blob %d commitment mismatch", i)
+		}
+
+		res.Deneb.KZGProofs[i] = bundle.BlobsBundle.Proofs[i]
+		res.Deneb.Blobs[i] = bundle.BlobsBundle.Blobs[i]
 	}
 
 	return &api.Response[*consensusapi.VersionedSignedProposal]{
 		Data:     res,
 		Metadata: metadataFromHeaders(httpResponse.headers),
 	}, nil
+}
+
+func (*Service) denebExecutionPayloadAndBlobsBundleFromSSZ(_ context.Context,
+	res *httpResponse,
+) (
+	*apideneb.ExecutionPayloadAndBlobsBundle,
+	error,
+) {
+	bundle := &apideneb.ExecutionPayloadAndBlobsBundle{}
+	if err := bundle.UnmarshalSSZ(res.body); err != nil {
+		return nil, errors.Join(errors.New("failed to decode deneb SSZ response"), err)
+	}
+
+	return bundle, nil
 }
 
 func (s *Service) unblindElectraProposal(ctx context.Context,
@@ -369,7 +387,7 @@ func (s *Service) unblindElectraProposal(ctx context.Context,
 		bytes.NewBuffer(specJSON),
 		ContentTypeJSON,
 		map[string]string{},
-		false,
+		true,
 	)
 	if err != nil {
 		return nil, errors.Join(errors.New("failed to submit unblind proposal request"), err)
@@ -404,41 +422,44 @@ func (s *Service) unblindElectraProposal(ctx context.Context,
 		},
 	}
 
+	var bundle *apideneb.ExecutionPayloadAndBlobsBundle
 	switch httpResponse.contentType {
 	case ContentTypeJSON:
-		bundle, _, err := decodeJSONResponse(bytes.NewReader(httpResponse.body), &apideneb.ExecutionPayloadAndBlobsBundle{})
-		if err != nil {
-			return nil, errors.Join(errors.New("failed to parse electra response"), err)
-		}
-		// Ensure that the data returned is what we expect.
-		ourExecutionPayloadHash, err := proposal.Message.Body.ExecutionPayloadHeader.HashTreeRoot()
-		if err != nil {
-			return nil, errors.Join(errors.New("failed to generate hash tree root for our execution payload header"), err)
-		}
-		receivedExecutionPayloadHash, err := bundle.ExecutionPayload.HashTreeRoot()
-		if err != nil {
-			return nil, errors.Join(errors.New("failed to generate hash tree root for the received execution payload header"), err)
-		}
-		if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
-			return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:],
-				ourExecutionPayloadHash[:],
-			)
-		}
-		res.Electra.SignedBlock.Message.Body.ExecutionPayload = bundle.ExecutionPayload
-
-		// Reconstruct blobs.
-		res.Electra.KZGProofs = make([]deneb.KZGProof, len(bundle.BlobsBundle.Proofs))
-		res.Electra.Blobs = make([]deneb.Blob, len(bundle.BlobsBundle.Blobs))
-		for i := range bundle.BlobsBundle.Blobs {
-			if !bytes.Equal(bundle.BlobsBundle.Commitments[i][:], res.Electra.SignedBlock.Message.Body.BlobKZGCommitments[i][:]) {
-				return nil, fmt.Errorf("blob %d commitment mismatch", i)
-			}
-
-			res.Electra.KZGProofs[i] = bundle.BlobsBundle.Proofs[i]
-			res.Electra.Blobs[i] = bundle.BlobsBundle.Blobs[i]
-		}
+		bundle, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &apideneb.ExecutionPayloadAndBlobsBundle{})
+	case ContentTypeSSZ:
+		bundle, err = s.denebExecutionPayloadAndBlobsBundleFromSSZ(ctx, httpResponse)
 	default:
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
+	}
+	if err != nil {
+		return nil, errors.Join(errors.New("failed to parse electra response"), err)
+	}
+	// Ensure that the data returned is what we expect.
+	ourExecutionPayloadHash, err := proposal.Message.Body.ExecutionPayloadHeader.HashTreeRoot()
+	if err != nil {
+		return nil, errors.Join(errors.New("failed to generate hash tree root for our execution payload header"), err)
+	}
+	receivedExecutionPayloadHash, err := bundle.ExecutionPayload.HashTreeRoot()
+	if err != nil {
+		return nil, errors.Join(errors.New("failed to generate hash tree root for the received execution payload header"), err)
+	}
+	if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
+		return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:],
+			ourExecutionPayloadHash[:],
+		)
+	}
+	res.Electra.SignedBlock.Message.Body.ExecutionPayload = bundle.ExecutionPayload
+
+	// Reconstruct blobs.
+	res.Electra.KZGProofs = make([]deneb.KZGProof, len(bundle.BlobsBundle.Proofs))
+	res.Electra.Blobs = make([]deneb.Blob, len(bundle.BlobsBundle.Blobs))
+	for i := range bundle.BlobsBundle.Blobs {
+		if !bytes.Equal(bundle.BlobsBundle.Commitments[i][:], res.Electra.SignedBlock.Message.Body.BlobKZGCommitments[i][:]) {
+			return nil, fmt.Errorf("blob %d commitment mismatch", i)
+		}
+
+		res.Electra.KZGProofs[i] = bundle.BlobsBundle.Proofs[i]
+		res.Electra.Blobs[i] = bundle.BlobsBundle.Blobs[i]
 	}
 
 	return &api.Response[*consensusapi.VersionedSignedProposal]{

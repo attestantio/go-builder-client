@@ -27,6 +27,7 @@ type VersionedExecutionPayloadHeader struct {
 	Capella   *capella.ExecutionPayloadHeader   `json:"capella,omitempty"`
 	Deneb     *deneb.ExecutionPayloadHeader     `json:"deneb,omitempty"`
 	Electra   *deneb.ExecutionPayloadHeader     `json:"electra,omitempty"`
+	Fulu      *deneb.ExecutionPayloadHeader     `json:"fulu,omitempty"`
 }
 
 // IsEmpty returns true if there is no payload.
@@ -40,6 +41,8 @@ func (v *VersionedExecutionPayloadHeader) IsEmpty() bool {
 		return v.Deneb == nil
 	case consensusspec.DataVersionElectra:
 		return v.Electra == nil
+	case consensusspec.DataVersionFulu:
+		return v.Fulu == nil
 	default:
 		return true
 	}

@@ -15,6 +15,8 @@ package api
 
 import (
 	"github.com/attestantio/go-builder-client/api/deneb"
+	"github.com/attestantio/go-builder-client/api/fulu"
+	"github.com/attestantio/go-eth2-client/spec"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/attestantio/go-eth2-client/spec/bellatrix"
 	"github.com/attestantio/go-eth2-client/spec/capella"
@@ -30,6 +32,7 @@ type VersionedSubmitBlindedBlockResponse struct {
 	Capella   *capella.ExecutionPayload
 	Deneb     *deneb.ExecutionPayloadAndBlobsBundle
 	Electra   *deneb.ExecutionPayloadAndBlobsBundle
+	Fulu      *fulu.ExecutionPayloadAndBlobsBundle
 }
 
 // IsEmpty returns true if there is no payload.
@@ -44,6 +47,8 @@ func (v *VersionedSubmitBlindedBlockResponse) IsEmpty() bool {
 		return v.Deneb == nil
 	case consensusspec.DataVersionElectra:
 		return v.Electra == nil
+	case consensusspec.DataVersionFulu:
+		return v.Fulu == nil
 	default:
 		return true
 	}
@@ -84,6 +89,15 @@ func (v *VersionedSubmitBlindedBlockResponse) BlockHash() (phase0.Hash32, error)
 		}
 
 		return v.Electra.ExecutionPayload.BlockHash, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.Hash32{}, errors.New("no data")
+		}
+		if v.Fulu.ExecutionPayload == nil {
+			return phase0.Hash32{}, errors.New("no execution payload")
+		}
+
+		return v.Fulu.ExecutionPayload.BlockHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
 	}
@@ -125,6 +139,15 @@ func (v *VersionedSubmitBlindedBlockResponse) Transactions() ([]bellatrix.Transa
 		}
 
 		return v.Electra.ExecutionPayload.Transactions, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return nil, errors.New("no data")
+		}
+		if v.Fulu.ExecutionPayload == nil {
+			return nil, errors.New("no execution payload")
+		}
+
+		return v.Fulu.ExecutionPayload.Transactions, nil
 	default:
 		return nil, errors.New("unsupported version")
 	}
@@ -154,6 +177,15 @@ func (v *VersionedSubmitBlindedBlockResponse) Blobs() ([]consensusdeneb.Blob, er
 		}
 
 		return v.Electra.BlobsBundle.Blobs, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return nil, errors.New("no data")
+		}
+		if v.Fulu.BlobsBundle == nil {
+			return nil, errors.New("no data blobs bundle")
+		}
+
+		return v.Fulu.BlobsBundle.Blobs, nil
 	default:
 		return nil, errors.New("unsupported version")
 	}
@@ -183,6 +215,15 @@ func (v *VersionedSubmitBlindedBlockResponse) BlobGasUsed() (uint64, error) {
 		}
 
 		return v.Electra.ExecutionPayload.BlobGasUsed, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Fulu.ExecutionPayload == nil {
+			return 0, errors.New("no data execution payload")
+		}
+
+		return v.Fulu.ExecutionPayload.BlobGasUsed, nil
 	default:
 		return 0, errors.New("unsupported version")
 	}
@@ -212,13 +253,22 @@ func (v *VersionedSubmitBlindedBlockResponse) ExcessBlobGas() (uint64, error) {
 		}
 
 		return v.Electra.ExecutionPayload.ExcessBlobGas, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Fulu.ExecutionPayload == nil {
+			return 0, errors.New("no data execution payload")
+		}
+
+		return v.Fulu.ExecutionPayload.ExcessBlobGas, nil
 	default:
 		return 0, errors.New("unsupported version")
 	}
 }
 
 // BlobsBundle returns the blobs bundle.
-func (v *VersionedSubmitBlindedBlockResponse) BlobsBundle() (*deneb.BlobsBundle, error) {
+func (v *VersionedSubmitBlindedBlockResponse) BlobsBundle() (*VersionedBlobsBundle, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
@@ -228,13 +278,28 @@ func (v *VersionedSubmitBlindedBlockResponse) BlobsBundle() (*deneb.BlobsBundle,
 			return nil, errors.New("no data")
 		}
 
-		return v.Deneb.BlobsBundle, nil
+		return &VersionedBlobsBundle{
+			Version: spec.DataVersionDeneb,
+			Deneb:   v.Deneb.BlobsBundle,
+		}, nil
 	case consensusspec.DataVersionElectra:
 		if v.Electra == nil {
 			return nil, errors.New("no data")
 		}
 
-		return v.Electra.BlobsBundle, nil
+		return &VersionedBlobsBundle{
+			Version: spec.DataVersionElectra,
+			Electra: v.Electra.BlobsBundle,
+		}, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return nil, errors.New("no data")
+		}
+
+		return &VersionedBlobsBundle{
+			Version: spec.DataVersionFulu,
+			Fulu:    v.Fulu.BlobsBundle,
+		}, nil
 	default:
 		return nil, errors.New("unsupported version")
 	}

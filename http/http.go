@@ -48,7 +48,7 @@ type responseMetadata struct {
 }
 
 // defaultUserAgent is sent with requests if no other user agent has been supplied.
-const defaultUserAgent = "go-builder-client/0.6.2"
+const defaultUserAgent = "go-builder-client/0.6.3"
 
 // post sends an HTTP post request and returns the body.
 //

@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
 	client "github.com/attestantio/go-builder-client"
 	"github.com/attestantio/go-builder-client/api"
@@ -98,13 +99,16 @@ func (s *Service) unblindBellatrixProposal(ctx context.Context,
 		return nil, errors.Join(errors.New("failed to marshal JSON"), err)
 	}
 
+	headers := make(map[string]string)
+	headers["Eth-Consensus-Version"] = strings.ToLower(opts.Proposal.Version.String())
+
 	httpResponse, err := s.post(ctx,
 		"/eth/v1/builder/blinded_blocks",
 		"",
 		&opts.Common,
 		bytes.NewBuffer(specJSON),
 		ContentTypeJSON,
-		map[string]string{},
+		headers,
 		false,
 	)
 	if err != nil {
@@ -181,13 +185,16 @@ func (s *Service) unblindCapellaProposal(ctx context.Context,
 		return nil, errors.Join(errors.New("failed to marshal JSON"), err)
 	}
 
+	headers := make(map[string]string)
+	headers["Eth-Consensus-Version"] = strings.ToLower(opts.Proposal.Version.String())
+
 	httpResponse, err := s.post(ctx,
 		"/eth/v1/builder/blinded_blocks",
 		"",
 		&opts.Common,
 		bytes.NewBuffer(specJSON),
 		ContentTypeJSON,
-		map[string]string{},
+		headers,
 		false,
 	)
 	if err != nil {
@@ -264,13 +271,16 @@ func (s *Service) unblindDenebProposal(ctx context.Context,
 		return nil, errors.Join(errors.New("failed to marshal JSON"), err)
 	}
 
+	headers := make(map[string]string)
+	headers["Eth-Consensus-Version"] = strings.ToLower(opts.Proposal.Version.String())
+
 	httpResponse, err := s.post(ctx,
 		"/eth/v1/builder/blinded_blocks",
 		"",
 		&opts.Common,
 		bytes.NewBuffer(specJSON),
 		ContentTypeJSON,
-		map[string]string{},
+		headers,
 		true,
 	)
 	if err != nil {
@@ -380,13 +390,16 @@ func (s *Service) unblindElectraProposal(ctx context.Context,
 		return nil, errors.Join(errors.New("failed to marshal JSON"), err)
 	}
 
+	headers := make(map[string]string)
+	headers["Eth-Consensus-Version"] = strings.ToLower(opts.Proposal.Version.String())
+
 	httpResponse, err := s.post(ctx,
 		"/eth/v1/builder/blinded_blocks",
 		"",
 		&opts.Common,
 		bytes.NewBuffer(specJSON),
 		ContentTypeJSON,
-		map[string]string{},
+		headers,
 		true,
 	)
 	if err != nil {

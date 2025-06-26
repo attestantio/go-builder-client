@@ -35,6 +35,7 @@ type VersionedSignedBuilderBid struct {
 	Capella   *capella.SignedBuilderBid
 	Deneb     *deneb.SignedBuilderBid
 	Electra   *electra.SignedBuilderBid
+	Fulu      *electra.SignedBuilderBid
 }
 
 // IsEmpty returns true if there is no bid.
@@ -48,6 +49,8 @@ func (v *VersionedSignedBuilderBid) IsEmpty() bool {
 		return v.Deneb == nil
 	case consensusspec.DataVersionElectra:
 		return v.Electra == nil
+	case consensusspec.DataVersionFulu:
+		return v.Fulu == nil
 	default:
 		return true
 	}
@@ -95,6 +98,15 @@ func (v *VersionedSignedBuilderBid) Builder() (phase0.BLSPubKey, error) {
 		}
 
 		return v.Electra.Message.Pubkey, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.BLSPubKey{}, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return phase0.BLSPubKey{}, errors.New("no data message")
+		}
+
+		return v.Fulu.Message.Pubkey, nil
 	default:
 		return phase0.BLSPubKey{}, errors.New("unsupported version")
 	}
@@ -142,6 +154,15 @@ func (v *VersionedSignedBuilderBid) Value() (*uint256.Int, error) {
 		}
 
 		return v.Electra.Message.Value, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return nil, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return nil, errors.New("no data message")
+		}
+
+		return v.Fulu.Message.Value, nil
 	default:
 		return nil, errors.New("unsupported version")
 	}
@@ -201,6 +222,18 @@ func (v *VersionedSignedBuilderBid) BlockNumber() (uint64, error) {
 		}
 
 		return v.Electra.Message.Header.BlockNumber, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return 0, errors.New("no data message")
+		}
+		if v.Fulu.Message.Header == nil {
+			return 0, errors.New("no data message header")
+		}
+
+		return v.Fulu.Message.Header.BlockNumber, nil
 	default:
 		return 0, errors.New("unsupported version")
 	}
@@ -260,6 +293,18 @@ func (v *VersionedSignedBuilderBid) BlockHash() (phase0.Hash32, error) {
 		}
 
 		return v.Electra.Message.Header.BlockHash, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.Hash32{}, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return phase0.Hash32{}, errors.New("no data message")
+		}
+		if v.Fulu.Message.Header == nil {
+			return phase0.Hash32{}, errors.New("no data message header")
+		}
+
+		return v.Fulu.Message.Header.BlockHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
 	}
@@ -319,6 +364,18 @@ func (v *VersionedSignedBuilderBid) ParentHash() (phase0.Hash32, error) {
 		}
 
 		return v.Electra.Message.Header.ParentHash, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.Hash32{}, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return phase0.Hash32{}, errors.New("no data message")
+		}
+		if v.Fulu.Message.Header == nil {
+			return phase0.Hash32{}, errors.New("no data message header")
+		}
+
+		return v.Fulu.Message.Header.ParentHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
 	}
@@ -378,6 +435,18 @@ func (v *VersionedSignedBuilderBid) StateRoot() (phase0.Root, error) {
 		}
 
 		return v.Electra.Message.Header.StateRoot, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.Root{}, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return phase0.Root{}, errors.New("no data message")
+		}
+		if v.Fulu.Message.Header == nil {
+			return phase0.Root{}, errors.New("no data message header")
+		}
+
+		return v.Fulu.Message.Header.StateRoot, nil
 	default:
 		return phase0.Root{}, errors.New("unsupported version")
 	}
@@ -437,6 +506,18 @@ func (v *VersionedSignedBuilderBid) FeeRecipient() (consensusbellatrix.Execution
 		}
 
 		return v.Electra.Message.Header.FeeRecipient, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return consensusbellatrix.ExecutionAddress{}, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message")
+		}
+		if v.Fulu.Message.Header == nil {
+			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message header")
+		}
+
+		return v.Fulu.Message.Header.FeeRecipient, nil
 	default:
 		return consensusbellatrix.ExecutionAddress{}, errors.New("unsupported version")
 	}
@@ -496,6 +577,18 @@ func (v *VersionedSignedBuilderBid) Timestamp() (uint64, error) {
 		}
 
 		return v.Electra.Message.Header.Timestamp, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return 0, errors.New("no data message")
+		}
+		if v.Fulu.Message.Header == nil {
+			return 0, errors.New("no data message header")
+		}
+
+		return v.Fulu.Message.Header.Timestamp, nil
 	default:
 		return 0, errors.New("unsupported version")
 	}
@@ -555,6 +648,18 @@ func (v *VersionedSignedBuilderBid) TransactionsRoot() (phase0.Root, error) {
 		}
 
 		return v.Electra.Message.Header.TransactionsRoot, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.Root{}, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return phase0.Root{}, errors.New("no data message")
+		}
+		if v.Fulu.Message.Header == nil {
+			return phase0.Root{}, errors.New("no data message header")
+		}
+
+		return v.Fulu.Message.Header.TransactionsRoot, nil
 	default:
 		return phase0.Root{}, errors.New("unsupported version")
 	}
@@ -602,6 +707,15 @@ func (v *VersionedSignedBuilderBid) MessageHashTreeRoot() (phase0.Root, error) {
 		}
 
 		return v.Electra.Message.HashTreeRoot()
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.Root{}, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return phase0.Root{}, errors.New("no data message")
+		}
+
+		return v.Fulu.Message.HashTreeRoot()
 	default:
 		return phase0.Root{}, errors.New("unsupported version")
 	}
@@ -661,6 +775,18 @@ func (v *VersionedSignedBuilderBid) HeaderHashTreeRoot() (phase0.Root, error) {
 		}
 
 		return v.Electra.Message.Header.HashTreeRoot()
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.Root{}, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return phase0.Root{}, errors.New("no data message")
+		}
+		if v.Fulu.Message.Header == nil {
+			return phase0.Root{}, errors.New("no data message header")
+		}
+
+		return v.Fulu.Message.Header.HashTreeRoot()
 	default:
 		return phase0.Root{}, errors.New("unsupported version")
 	}
@@ -720,6 +846,18 @@ func (v *VersionedSignedBuilderBid) BlockGasLimit() (uint64, error) {
 		}
 
 		return v.Electra.Message.Header.GasLimit, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return 0, errors.New("no data message")
+		}
+		if v.Fulu.Message.Header == nil {
+			return 0, errors.New("no data message header")
+		}
+
+		return v.Fulu.Message.Header.GasLimit, nil
 	default:
 		return 0, errors.New("unsupported version")
 	}
@@ -755,6 +893,12 @@ func (v *VersionedSignedBuilderBid) Signature() (phase0.BLSSignature, error) {
 		}
 
 		return v.Electra.Signature, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.BLSSignature{}, errors.New("no data")
+		}
+
+		return v.Fulu.Signature, nil
 	default:
 		return phase0.BLSSignature{}, errors.New("unsupported version")
 	}

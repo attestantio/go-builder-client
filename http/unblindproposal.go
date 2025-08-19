@@ -86,7 +86,29 @@ func (s *Service) UnblindProposal(ctx context.Context,
 			return nil, errors.New("fulu proposal without payload")
 		}
 
-		return s.unblindFuluProposal(ctx, opts)
+		// Reuse Electra logic since Fulu structures are identical to Electra
+		// First convert Fulu proposal to Electra for processing
+		electraOpts := &api.UnblindProposalOpts{
+			Common: opts.Common,
+			Proposal: &consensusapi.VersionedSignedBlindedProposal{
+				Version: consensusspec.DataVersionElectra,
+				Electra: opts.Proposal.Fulu,
+			},
+		}
+
+		electraRes, err := s.unblindElectraProposal(ctx, electraOpts)
+		if err != nil {
+			return nil, err
+		}
+
+		// Convert response back to Fulu version
+		return &api.Response[*consensusapi.VersionedSignedProposal]{
+			Data: &consensusapi.VersionedSignedProposal{
+				Version: consensusspec.DataVersionFulu,
+				Fulu:    electraRes.Data.Electra,
+			},
+			Metadata: electraRes.Metadata,
+		}, nil
 	default:
 		return nil, fmt.Errorf("unhandled data version %v", opts.Proposal.Version)
 	}

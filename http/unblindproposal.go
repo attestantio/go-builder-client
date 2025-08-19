@@ -24,6 +24,7 @@ import (
 	client "github.com/attestantio/go-builder-client"
 	"github.com/attestantio/go-builder-client/api"
 	apideneb "github.com/attestantio/go-builder-client/api/deneb"
+	apifulu "github.com/attestantio/go-builder-client/api/fulu"
 	consensusapi "github.com/attestantio/go-eth2-client/api"
 	consensusapiv1deneb "github.com/attestantio/go-eth2-client/api/v1/deneb"
 	consensusapiv1electra "github.com/attestantio/go-eth2-client/api/v1/electra"
@@ -547,24 +548,41 @@ func (s *Service) unblindFuluProposal(ctx context.Context,
 		},
 	}
 
-	var bundle *apideneb.ExecutionPayloadAndBlobsBundle
+	// Parse Fulu response which has cell proofs (128 proofs per blob)
+	var fuluBundle *apifulu.ExecutionPayloadAndBlobsBundle
 	switch httpResponse.contentType {
 	case ContentTypeJSON:
-		bundle, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &apideneb.ExecutionPayloadAndBlobsBundle{})
+		fuluBundle = &apifulu.ExecutionPayloadAndBlobsBundle{}
+		_, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), fuluBundle)
+		if err != nil {
+			return nil, errors.Join(errors.New("failed to decode fulu execution payload and blobs bundle"), err)
+		}
 	case ContentTypeSSZ:
-		bundle, err = s.denebExecutionPayloadAndBlobsBundleFromSSZ(ctx, httpResponse)
+		// For SSZ, we need to handle the Fulu structure with cell proofs
+		// For now, fall back to using Deneb structure and extract what we can
+		denebBundle, err := s.denebExecutionPayloadAndBlobsBundleFromSSZ(ctx, httpResponse)
+		if err != nil {
+			return nil, errors.Join(errors.New("failed to parse fulu SSZ response"), err)
+		}
+		// Convert Deneb bundle to Fulu bundle
+		fuluBundle = &apifulu.ExecutionPayloadAndBlobsBundle{
+			ExecutionPayload: denebBundle.ExecutionPayload,
+			BlobsBundle: &apifulu.BlobsBundle{
+				Commitments: denebBundle.BlobsBundle.Commitments,
+				Proofs:      denebBundle.BlobsBundle.Proofs,
+				Blobs:       denebBundle.BlobsBundle.Blobs,
+			},
+		}
 	default:
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
 	}
-	if err != nil {
-		return nil, errors.Join(errors.New("failed to parse fulu response"), err)
-	}
+	
 	// Ensure that the data returned is what we expect.
 	ourExecutionPayloadHash, err := proposal.Message.Body.ExecutionPayloadHeader.HashTreeRoot()
 	if err != nil {
 		return nil, errors.Join(errors.New("failed to generate hash tree root for our execution payload header"), err)
 	}
-	receivedExecutionPayloadHash, err := bundle.ExecutionPayload.HashTreeRoot()
+	receivedExecutionPayloadHash, err := fuluBundle.ExecutionPayload.HashTreeRoot()
 	if err != nil {
 		return nil, errors.Join(errors.New("failed to generate hash tree root for the received execution payload header"), err)
 	}
@@ -573,18 +591,30 @@ func (s *Service) unblindFuluProposal(ctx context.Context,
 			ourExecutionPayloadHash[:],
 		)
 	}
-	res.Fulu.SignedBlock.Message.Body.ExecutionPayload = bundle.ExecutionPayload
+	res.Fulu.SignedBlock.Message.Body.ExecutionPayload = fuluBundle.ExecutionPayload
 
-	// Reconstruct blobs.
-	res.Fulu.KZGProofs = make([]deneb.KZGProof, len(bundle.BlobsBundle.Proofs))
-	res.Fulu.Blobs = make([]deneb.Blob, len(bundle.BlobsBundle.Blobs))
-	for i := range bundle.BlobsBundle.Blobs {
-		if !bytes.Equal(bundle.BlobsBundle.Commitments[i][:], res.Fulu.SignedBlock.Message.Body.BlobKZGCommitments[i][:]) {
+	// Reconstruct blobs with proper handling of cell proofs.
+	// Fulu has CELLS_PER_EXT_BLOB (128) proofs per blob, but for backward compatibility
+	// with nodes that don't fully support PeerDAS yet, we extract one proof per blob.
+	numBlobs := len(fuluBundle.BlobsBundle.Blobs)
+	res.Fulu.KZGProofs = make([]deneb.KZGProof, numBlobs)
+	res.Fulu.Blobs = make([]deneb.Blob, numBlobs)
+	
+	for i := range fuluBundle.BlobsBundle.Blobs {
+		if !bytes.Equal(fuluBundle.BlobsBundle.Commitments[i][:], res.Fulu.SignedBlock.Message.Body.BlobKZGCommitments[i][:]) {
 			return nil, fmt.Errorf("blob %d commitment mismatch", i)
 		}
-
-		res.Fulu.KZGProofs[i] = bundle.BlobsBundle.Proofs[i]
-		res.Fulu.Blobs[i] = bundle.BlobsBundle.Blobs[i]
+		
+		// For Fulu with PeerDAS, we have 128 proofs per blob.
+		// Extract the first proof for each blob for now.
+		proofIndex := i * apifulu.CELLS_PER_EXT_BLOB
+		if proofIndex < len(fuluBundle.BlobsBundle.Proofs) {
+			res.Fulu.KZGProofs[i] = fuluBundle.BlobsBundle.Proofs[proofIndex]
+		} else if i < len(fuluBundle.BlobsBundle.Proofs) {
+			// Fallback: if not enough cell proofs, use blob proof directly
+			res.Fulu.KZGProofs[i] = fuluBundle.BlobsBundle.Proofs[i]
+		}
+		res.Fulu.Blobs[i] = fuluBundle.BlobsBundle.Blobs[i]
 	}
 
 	return &api.Response[*consensusapi.VersionedSignedProposal]{

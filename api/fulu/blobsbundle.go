@@ -14,8 +14,32 @@
 package fulu
 
 import (
-	apideneb "github.com/attestantio/go-builder-client/api/deneb"
+	"fmt"
+
+	"github.com/attestantio/go-eth2-client/spec/deneb"
+	"github.com/goccy/go-yaml"
 )
 
-// BlobsBundle is an alias to the Deneb BlobsBundle as they are structurally identical.
-type BlobsBundle = apideneb.BlobsBundle
+// Constants for PeerDAS (EIP-7594)
+const (
+	CELLS_PER_EXT_BLOB = 128 // Number of cells per extended blob
+)
+
+// BlobsBundle is the structure used to store the blobs bundle for Fulu.
+// Fulu implements PeerDAS (EIP-7594) which uses cell proofs instead of blob proofs.
+type BlobsBundle struct {
+	Commitments []deneb.KZGCommitment `ssz-max:"4096" ssz-size:"?,48"`
+	// In Fulu, we have CELLS_PER_EXT_BLOB proofs per blob (128 proofs per blob)
+	Proofs []deneb.KZGProof `ssz-max:"524288" ssz-size:"?,48"` // 4096 blobs * 128 proofs per blob = 524288
+	Blobs  []deneb.Blob     `ssz-max:"4096" ssz-size:"?,131072"`
+}
+
+// String returns a string version of the structure.
+func (b *BlobsBundle) String() string {
+	data, err := yaml.Marshal(b)
+	if err != nil {
+		return fmt.Sprintf("ERR: %v", err)
+	}
+
+	return string(data)
+}

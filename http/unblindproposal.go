@@ -81,6 +81,12 @@ func (s *Service) UnblindProposal(ctx context.Context,
 		}
 
 		return s.unblindElectraProposal(ctx, opts)
+	case consensusspec.DataVersionFulu:
+		if opts.Proposal.Fulu == nil {
+			return nil, errors.New("fulu proposal without payload")
+		}
+
+		return s.unblindFuluProposal(ctx, opts)
 	default:
 		return nil, fmt.Errorf("unhandled data version %v", opts.Proposal.Version)
 	}

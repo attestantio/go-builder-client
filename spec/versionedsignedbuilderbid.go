@@ -170,6 +170,7 @@ func (v *VersionedSignedBuilderBid) Value() (*uint256.Int, error) {
 }
 
 // BlockNumber returns the block number of the bid.
+//
 //nolint:gocognit
 func (v *VersionedSignedBuilderBid) BlockNumber() (uint64, error) {
 	if v == nil {
@@ -242,6 +243,7 @@ func (v *VersionedSignedBuilderBid) BlockNumber() (uint64, error) {
 }
 
 // BlockHash returns the block hash of the bid.
+//
 //nolint:gocognit
 func (v *VersionedSignedBuilderBid) BlockHash() (phase0.Hash32, error) {
 	if v == nil {
@@ -314,6 +316,7 @@ func (v *VersionedSignedBuilderBid) BlockHash() (phase0.Hash32, error) {
 }
 
 // ParentHash returns the parent hash of the bid.
+//
 //nolint:gocognit
 func (v *VersionedSignedBuilderBid) ParentHash() (phase0.Hash32, error) {
 	if v == nil {
@@ -386,6 +389,7 @@ func (v *VersionedSignedBuilderBid) ParentHash() (phase0.Hash32, error) {
 }
 
 // StateRoot returns the state root of the bid.
+//
 //nolint:gocognit
 func (v *VersionedSignedBuilderBid) StateRoot() (phase0.Root, error) {
 	if v == nil {
@@ -458,6 +462,7 @@ func (v *VersionedSignedBuilderBid) StateRoot() (phase0.Root, error) {
 }
 
 // FeeRecipient returns the fee recipient of the bid.
+//
 //nolint:gocognit
 func (v *VersionedSignedBuilderBid) FeeRecipient() (consensusbellatrix.ExecutionAddress, error) {
 	if v == nil {
@@ -530,6 +535,7 @@ func (v *VersionedSignedBuilderBid) FeeRecipient() (consensusbellatrix.Execution
 }
 
 // Timestamp returns the timestamp of the bid.
+//
 //nolint:gocognit
 func (v *VersionedSignedBuilderBid) Timestamp() (uint64, error) {
 	if v == nil {
@@ -602,6 +608,7 @@ func (v *VersionedSignedBuilderBid) Timestamp() (uint64, error) {
 }
 
 // TransactionsRoot returns the transactions root of the bid.
+//
 //nolint:gocognit
 func (v *VersionedSignedBuilderBid) TransactionsRoot() (phase0.Root, error) {
 	if v == nil {
@@ -730,6 +737,7 @@ func (v *VersionedSignedBuilderBid) MessageHashTreeRoot() (phase0.Root, error) {
 }
 
 // HeaderHashTreeRoot returns the hash tree root of the header of the bid.
+//
 //nolint:gocognit
 func (v *VersionedSignedBuilderBid) HeaderHashTreeRoot() (phase0.Root, error) {
 	if v == nil {
@@ -802,6 +810,7 @@ func (v *VersionedSignedBuilderBid) HeaderHashTreeRoot() (phase0.Root, error) {
 }
 
 // BlockGasLimit returns the block gas limit of the header of the bid.
+//
 //nolint:gocognit
 func (v *VersionedSignedBuilderBid) BlockGasLimit() (uint64, error) {
 	if v == nil {

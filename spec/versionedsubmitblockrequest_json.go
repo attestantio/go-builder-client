@@ -21,6 +21,7 @@ import (
 	"github.com/attestantio/go-builder-client/api/capella"
 	"github.com/attestantio/go-builder-client/api/deneb"
 	"github.com/attestantio/go-builder-client/api/electra"
+	"github.com/attestantio/go-builder-client/api/fulu"
 	"github.com/attestantio/go-eth2-client/spec"
 	"github.com/pkg/errors"
 )
@@ -38,6 +39,10 @@ type denebVersionedSubmitBlockRequestJSON struct {
 
 type electraVersionedSubmitBlockRequestJSON struct {
 	Data *electra.SubmitBlockRequest `json:"data"`
+}
+
+type fuluVersionedSubmitBlockRequestJSON struct {
+	Data *fulu.SubmitBlockRequest `json:"data"`
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -99,6 +104,19 @@ func (v *VersionedSubmitBlockRequest) MarshalJSON() ([]byte, error) {
 		}{version, data}
 
 		return json.Marshal(payload)
+	case spec.DataVersionFulu:
+		if v.Fulu == nil {
+			return nil, errors.New("no fulu data")
+		}
+		data := &fuluVersionedSubmitBlockRequestJSON{
+			Data: v.Fulu,
+		}
+		payload := struct {
+			*versionJSON
+			*fuluVersionedSubmitBlockRequestJSON
+		}{version, data}
+
+		return json.Marshal(payload)
 	default:
 		return nil, fmt.Errorf("unsupported data version %v", v.Version)
 	}
@@ -136,6 +154,12 @@ func (v *VersionedSubmitBlockRequest) UnmarshalJSON(input []byte) error {
 			return errors.Wrap(err, "invalid JSON")
 		}
 		v.Electra = data.Data
+	case spec.DataVersionFulu:
+		var data fuluVersionedSubmitBlockRequestJSON
+		if err := json.Unmarshal(input, &data); err != nil {
+			return errors.Wrap(err, "invalid JSON")
+		}
+		v.Fulu = data.Data
 	default:
 		return fmt.Errorf("unsupported data version %v", metadata.Version)
 	}

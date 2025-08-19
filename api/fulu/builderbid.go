@@ -14,30 +14,8 @@
 package fulu
 
 import (
-	"fmt"
-
-	"github.com/attestantio/go-eth2-client/spec/deneb"
-	"github.com/attestantio/go-eth2-client/spec/electra"
-	"github.com/attestantio/go-eth2-client/spec/phase0"
-	"github.com/goccy/go-yaml"
-	"github.com/holiman/uint256"
+	"github.com/attestantio/go-builder-client/api/electra"
 )
 
-// BuilderBid represents a BuilderBid.
-type BuilderBid struct {
-	Header             *deneb.ExecutionPayloadHeader
-	BlobKZGCommitments []deneb.KZGCommitment `ssz-max:"4096" ssz-size:"?,48"`
-	ExecutionRequests  *electra.ExecutionRequests
-	Value              *uint256.Int     `ssz-size:"32"`
-	Pubkey             phase0.BLSPubKey `ssz-size:"48"`
-}
-
-// String returns a string version of the structure.
-func (b *BuilderBid) String() string {
-	data, err := yaml.Marshal(b)
-	if err != nil {
-		return fmt.Sprintf("ERR: %v", err)
-	}
-
-	return string(data)
-}
+// BuilderBid is an alias to the Electra BuilderBid as they are structurally identical.
+type BuilderBid = electra.BuilderBid

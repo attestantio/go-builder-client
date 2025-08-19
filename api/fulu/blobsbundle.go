@@ -14,25 +14,8 @@
 package fulu
 
 import (
-	"fmt"
-
-	"github.com/attestantio/go-eth2-client/spec/deneb"
-	"github.com/goccy/go-yaml"
+	apideneb "github.com/attestantio/go-builder-client/api/deneb"
 )
 
-// BlobsBundle is the structure used to store the blobs bundle.
-type BlobsBundle struct {
-	Commitments []deneb.KZGCommitment `ssz-max:"4096" ssz-size:"?,48"`
-	Proofs      []deneb.KZGProof      `ssz-max:"4096" ssz-size:"?,48"`
-	Blobs       []deneb.Blob          `ssz-max:"4096" ssz-size:"?,131072"`
-}
-
-// String returns a string version of the structure.
-func (b *BlobsBundle) String() string {
-	data, err := yaml.Marshal(b)
-	if err != nil {
-		return fmt.Sprintf("ERR: %v", err)
-	}
-
-	return string(data)
-}
+// BlobsBundle is an alias to the Deneb BlobsBundle as they are structurally identical.
+type BlobsBundle = apideneb.BlobsBundle

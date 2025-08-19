@@ -14,24 +14,8 @@
 package fulu
 
 import (
-	"fmt"
-
-	"github.com/attestantio/go-eth2-client/spec/deneb"
-	"github.com/goccy/go-yaml"
+	apideneb "github.com/attestantio/go-builder-client/api/deneb"
 )
 
-// ExecutionPayloadAndBlobsBundle represents an execution layer payload.
-type ExecutionPayloadAndBlobsBundle struct {
-	ExecutionPayload *deneb.ExecutionPayload
-	BlobsBundle      *BlobsBundle
-}
-
-// String returns a string version of the structure.
-func (e *ExecutionPayloadAndBlobsBundle) String() string {
-	data, err := yaml.Marshal(e)
-	if err != nil {
-		return fmt.Sprintf("ERR: %v", err)
-	}
-
-	return string(data)
-}
+// ExecutionPayloadAndBlobsBundle is an alias to the Deneb ExecutionPayloadAndBlobsBundle as they are structurally identical.
+type ExecutionPayloadAndBlobsBundle = apideneb.ExecutionPayloadAndBlobsBundle

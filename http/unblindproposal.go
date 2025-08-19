@@ -576,7 +576,7 @@ func (s *Service) unblindFuluProposal(ctx context.Context,
 	default:
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
 	}
-	
+
 	// Ensure that the data returned is what we expect.
 	ourExecutionPayloadHash, err := proposal.Message.Body.ExecutionPayloadHeader.HashTreeRoot()
 	if err != nil {
@@ -599,19 +599,19 @@ func (s *Service) unblindFuluProposal(ctx context.Context,
 	numBlobs := len(fuluBundle.BlobsBundle.Blobs)
 	res.Fulu.KZGProofs = make([]deneb.KZGProof, numBlobs)
 	res.Fulu.Blobs = make([]deneb.Blob, numBlobs)
-	
+
 	for i := range fuluBundle.BlobsBundle.Blobs {
 		if !bytes.Equal(fuluBundle.BlobsBundle.Commitments[i][:], res.Fulu.SignedBlock.Message.Body.BlobKZGCommitments[i][:]) {
 			return nil, fmt.Errorf("blob %d commitment mismatch", i)
 		}
-		
+
 		// For Fulu with PeerDAS, we have 128 proofs per blob.
 		// Extract the first proof for each blob for now.
-		proofIndex := i * apifulu.CELLS_PER_EXT_BLOB
+		proofIndex := i * apifulu.CellsPerExtBlob
 		if proofIndex < len(fuluBundle.BlobsBundle.Proofs) {
 			res.Fulu.KZGProofs[i] = fuluBundle.BlobsBundle.Proofs[proofIndex]
 		} else if i < len(fuluBundle.BlobsBundle.Proofs) {
-			// Fallback: if not enough cell proofs, use blob proof directly
+			// Fallback: if not enough cell proofs, use blob proof directly.
 			res.Fulu.KZGProofs[i] = fuluBundle.BlobsBundle.Proofs[i]
 		}
 		res.Fulu.Blobs[i] = fuluBundle.BlobsBundle.Blobs[i]

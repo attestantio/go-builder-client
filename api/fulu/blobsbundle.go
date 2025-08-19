@@ -20,18 +20,16 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
-// Constants for PeerDAS (EIP-7594)
-const (
-	CELLS_PER_EXT_BLOB = 128 // Number of cells per extended blob
-)
+// CellsPerExtBlob is the number of cells per extended blob for PeerDAS (EIP-7594).
+const CellsPerExtBlob = 128
 
 // BlobsBundle is the structure used to store the blobs bundle for Fulu.
 // Fulu implements PeerDAS (EIP-7594) which uses cell proofs instead of blob proofs.
 type BlobsBundle struct {
-	Commitments []deneb.KZGCommitment `ssz-max:"4096" ssz-size:"?,48"`
-	// In Fulu, we have CELLS_PER_EXT_BLOB proofs per blob (128 proofs per blob)
+	Commitments []deneb.KZGCommitment `ssz-max:"4096"   ssz-size:"?,48"`
+	// In Fulu, we have CellsPerExtBlob proofs per blob (128 proofs per blob).
 	Proofs []deneb.KZGProof `ssz-max:"524288" ssz-size:"?,48"` // 4096 blobs * 128 proofs per blob = 524288
-	Blobs  []deneb.Blob     `ssz-max:"4096" ssz-size:"?,131072"`
+	Blobs  []deneb.Blob     `ssz-max:"4096"   ssz-size:"?,131072"`
 }
 
 // String returns a string version of the structure.

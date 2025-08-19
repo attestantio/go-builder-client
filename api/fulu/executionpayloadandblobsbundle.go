@@ -16,13 +16,13 @@ package fulu
 import (
 	"fmt"
 
-	"github.com/attestantio/go-eth2-client/spec/electra"
+	"github.com/attestantio/go-eth2-client/spec/deneb"
 	"github.com/goccy/go-yaml"
 )
 
 // ExecutionPayloadAndBlobsBundle represents an execution layer payload with blob data for Fulu.
 type ExecutionPayloadAndBlobsBundle struct {
-	ExecutionPayload *electra.ExecutionPayload
+	ExecutionPayload *deneb.ExecutionPayload
 	BlobsBundle      *BlobsBundle
 }
 

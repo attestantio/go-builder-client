@@ -106,7 +106,7 @@ func (v *VersionedSubmitBlockRequest) MarshalJSON() ([]byte, error) {
 		return json.Marshal(payload)
 	case spec.DataVersionFulu:
 		if v.Fulu == nil {
-			return nil, errors.New("no electra data")
+			return nil, errors.New("no fulu data")
 		}
 		data := &fuluVersionedSubmitBlockRequestJSON{
 			Data: v.Fulu,

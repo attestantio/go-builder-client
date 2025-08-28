@@ -49,4 +49,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/attestantio/go-eth2-client => github.com/jtraglia/go-eth2-client v0.21.5-0.20250410190628-e845cec4674f
+replace github.com/attestantio/go-eth2-client => github.com/bharath-123/go-eth2-client v0.0.0-20250828150342-e40370b26de3

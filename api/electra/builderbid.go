@@ -26,10 +26,10 @@ import (
 // BuilderBid represents a BuilderBid.
 type BuilderBid struct {
 	Header             *deneb.ExecutionPayloadHeader
-	BlobKZGCommitments []deneb.KZGCommitment `ssz-max:"4096" ssz-size:"?,48"`
+	BlobKZGCommitments []deneb.KZGCommitment 		`ssz-max:"4096" ssz-size:"?,48"`
 	ExecutionRequests  *electra.ExecutionRequests
-	Value              *uint256.Int     `ssz-size:"32"`
-	Pubkey             phase0.BLSPubKey `ssz-size:"48"`
+	Value              *uint256.Int     			`ssz-size:"32"`
+	Pubkey             phase0.BLSPubKey 			`ssz-size:"48"`
 }
 
 // String returns a string version of the structure.

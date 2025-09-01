@@ -168,6 +168,7 @@ linters:
     - funlen
     - gci
     - gochecknoglobals
+    - gocognit
     - err113
     - ireturn
     - mnd

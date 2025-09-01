@@ -16,7 +16,6 @@ package api
 import (
 	"github.com/attestantio/go-builder-client/api/deneb"
 	"github.com/attestantio/go-builder-client/api/fulu"
-	"github.com/attestantio/go-eth2-client/spec"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/attestantio/go-eth2-client/spec/bellatrix"
 	"github.com/attestantio/go-eth2-client/spec/capella"
@@ -279,7 +278,7 @@ func (v *VersionedSubmitBlindedBlockResponse) BlobsBundle() (*VersionedBlobsBund
 		}
 
 		return &VersionedBlobsBundle{
-			Version: spec.DataVersionDeneb,
+			Version: consensusspec.DataVersionDeneb,
 			Deneb:   v.Deneb.BlobsBundle,
 		}, nil
 	case consensusspec.DataVersionElectra:
@@ -288,7 +287,7 @@ func (v *VersionedSubmitBlindedBlockResponse) BlobsBundle() (*VersionedBlobsBund
 		}
 
 		return &VersionedBlobsBundle{
-			Version: spec.DataVersionElectra,
+			Version: consensusspec.DataVersionElectra,
 			Electra: v.Electra.BlobsBundle,
 		}, nil
 	case consensusspec.DataVersionFulu:
@@ -297,7 +296,7 @@ func (v *VersionedSubmitBlindedBlockResponse) BlobsBundle() (*VersionedBlobsBund
 		}
 
 		return &VersionedBlobsBundle{
-			Version: spec.DataVersionFulu,
+			Version: consensusspec.DataVersionFulu,
 			Fulu:    v.Fulu.BlobsBundle,
 		}, nil
 	default:

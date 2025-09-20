@@ -22,6 +22,7 @@ import (
 	"github.com/attestantio/go-builder-client/api/capella"
 	"github.com/attestantio/go-builder-client/api/deneb"
 	"github.com/attestantio/go-builder-client/api/electra"
+	"github.com/attestantio/go-builder-client/api/fulu"
 	apiv1 "github.com/attestantio/go-builder-client/api/v1"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	consensusbellatrix "github.com/attestantio/go-eth2-client/spec/bellatrix"
@@ -39,6 +40,7 @@ type VersionedSubmitBlockRequest struct {
 	Capella   *capella.SubmitBlockRequest
 	Deneb     *deneb.SubmitBlockRequest
 	Electra   *electra.SubmitBlockRequest
+	Fulu      *fulu.SubmitBlockRequest
 }
 
 // IsEmpty returns true if there is no request.
@@ -52,6 +54,8 @@ func (v *VersionedSubmitBlockRequest) IsEmpty() bool {
 		return v.Deneb == nil
 	case consensusspec.DataVersionElectra:
 		return v.Electra == nil
+	case consensusspec.DataVersionFulu:
+		return v.Fulu == nil
 	default:
 		return true
 	}
@@ -99,6 +103,15 @@ func (v *VersionedSubmitBlockRequest) Slot() (uint64, error) {
 		}
 
 		return v.Electra.Message.Slot, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return 0, errors.New("no data message")
+		}
+
+		return v.Fulu.Message.Slot, nil
 	default:
 		return 0, errors.New("unsupported version")
 	}
@@ -146,6 +159,15 @@ func (v *VersionedSubmitBlockRequest) BlockHash() (phase0.Hash32, error) {
 		}
 
 		return v.Electra.Message.BlockHash, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.Hash32{}, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return phase0.Hash32{}, errors.New("no data message")
+		}
+
+		return v.Fulu.Message.BlockHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
 	}
@@ -193,6 +215,15 @@ func (v *VersionedSubmitBlockRequest) Builder() (phase0.BLSPubKey, error) {
 		}
 
 		return v.Electra.Message.BuilderPubkey, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.BLSPubKey{}, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return phase0.BLSPubKey{}, errors.New("no data message")
+		}
+
+		return v.Fulu.Message.BuilderPubkey, nil
 	default:
 		return phase0.BLSPubKey{}, errors.New("unsupported version")
 	}
@@ -240,6 +271,15 @@ func (v *VersionedSubmitBlockRequest) ProposerFeeRecipient() (consensusbellatrix
 		}
 
 		return v.Electra.Message.ProposerFeeRecipient, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return consensusbellatrix.ExecutionAddress{}, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message")
+		}
+
+		return v.Fulu.Message.ProposerFeeRecipient, nil
 	default:
 		return consensusbellatrix.ExecutionAddress{}, errors.New("unsupported version")
 	}
@@ -287,6 +327,15 @@ func (v *VersionedSubmitBlockRequest) ProposerPubKey() (phase0.BLSPubKey, error)
 		}
 
 		return v.Electra.Message.ProposerPubkey, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.BLSPubKey{}, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return phase0.BLSPubKey{}, errors.New("no data message")
+		}
+
+		return v.Fulu.Message.ProposerPubkey, nil
 	default:
 		return phase0.BLSPubKey{}, errors.New("unsupported version")
 	}
@@ -334,6 +383,15 @@ func (v *VersionedSubmitBlockRequest) ParentHash() (phase0.Hash32, error) {
 		}
 
 		return v.Electra.Message.ParentHash, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.Hash32{}, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return phase0.Hash32{}, errors.New("no data message")
+		}
+
+		return v.Fulu.Message.ParentHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
 	}
@@ -381,6 +439,15 @@ func (v *VersionedSubmitBlockRequest) Value() (*uint256.Int, error) {
 		}
 
 		return v.Electra.Message.Value, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return nil, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return nil, errors.New("no data message")
+		}
+
+		return v.Fulu.Message.Value, nil
 	default:
 		return nil, errors.New("unsupported version")
 	}
@@ -428,6 +495,15 @@ func (v *VersionedSubmitBlockRequest) BidTrace() (*apiv1.BidTrace, error) {
 		}
 
 		return v.Electra.Message, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return nil, errors.New("no data")
+		}
+		if v.Fulu.Message == nil {
+			return nil, errors.New("no data message")
+		}
+
+		return v.Fulu.Message, nil
 	default:
 		return nil, errors.New("unsupported version")
 	}
@@ -463,6 +539,12 @@ func (v *VersionedSubmitBlockRequest) Signature() (phase0.BLSSignature, error) {
 		}
 
 		return v.Electra.Signature, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.BLSSignature{}, errors.New("no data")
+		}
+
+		return v.Fulu.Signature, nil
 	default:
 		return phase0.BLSSignature{}, errors.New("unsupported version")
 	}
@@ -510,6 +592,15 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadBlockHash() (phase0.Hash32
 		}
 
 		return v.Electra.ExecutionPayload.BlockHash, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.Hash32{}, errors.New("no data")
+		}
+		if v.Fulu.ExecutionPayload == nil {
+			return phase0.Hash32{}, errors.New("no data execution payload")
+		}
+
+		return v.Fulu.ExecutionPayload.BlockHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
 	}
@@ -557,6 +648,15 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadParentHash() (phase0.Hash3
 		}
 
 		return v.Electra.ExecutionPayload.ParentHash, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.Hash32{}, errors.New("no data")
+		}
+		if v.Fulu.ExecutionPayload == nil {
+			return phase0.Hash32{}, errors.New("no data execution payload")
+		}
+
+		return v.Fulu.ExecutionPayload.ParentHash, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
 	}
@@ -604,6 +704,15 @@ func (v *VersionedSubmitBlockRequest) PrevRandao() (phase0.Hash32, error) {
 		}
 
 		return v.Electra.ExecutionPayload.PrevRandao, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return phase0.Hash32{}, errors.New("no data")
+		}
+		if v.Fulu.ExecutionPayload == nil {
+			return phase0.Hash32{}, errors.New("no data execution payload")
+		}
+
+		return v.Fulu.ExecutionPayload.PrevRandao, nil
 	default:
 		return phase0.Hash32{}, errors.New("unsupported version")
 	}
@@ -651,6 +760,15 @@ func (v *VersionedSubmitBlockRequest) GasLimit() (uint64, error) {
 		}
 
 		return v.Electra.ExecutionPayload.GasLimit, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Fulu.ExecutionPayload == nil {
+			return 0, errors.New("no data execution payload")
+		}
+
+		return v.Fulu.ExecutionPayload.GasLimit, nil
 	default:
 		return 0, errors.New("unsupported version")
 	}
@@ -698,6 +816,15 @@ func (v *VersionedSubmitBlockRequest) GasUsed() (uint64, error) {
 		}
 
 		return v.Electra.ExecutionPayload.GasUsed, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Fulu.ExecutionPayload == nil {
+			return 0, errors.New("no data execution payload")
+		}
+
+		return v.Fulu.ExecutionPayload.GasUsed, nil
 	default:
 		return 0, errors.New("unsupported version")
 	}
@@ -745,6 +872,15 @@ func (v *VersionedSubmitBlockRequest) BlockNumber() (uint64, error) {
 		}
 
 		return v.Electra.ExecutionPayload.BlockNumber, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Fulu.ExecutionPayload == nil {
+			return 0, errors.New("no data execution payload")
+		}
+
+		return v.Fulu.ExecutionPayload.BlockNumber, nil
 	default:
 		return 0, errors.New("unsupported version")
 	}
@@ -792,6 +928,15 @@ func (v *VersionedSubmitBlockRequest) Timestamp() (uint64, error) {
 		}
 
 		return v.Electra.ExecutionPayload.Timestamp, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Fulu.ExecutionPayload == nil {
+			return 0, errors.New("no data execution payload")
+		}
+
+		return v.Fulu.ExecutionPayload.Timestamp, nil
 	default:
 		return 0, errors.New("unsupported version")
 	}
@@ -839,6 +984,15 @@ func (v *VersionedSubmitBlockRequest) Transactions() ([]consensusbellatrix.Trans
 		}
 
 		return v.Electra.ExecutionPayload.Transactions, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return nil, errors.New("no data")
+		}
+		if v.Fulu.ExecutionPayload == nil {
+			return nil, errors.New("no data execution payload")
+		}
+
+		return v.Fulu.ExecutionPayload.Transactions, nil
 	default:
 		return nil, errors.New("unsupported version")
 	}
@@ -877,6 +1031,15 @@ func (v *VersionedSubmitBlockRequest) Withdrawals() ([]*consensuscapella.Withdra
 		}
 
 		return v.Electra.ExecutionPayload.Withdrawals, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return nil, errors.New("no data")
+		}
+		if v.Fulu.ExecutionPayload == nil {
+			return nil, errors.New("no data execution payload")
+		}
+
+		return v.Fulu.ExecutionPayload.Withdrawals, nil
 	default:
 		return nil, errors.New("unsupported version")
 	}
@@ -906,6 +1069,15 @@ func (v *VersionedSubmitBlockRequest) Blobs() ([]consensusdeneb.Blob, error) {
 		}
 
 		return v.Electra.BlobsBundle.Blobs, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return nil, errors.New("no data")
+		}
+		if v.Fulu.BlobsBundle == nil {
+			return nil, errors.New("no data blobs bundle")
+		}
+
+		return v.Fulu.BlobsBundle.Blobs, nil
 	default:
 		return nil, errors.New("unsupported version")
 	}
@@ -935,6 +1107,15 @@ func (v *VersionedSubmitBlockRequest) BlobGasUsed() (uint64, error) {
 		}
 
 		return v.Electra.ExecutionPayload.BlobGasUsed, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Fulu.ExecutionPayload == nil {
+			return 0, errors.New("no data execution payload")
+		}
+
+		return v.Fulu.ExecutionPayload.BlobGasUsed, nil
 	default:
 		return 0, errors.New("unsupported version")
 	}
@@ -964,6 +1145,15 @@ func (v *VersionedSubmitBlockRequest) ExcessBlobGas() (uint64, error) {
 		}
 
 		return v.Electra.ExecutionPayload.ExcessBlobGas, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return 0, errors.New("no data")
+		}
+		if v.Fulu.ExecutionPayload == nil {
+			return 0, errors.New("no data execution payload")
+		}
+
+		return v.Fulu.ExecutionPayload.ExcessBlobGas, nil
 	default:
 		return 0, errors.New("unsupported version")
 	}
@@ -984,6 +1174,15 @@ func (v *VersionedSubmitBlockRequest) DepositRequests() ([]*consensuselectra.Dep
 		}
 
 		return v.Electra.ExecutionRequests.Deposits, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return nil, errors.New("no data")
+		}
+		if v.Fulu.ExecutionRequests == nil {
+			return nil, errors.New("no data execution requests")
+		}
+
+		return v.Fulu.ExecutionRequests.Deposits, nil
 	default:
 		return nil, errors.New("unsupported version")
 	}
@@ -1004,6 +1203,15 @@ func (v *VersionedSubmitBlockRequest) WithdrawalRequests() ([]*consensuselectra.
 		}
 
 		return v.Electra.ExecutionRequests.Withdrawals, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return nil, errors.New("no data")
+		}
+		if v.Fulu.ExecutionRequests == nil {
+			return nil, errors.New("no data execution requests")
+		}
+
+		return v.Fulu.ExecutionRequests.Withdrawals, nil
 	default:
 		return nil, errors.New("unsupported version")
 	}
@@ -1024,6 +1232,15 @@ func (v *VersionedSubmitBlockRequest) ConsolidationRequests() ([]*consensuselect
 		}
 
 		return v.Electra.ExecutionRequests.Consolidations, nil
+	case consensusspec.DataVersionFulu:
+		if v.Fulu == nil {
+			return nil, errors.New("no data")
+		}
+		if v.Fulu.ExecutionRequests == nil {
+			return nil, errors.New("no data execution requests")
+		}
+
+		return v.Fulu.ExecutionRequests.Consolidations, nil
 	default:
 		return nil, errors.New("unsupported version")
 	}

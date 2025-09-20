@@ -98,6 +98,19 @@ func (v *VersionedExecutionPayload) MarshalJSON() ([]byte, error) {
 		}{version, data}
 
 		return json.Marshal(payload)
+	case spec.DataVersionFulu:
+		if v.Fulu == nil {
+			return nil, errors.New("no fulu data")
+		}
+		data := &denebVersionedExecutionPayloadJSON{
+			Data: v.Fulu,
+		}
+		payload := struct {
+			*versionJSON
+			*denebVersionedExecutionPayloadJSON
+		}{version, data}
+
+		return json.Marshal(payload)
 	default:
 		return nil, fmt.Errorf("unsupported data version %v", v.Version)
 	}
@@ -135,6 +148,12 @@ func (v *VersionedExecutionPayload) UnmarshalJSON(input []byte) error {
 			return errors.Wrap(err, "invalid JSON")
 		}
 		v.Electra = data.Data
+	case spec.DataVersionFulu:
+		var data denebVersionedExecutionPayloadJSON
+		if err := json.Unmarshal(input, &data); err != nil {
+			return errors.Wrap(err, "invalid JSON")
+		}
+		v.Fulu = data.Data
 	default:
 		return fmt.Errorf("unsupported data version %v", metadata.Version)
 	}

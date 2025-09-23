@@ -147,6 +147,10 @@ func (*Service) signedBuilderBidFromJSON(res *httpResponse) (
 		response.Data.Electra, _, err = decodeJSONResponse(bytes.NewReader(res.body),
 			&electra.SignedBuilderBid{},
 		)
+	case consensusspec.DataVersionFulu:
+		response.Data.Fulu, _, err = decodeJSONResponse(bytes.NewReader(res.body),
+			&electra.SignedBuilderBid{},
+		)
 	default:
 		return nil, fmt.Errorf("unsupported block version %s", res.consensusVersion)
 	}
@@ -184,6 +188,9 @@ func (*Service) signedBuilderBidFromSSZ(_ context.Context,
 	case consensusspec.DataVersionElectra:
 		response.Data.Electra = &electra.SignedBuilderBid{}
 		err = response.Data.Electra.UnmarshalSSZ(res.body)
+	case consensusspec.DataVersionFulu:
+		response.Data.Fulu = &electra.SignedBuilderBid{}
+		err = response.Data.Fulu.UnmarshalSSZ(res.body)
 	default:
 		return nil, fmt.Errorf("unsupported block version %s", res.consensusVersion)
 	}

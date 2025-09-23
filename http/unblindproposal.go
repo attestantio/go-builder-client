@@ -24,9 +24,11 @@ import (
 	client "github.com/attestantio/go-builder-client"
 	"github.com/attestantio/go-builder-client/api"
 	apideneb "github.com/attestantio/go-builder-client/api/deneb"
+	apifulu "github.com/attestantio/go-builder-client/api/fulu"
 	consensusapi "github.com/attestantio/go-eth2-client/api"
 	consensusapiv1deneb "github.com/attestantio/go-eth2-client/api/v1/deneb"
 	consensusapiv1electra "github.com/attestantio/go-eth2-client/api/v1/electra"
+	consensusapiv1fulu "github.com/attestantio/go-eth2-client/api/v1/fulu"
 	consensusspec "github.com/attestantio/go-eth2-client/spec"
 	"github.com/attestantio/go-eth2-client/spec/bellatrix"
 	"github.com/attestantio/go-eth2-client/spec/capella"
@@ -81,6 +83,12 @@ func (s *Service) UnblindProposal(ctx context.Context,
 		}
 
 		return s.unblindElectraProposal(ctx, opts)
+	case consensusspec.DataVersionFulu:
+		if opts.Proposal.Fulu == nil {
+			return nil, errors.New("fulu proposal without payload")
+		}
+
+		return s.unblindFuluProposal(ctx, opts)
 	default:
 		return nil, fmt.Errorf("unhandled data version %v", opts.Proposal.Version)
 	}
@@ -480,4 +488,123 @@ func (s *Service) unblindElectraProposal(ctx context.Context,
 		Data:     res,
 		Metadata: metadataFromHeaders(httpResponse.headers),
 	}, nil
+}
+
+func (s *Service) unblindFuluProposal(ctx context.Context,
+	opts *api.UnblindProposalOpts,
+) (
+	*api.Response[*consensusapi.VersionedSignedProposal],
+	error,
+) {
+	proposal := opts.Proposal.Fulu
+
+	specJSON, err := json.Marshal(proposal)
+	if err != nil {
+		return nil, errors.Join(errors.New("failed to marshal JSON"), err)
+	}
+
+	headers := make(map[string]string)
+	headers["Eth-Consensus-Version"] = strings.ToLower(opts.Proposal.Version.String())
+
+	httpResponse, err := s.post(ctx,
+		"/eth/v1/builder/blinded_blocks",
+		"",
+		&opts.Common,
+		bytes.NewBuffer(specJSON),
+		ContentTypeJSON,
+		headers,
+		true,
+	)
+	if err != nil {
+		return nil, errors.Join(errors.New("failed to submit unblind proposal request"), err)
+	}
+
+	// Reconstruct proposal.
+	res := &consensusapi.VersionedSignedProposal{
+		Version: consensusspec.DataVersionFulu,
+		Fulu: &consensusapiv1fulu.SignedBlockContents{
+			SignedBlock: &electra.SignedBeaconBlock{
+				Message: &electra.BeaconBlock{
+					Slot:          proposal.Message.Slot,
+					ProposerIndex: proposal.Message.ProposerIndex,
+					ParentRoot:    proposal.Message.ParentRoot,
+					StateRoot:     proposal.Message.StateRoot,
+					Body: &electra.BeaconBlockBody{
+						RANDAOReveal:          proposal.Message.Body.RANDAOReveal,
+						ETH1Data:              proposal.Message.Body.ETH1Data,
+						Graffiti:              proposal.Message.Body.Graffiti,
+						ProposerSlashings:     proposal.Message.Body.ProposerSlashings,
+						AttesterSlashings:     proposal.Message.Body.AttesterSlashings,
+						Attestations:          proposal.Message.Body.Attestations,
+						Deposits:              proposal.Message.Body.Deposits,
+						VoluntaryExits:        proposal.Message.Body.VoluntaryExits,
+						SyncAggregate:         proposal.Message.Body.SyncAggregate,
+						BLSToExecutionChanges: proposal.Message.Body.BLSToExecutionChanges,
+						BlobKZGCommitments:    proposal.Message.Body.BlobKZGCommitments,
+						ExecutionRequests:     proposal.Message.Body.ExecutionRequests,
+					},
+				},
+				Signature: proposal.Signature,
+			},
+		},
+	}
+
+	var bundle *apifulu.ExecutionPayloadAndBlobsBundle
+	switch httpResponse.contentType {
+	case ContentTypeJSON:
+		bundle, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &apifulu.ExecutionPayloadAndBlobsBundle{})
+	case ContentTypeSSZ:
+		bundle, err = s.fuluExecutionPayloadAndBlobsBundleFromSSZ(ctx, httpResponse)
+	default:
+		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
+	}
+	if err != nil {
+		return nil, errors.Join(errors.New("failed to parse fulu response"), err)
+	}
+	// Ensure that the data returned is what we expect.
+	ourExecutionPayloadHash, err := proposal.Message.Body.ExecutionPayloadHeader.HashTreeRoot()
+	if err != nil {
+		return nil, errors.Join(errors.New("failed to generate hash tree root for our execution payload header"), err)
+	}
+	receivedExecutionPayloadHash, err := bundle.ExecutionPayload.HashTreeRoot()
+	if err != nil {
+		return nil, errors.Join(errors.New("failed to generate hash tree root for the received execution payload header"), err)
+	}
+	if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
+		return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:],
+			ourExecutionPayloadHash[:],
+		)
+	}
+	res.Fulu.SignedBlock.Message.Body.ExecutionPayload = bundle.ExecutionPayload
+
+	// Reconstruct blobs.
+	res.Fulu.KZGProofs = make([]deneb.KZGProof, len(bundle.BlobsBundle.Proofs))
+	res.Fulu.Blobs = make([]deneb.Blob, len(bundle.BlobsBundle.Blobs))
+	for i := range bundle.BlobsBundle.Blobs {
+		if !bytes.Equal(bundle.BlobsBundle.Commitments[i][:], res.Fulu.SignedBlock.Message.Body.BlobKZGCommitments[i][:]) {
+			return nil, fmt.Errorf("blob %d commitment mismatch", i)
+		}
+
+		res.Fulu.KZGProofs[i] = bundle.BlobsBundle.Proofs[i]
+		res.Fulu.Blobs[i] = bundle.BlobsBundle.Blobs[i]
+	}
+
+	return &api.Response[*consensusapi.VersionedSignedProposal]{
+		Data:     res,
+		Metadata: metadataFromHeaders(httpResponse.headers),
+	}, nil
+}
+
+func (*Service) fuluExecutionPayloadAndBlobsBundleFromSSZ(_ context.Context,
+	res *httpResponse,
+) (
+	*apifulu.ExecutionPayloadAndBlobsBundle,
+	error,
+) {
+	bundle := &apifulu.ExecutionPayloadAndBlobsBundle{}
+	if err := bundle.UnmarshalSSZ(res.body); err != nil {
+		return nil, errors.Join(errors.New("failed to decode fulu SSZ response"), err)
+	}
+
+	return bundle, nil
 }

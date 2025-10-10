@@ -57,6 +57,7 @@ func (s *Service) BuilderBid(ctx context.Context,
 	if bytes.Equal(opts.ParentHash[:], emptyHash[:]) {
 		return nil, errors.Join(errors.New("no parent hash specified"), client.ErrInvalidOptions)
 	}
+
 	var emptyPubKey phase0.BLSPubKey
 	if bytes.Equal(opts.PubKey[:], emptyPubKey[:]) {
 		return nil, errors.Join(errors.New("no public key specified"), client.ErrInvalidOptions)
@@ -66,6 +67,7 @@ func (s *Service) BuilderBid(ctx context.Context,
 	headers["Date-Milliseconds"] = fmt.Sprintf("%d", time.Now().UnixMilli())
 
 	endpoint := fmt.Sprintf("/eth/v1/builder/header/%d/%#x/%#x", opts.Slot, opts.ParentHash[:], opts.PubKey[:])
+
 	httpResponse, err := s.get(ctx,
 		endpoint,
 		"",
@@ -95,6 +97,7 @@ func (s *Service) BuilderBid(ctx context.Context,
 	default:
 		return nil, fmt.Errorf("unhandled content type %v", httpResponse.contentType)
 	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -103,6 +106,7 @@ func (s *Service) BuilderBid(ctx context.Context,
 	if err != nil {
 		return nil, errors.Join(errors.New("could not obtain parent hash of bid"), err)
 	}
+
 	if !bytes.Equal(parentHash[:], opts.ParentHash[:]) {
 		return nil, errors.New("parent hash mismatch")
 	}
@@ -130,6 +134,7 @@ func (*Service) signedBuilderBidFromJSON(res *httpResponse) (
 	}
 
 	var err error
+
 	switch res.consensusVersion {
 	case consensusspec.DataVersionBellatrix:
 		response.Data.Bellatrix, _, err = decodeJSONResponse(bytes.NewReader(res.body),
@@ -154,6 +159,7 @@ func (*Service) signedBuilderBidFromJSON(res *httpResponse) (
 	default:
 		return nil, fmt.Errorf("unsupported block version %s", res.consensusVersion)
 	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -175,6 +181,7 @@ func (*Service) signedBuilderBidFromSSZ(_ context.Context,
 	}
 
 	var err error
+
 	switch res.consensusVersion {
 	case consensusspec.DataVersionBellatrix:
 		response.Data.Bellatrix = &bellatrix.SignedBuilderBid{}
@@ -194,6 +201,7 @@ func (*Service) signedBuilderBidFromSSZ(_ context.Context,
 	default:
 		return nil, fmt.Errorf("unsupported block version %s", res.consensusVersion)
 	}
+
 	if err != nil {
 		return nil, err
 	}

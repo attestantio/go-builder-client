@@ -45,6 +45,7 @@ func (v *VersionedSubmitBlindedBlockResponse) MarshalJSON() ([]byte, error) {
 		if v.Bellatrix == nil {
 			return nil, errors.New("no bellatrix data")
 		}
+
 		data := &bellatrixVersionedExecutionPayloadJSON{
 			Data: v.Bellatrix,
 		}
@@ -58,6 +59,7 @@ func (v *VersionedSubmitBlindedBlockResponse) MarshalJSON() ([]byte, error) {
 		if v.Capella == nil {
 			return nil, errors.New("no capella data")
 		}
+
 		data := &capellaVersionedExecutionPayloadJSON{
 			Data: v.Capella,
 		}
@@ -71,6 +73,7 @@ func (v *VersionedSubmitBlindedBlockResponse) MarshalJSON() ([]byte, error) {
 		if v.Deneb == nil {
 			return nil, errors.New("no deneb data")
 		}
+
 		data := &denebVersionedExecutionPayloadAndBlobsBundleJSON{
 			Data: v.Deneb,
 		}
@@ -84,6 +87,7 @@ func (v *VersionedSubmitBlindedBlockResponse) MarshalJSON() ([]byte, error) {
 		if v.Electra == nil {
 			return nil, errors.New("no electra data")
 		}
+
 		data := &electraVersionedExecutionPayloadAndBlobsBundleJSON{
 			Data: v.Electra,
 		}
@@ -97,6 +101,7 @@ func (v *VersionedSubmitBlindedBlockResponse) MarshalJSON() ([]byte, error) {
 		if v.Fulu == nil {
 			return nil, errors.New("no fulu data")
 		}
+
 		data := &fuluVersionedExecutionPayloadAndBlobsBundleJSON{
 			Data: v.Fulu,
 		}
@@ -117,6 +122,7 @@ func (v *VersionedSubmitBlindedBlockResponse) UnmarshalJSON(input []byte) error 
 	if err := json.Unmarshal(input, &metadata); err != nil {
 		return errors.Wrap(err, "invalid JSON")
 	}
+
 	v.Version = metadata.Version
 	switch v.Version {
 	case spec.DataVersionBellatrix:
@@ -124,30 +130,35 @@ func (v *VersionedSubmitBlindedBlockResponse) UnmarshalJSON(input []byte) error 
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}
+
 		v.Bellatrix = data.Data
 	case spec.DataVersionCapella:
 		var data capellaVersionedExecutionPayloadJSON
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}
+
 		v.Capella = data.Data
 	case spec.DataVersionDeneb:
 		var data denebVersionedExecutionPayloadAndBlobsBundleJSON
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}
+
 		v.Deneb = data.Data
 	case spec.DataVersionElectra:
 		var data electraVersionedExecutionPayloadAndBlobsBundleJSON
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}
+
 		v.Electra = data.Data
 	case spec.DataVersionFulu:
 		var data fuluVersionedExecutionPayloadAndBlobsBundleJSON
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}
+
 		v.Fulu = data.Data
 	default:
 		return fmt.Errorf("unsupported data version %v", metadata.Version)

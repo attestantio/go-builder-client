@@ -54,6 +54,7 @@ linters:
     - varnamelen      # Disabled: Variable name length too strict
     - wrapcheck       # Disabled: Error wrapping not always applicable
     - wsl             # Disabled: Whitespace linting too strict (replaced with wsl_v5)
+    - noinlineerr     # Disabled: Inline error wrapping not always applicable
   
   # Individual linter settings and rule configurations
   settings:

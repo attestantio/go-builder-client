@@ -36,6 +36,7 @@ func (s *Service) SubmitValidatorRegistrations(ctx context.Context,
 	if opts == nil {
 		return client.ErrNoOptions
 	}
+
 	if len(opts.Registrations) == 0 {
 		return errors.Join(errors.New("no validator registrations specified"), client.ErrInvalidOptions)
 	}
@@ -64,8 +65,10 @@ func (s *Service) submitValidatorRegistrations(ctx context.Context,
 	opts *api.SubmitValidatorRegistrationsOpts,
 ) error {
 	// Unwrap versioned registrations.
-	var version *spec.BuilderVersion
-	var unversionedRegistrations []any
+	var (
+		version                  *spec.BuilderVersion
+		unversionedRegistrations []any
+	)
 
 	for _, registration := range opts.Registrations {
 		if registration == nil {
@@ -92,6 +95,7 @@ func (s *Service) submitValidatorRegistrations(ctx context.Context,
 	if err != nil {
 		return errors.Join(errors.New("failed to marshal JSON"), err)
 	}
+
 	_, err = s.post(ctx,
 		"/eth/v1/builder/validators",
 		"",
@@ -115,10 +119,12 @@ func (s *Service) submitChunkedValidatorRegistrations(ctx context.Context,
 	chunkSize := submitValidatorRegistrationsChunkSize
 	for i := 0; i < len(opts.Registrations); i += chunkSize {
 		chunkStart := i
+
 		chunkEnd := i + chunkSize
 		if len(opts.Registrations) < chunkEnd {
 			chunkEnd = len(opts.Registrations)
 		}
+
 		err := s.submitValidatorRegistrations(ctx, &api.SubmitValidatorRegistrationsOpts{
 			Common:        opts.Common,
 			Registrations: opts.Registrations[chunkStart:chunkEnd],

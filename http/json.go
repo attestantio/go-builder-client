@@ -37,7 +37,9 @@ func decodeJSONResponse[T any](body io.Reader, res T) (T, map[string]any, error)
 	if !isCorrectType {
 		return res, nil, ErrIncorrectType
 	}
+
 	metadata := make(map[string]any)
+
 	for k, v := range decoded {
 		switch k {
 		case "data":
@@ -47,10 +49,12 @@ func decodeJSONResponse[T any](body io.Reader, res T) (T, map[string]any, error)
 			}
 		default:
 			var val any
+
 			err := json.Unmarshal(v, &val)
 			if err != nil {
 				return res, nil, errors.Join(fmt.Errorf("failed to unmarshal metadata %s", k), err)
 			}
+
 			metadata[k] = val
 		}
 	}

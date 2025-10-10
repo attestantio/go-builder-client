@@ -66,11 +66,13 @@ func (v *VersionedSubmitBlockRequest) Slot() (uint64, error) {
 	if v == nil {
 		return 0, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return 0, errors.New("no data message")
 		}
@@ -80,6 +82,7 @@ func (v *VersionedSubmitBlockRequest) Slot() (uint64, error) {
 		if v.Capella == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return 0, errors.New("no data message")
 		}
@@ -89,6 +92,7 @@ func (v *VersionedSubmitBlockRequest) Slot() (uint64, error) {
 		if v.Deneb == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return 0, errors.New("no data message")
 		}
@@ -98,6 +102,7 @@ func (v *VersionedSubmitBlockRequest) Slot() (uint64, error) {
 		if v.Electra == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return 0, errors.New("no data message")
 		}
@@ -107,6 +112,7 @@ func (v *VersionedSubmitBlockRequest) Slot() (uint64, error) {
 		if v.Fulu == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return 0, errors.New("no data message")
 		}
@@ -122,11 +128,13 @@ func (v *VersionedSubmitBlockRequest) BlockHash() (phase0.Hash32, error) {
 	if v == nil {
 		return phase0.Hash32{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
@@ -136,6 +144,7 @@ func (v *VersionedSubmitBlockRequest) BlockHash() (phase0.Hash32, error) {
 		if v.Capella == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
@@ -145,6 +154,7 @@ func (v *VersionedSubmitBlockRequest) BlockHash() (phase0.Hash32, error) {
 		if v.Deneb == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
@@ -154,6 +164,7 @@ func (v *VersionedSubmitBlockRequest) BlockHash() (phase0.Hash32, error) {
 		if v.Electra == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
@@ -163,6 +174,7 @@ func (v *VersionedSubmitBlockRequest) BlockHash() (phase0.Hash32, error) {
 		if v.Fulu == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
@@ -178,11 +190,13 @@ func (v *VersionedSubmitBlockRequest) Builder() (phase0.BLSPubKey, error) {
 	if v == nil {
 		return phase0.BLSPubKey{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return phase0.BLSPubKey{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
@@ -192,6 +206,7 @@ func (v *VersionedSubmitBlockRequest) Builder() (phase0.BLSPubKey, error) {
 		if v.Capella == nil {
 			return phase0.BLSPubKey{}, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
@@ -201,6 +216,7 @@ func (v *VersionedSubmitBlockRequest) Builder() (phase0.BLSPubKey, error) {
 		if v.Deneb == nil {
 			return phase0.BLSPubKey{}, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
@@ -210,6 +226,7 @@ func (v *VersionedSubmitBlockRequest) Builder() (phase0.BLSPubKey, error) {
 		if v.Electra == nil {
 			return phase0.BLSPubKey{}, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
@@ -219,6 +236,7 @@ func (v *VersionedSubmitBlockRequest) Builder() (phase0.BLSPubKey, error) {
 		if v.Fulu == nil {
 			return phase0.BLSPubKey{}, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
@@ -234,11 +252,13 @@ func (v *VersionedSubmitBlockRequest) ProposerFeeRecipient() (consensusbellatrix
 	if v == nil {
 		return consensusbellatrix.ExecutionAddress{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message")
 		}
@@ -248,6 +268,7 @@ func (v *VersionedSubmitBlockRequest) ProposerFeeRecipient() (consensusbellatrix
 		if v.Capella == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message")
 		}
@@ -257,6 +278,7 @@ func (v *VersionedSubmitBlockRequest) ProposerFeeRecipient() (consensusbellatrix
 		if v.Deneb == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message")
 		}
@@ -266,6 +288,7 @@ func (v *VersionedSubmitBlockRequest) ProposerFeeRecipient() (consensusbellatrix
 		if v.Electra == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message")
 		}
@@ -275,6 +298,7 @@ func (v *VersionedSubmitBlockRequest) ProposerFeeRecipient() (consensusbellatrix
 		if v.Fulu == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message")
 		}
@@ -290,11 +314,13 @@ func (v *VersionedSubmitBlockRequest) ProposerPubKey() (phase0.BLSPubKey, error)
 	if v == nil {
 		return phase0.BLSPubKey{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return phase0.BLSPubKey{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
@@ -304,6 +330,7 @@ func (v *VersionedSubmitBlockRequest) ProposerPubKey() (phase0.BLSPubKey, error)
 		if v.Capella == nil {
 			return phase0.BLSPubKey{}, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
@@ -313,6 +340,7 @@ func (v *VersionedSubmitBlockRequest) ProposerPubKey() (phase0.BLSPubKey, error)
 		if v.Deneb == nil {
 			return phase0.BLSPubKey{}, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
@@ -322,6 +350,7 @@ func (v *VersionedSubmitBlockRequest) ProposerPubKey() (phase0.BLSPubKey, error)
 		if v.Electra == nil {
 			return phase0.BLSPubKey{}, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
@@ -331,6 +360,7 @@ func (v *VersionedSubmitBlockRequest) ProposerPubKey() (phase0.BLSPubKey, error)
 		if v.Fulu == nil {
 			return phase0.BLSPubKey{}, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
@@ -346,11 +376,13 @@ func (v *VersionedSubmitBlockRequest) ParentHash() (phase0.Hash32, error) {
 	if v == nil {
 		return phase0.Hash32{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
@@ -360,6 +392,7 @@ func (v *VersionedSubmitBlockRequest) ParentHash() (phase0.Hash32, error) {
 		if v.Capella == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
@@ -369,6 +402,7 @@ func (v *VersionedSubmitBlockRequest) ParentHash() (phase0.Hash32, error) {
 		if v.Deneb == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
@@ -378,6 +412,7 @@ func (v *VersionedSubmitBlockRequest) ParentHash() (phase0.Hash32, error) {
 		if v.Electra == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
@@ -387,6 +422,7 @@ func (v *VersionedSubmitBlockRequest) ParentHash() (phase0.Hash32, error) {
 		if v.Fulu == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
@@ -402,11 +438,13 @@ func (v *VersionedSubmitBlockRequest) Value() (*uint256.Int, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return nil, errors.New("no data message")
 		}
@@ -416,6 +454,7 @@ func (v *VersionedSubmitBlockRequest) Value() (*uint256.Int, error) {
 		if v.Capella == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return nil, errors.New("no data message")
 		}
@@ -425,6 +464,7 @@ func (v *VersionedSubmitBlockRequest) Value() (*uint256.Int, error) {
 		if v.Deneb == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return nil, errors.New("no data message")
 		}
@@ -434,6 +474,7 @@ func (v *VersionedSubmitBlockRequest) Value() (*uint256.Int, error) {
 		if v.Electra == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return nil, errors.New("no data message")
 		}
@@ -443,6 +484,7 @@ func (v *VersionedSubmitBlockRequest) Value() (*uint256.Int, error) {
 		if v.Fulu == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return nil, errors.New("no data message")
 		}
@@ -458,11 +500,13 @@ func (v *VersionedSubmitBlockRequest) BidTrace() (*apiv1.BidTrace, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return nil, errors.New("no data message")
 		}
@@ -472,6 +516,7 @@ func (v *VersionedSubmitBlockRequest) BidTrace() (*apiv1.BidTrace, error) {
 		if v.Capella == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return nil, errors.New("no data message")
 		}
@@ -481,6 +526,7 @@ func (v *VersionedSubmitBlockRequest) BidTrace() (*apiv1.BidTrace, error) {
 		if v.Deneb == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return nil, errors.New("no data message")
 		}
@@ -490,6 +536,7 @@ func (v *VersionedSubmitBlockRequest) BidTrace() (*apiv1.BidTrace, error) {
 		if v.Electra == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return nil, errors.New("no data message")
 		}
@@ -499,6 +546,7 @@ func (v *VersionedSubmitBlockRequest) BidTrace() (*apiv1.BidTrace, error) {
 		if v.Fulu == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return nil, errors.New("no data message")
 		}
@@ -514,6 +562,7 @@ func (v *VersionedSubmitBlockRequest) Signature() (phase0.BLSSignature, error) {
 	if v == nil {
 		return phase0.BLSSignature{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
@@ -555,11 +604,13 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadBlockHash() (phase0.Hash32
 	if v == nil {
 		return phase0.Hash32{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
@@ -569,6 +620,7 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadBlockHash() (phase0.Hash32
 		if v.Capella == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Capella.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
@@ -578,6 +630,7 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadBlockHash() (phase0.Hash32
 		if v.Deneb == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Deneb.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
@@ -587,6 +640,7 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadBlockHash() (phase0.Hash32
 		if v.Electra == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
@@ -596,6 +650,7 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadBlockHash() (phase0.Hash32
 		if v.Fulu == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
@@ -611,11 +666,13 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadParentHash() (phase0.Hash3
 	if v == nil {
 		return phase0.Hash32{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
@@ -625,6 +682,7 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadParentHash() (phase0.Hash3
 		if v.Capella == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Capella.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
@@ -634,6 +692,7 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadParentHash() (phase0.Hash3
 		if v.Deneb == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Deneb.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
@@ -643,6 +702,7 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadParentHash() (phase0.Hash3
 		if v.Electra == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
@@ -652,6 +712,7 @@ func (v *VersionedSubmitBlockRequest) ExecutionPayloadParentHash() (phase0.Hash3
 		if v.Fulu == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
@@ -667,11 +728,13 @@ func (v *VersionedSubmitBlockRequest) PrevRandao() (phase0.Hash32, error) {
 	if v == nil {
 		return phase0.Hash32{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
@@ -681,6 +744,7 @@ func (v *VersionedSubmitBlockRequest) PrevRandao() (phase0.Hash32, error) {
 		if v.Capella == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Capella.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
@@ -690,6 +754,7 @@ func (v *VersionedSubmitBlockRequest) PrevRandao() (phase0.Hash32, error) {
 		if v.Deneb == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Deneb.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
@@ -699,6 +764,7 @@ func (v *VersionedSubmitBlockRequest) PrevRandao() (phase0.Hash32, error) {
 		if v.Electra == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
@@ -708,6 +774,7 @@ func (v *VersionedSubmitBlockRequest) PrevRandao() (phase0.Hash32, error) {
 		if v.Fulu == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no data execution payload")
 		}
@@ -723,11 +790,13 @@ func (v *VersionedSubmitBlockRequest) GasLimit() (uint64, error) {
 	if v == nil {
 		return 0, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Bellatrix.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -737,6 +806,7 @@ func (v *VersionedSubmitBlockRequest) GasLimit() (uint64, error) {
 		if v.Capella == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Capella.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -746,6 +816,7 @@ func (v *VersionedSubmitBlockRequest) GasLimit() (uint64, error) {
 		if v.Deneb == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Deneb.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -755,6 +826,7 @@ func (v *VersionedSubmitBlockRequest) GasLimit() (uint64, error) {
 		if v.Electra == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -764,6 +836,7 @@ func (v *VersionedSubmitBlockRequest) GasLimit() (uint64, error) {
 		if v.Fulu == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -779,11 +852,13 @@ func (v *VersionedSubmitBlockRequest) GasUsed() (uint64, error) {
 	if v == nil {
 		return 0, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Bellatrix.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -793,6 +868,7 @@ func (v *VersionedSubmitBlockRequest) GasUsed() (uint64, error) {
 		if v.Capella == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Capella.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -802,6 +878,7 @@ func (v *VersionedSubmitBlockRequest) GasUsed() (uint64, error) {
 		if v.Deneb == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Deneb.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -811,6 +888,7 @@ func (v *VersionedSubmitBlockRequest) GasUsed() (uint64, error) {
 		if v.Electra == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -820,6 +898,7 @@ func (v *VersionedSubmitBlockRequest) GasUsed() (uint64, error) {
 		if v.Fulu == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -835,11 +914,13 @@ func (v *VersionedSubmitBlockRequest) BlockNumber() (uint64, error) {
 	if v == nil {
 		return 0, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Bellatrix.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -849,6 +930,7 @@ func (v *VersionedSubmitBlockRequest) BlockNumber() (uint64, error) {
 		if v.Capella == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Capella.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -858,6 +940,7 @@ func (v *VersionedSubmitBlockRequest) BlockNumber() (uint64, error) {
 		if v.Deneb == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Deneb.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -867,6 +950,7 @@ func (v *VersionedSubmitBlockRequest) BlockNumber() (uint64, error) {
 		if v.Electra == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -876,6 +960,7 @@ func (v *VersionedSubmitBlockRequest) BlockNumber() (uint64, error) {
 		if v.Fulu == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -891,11 +976,13 @@ func (v *VersionedSubmitBlockRequest) Timestamp() (uint64, error) {
 	if v == nil {
 		return 0, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Bellatrix.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -905,6 +992,7 @@ func (v *VersionedSubmitBlockRequest) Timestamp() (uint64, error) {
 		if v.Capella == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Capella.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -914,6 +1002,7 @@ func (v *VersionedSubmitBlockRequest) Timestamp() (uint64, error) {
 		if v.Deneb == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Deneb.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -923,6 +1012,7 @@ func (v *VersionedSubmitBlockRequest) Timestamp() (uint64, error) {
 		if v.Electra == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -932,6 +1022,7 @@ func (v *VersionedSubmitBlockRequest) Timestamp() (uint64, error) {
 		if v.Fulu == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -947,11 +1038,13 @@ func (v *VersionedSubmitBlockRequest) Transactions() ([]consensusbellatrix.Trans
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Bellatrix.ExecutionPayload == nil {
 			return nil, errors.New("no data execution payload")
 		}
@@ -961,6 +1054,7 @@ func (v *VersionedSubmitBlockRequest) Transactions() ([]consensusbellatrix.Trans
 		if v.Capella == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Capella.ExecutionPayload == nil {
 			return nil, errors.New("no data execution payload")
 		}
@@ -970,6 +1064,7 @@ func (v *VersionedSubmitBlockRequest) Transactions() ([]consensusbellatrix.Trans
 		if v.Deneb == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Deneb.ExecutionPayload == nil {
 			return nil, errors.New("no data execution payload")
 		}
@@ -979,6 +1074,7 @@ func (v *VersionedSubmitBlockRequest) Transactions() ([]consensusbellatrix.Trans
 		if v.Electra == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionPayload == nil {
 			return nil, errors.New("no data execution payload")
 		}
@@ -988,6 +1084,7 @@ func (v *VersionedSubmitBlockRequest) Transactions() ([]consensusbellatrix.Trans
 		if v.Fulu == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionPayload == nil {
 			return nil, errors.New("no data execution payload")
 		}
@@ -1003,11 +1100,13 @@ func (v *VersionedSubmitBlockRequest) Withdrawals() ([]*consensuscapella.Withdra
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionCapella:
 		if v.Capella == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Capella.ExecutionPayload == nil {
 			return nil, errors.New("no data execution payload")
 		}
@@ -1017,6 +1116,7 @@ func (v *VersionedSubmitBlockRequest) Withdrawals() ([]*consensuscapella.Withdra
 		if v.Deneb == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Deneb.ExecutionPayload == nil {
 			return nil, errors.New("no data execution payload")
 		}
@@ -1026,6 +1126,7 @@ func (v *VersionedSubmitBlockRequest) Withdrawals() ([]*consensuscapella.Withdra
 		if v.Electra == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionPayload == nil {
 			return nil, errors.New("no data execution payload")
 		}
@@ -1035,6 +1136,7 @@ func (v *VersionedSubmitBlockRequest) Withdrawals() ([]*consensuscapella.Withdra
 		if v.Fulu == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionPayload == nil {
 			return nil, errors.New("no data execution payload")
 		}
@@ -1050,11 +1152,13 @@ func (v *VersionedSubmitBlockRequest) Blobs() ([]consensusdeneb.Blob, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Deneb.BlobsBundle == nil {
 			return nil, errors.New("no data blobs bundle")
 		}
@@ -1064,6 +1168,7 @@ func (v *VersionedSubmitBlockRequest) Blobs() ([]consensusdeneb.Blob, error) {
 		if v.Electra == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Electra.BlobsBundle == nil {
 			return nil, errors.New("no data blobs bundle")
 		}
@@ -1073,6 +1178,7 @@ func (v *VersionedSubmitBlockRequest) Blobs() ([]consensusdeneb.Blob, error) {
 		if v.Fulu == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Fulu.BlobsBundle == nil {
 			return nil, errors.New("no data blobs bundle")
 		}
@@ -1088,11 +1194,13 @@ func (v *VersionedSubmitBlockRequest) BlobGasUsed() (uint64, error) {
 	if v == nil {
 		return 0, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Deneb.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -1102,6 +1210,7 @@ func (v *VersionedSubmitBlockRequest) BlobGasUsed() (uint64, error) {
 		if v.Electra == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -1111,6 +1220,7 @@ func (v *VersionedSubmitBlockRequest) BlobGasUsed() (uint64, error) {
 		if v.Fulu == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -1126,11 +1236,13 @@ func (v *VersionedSubmitBlockRequest) ExcessBlobGas() (uint64, error) {
 	if v == nil {
 		return 0, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Deneb.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -1140,6 +1252,7 @@ func (v *VersionedSubmitBlockRequest) ExcessBlobGas() (uint64, error) {
 		if v.Electra == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -1149,6 +1262,7 @@ func (v *VersionedSubmitBlockRequest) ExcessBlobGas() (uint64, error) {
 		if v.Fulu == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -1164,11 +1278,13 @@ func (v *VersionedSubmitBlockRequest) DepositRequests() ([]*consensuselectra.Dep
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionElectra:
 		if v.Electra == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionRequests == nil {
 			return nil, errors.New("no data execution requests")
 		}
@@ -1178,6 +1294,7 @@ func (v *VersionedSubmitBlockRequest) DepositRequests() ([]*consensuselectra.Dep
 		if v.Fulu == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionRequests == nil {
 			return nil, errors.New("no data execution requests")
 		}
@@ -1193,11 +1310,13 @@ func (v *VersionedSubmitBlockRequest) WithdrawalRequests() ([]*consensuselectra.
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionElectra:
 		if v.Electra == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionRequests == nil {
 			return nil, errors.New("no data execution requests")
 		}
@@ -1207,6 +1326,7 @@ func (v *VersionedSubmitBlockRequest) WithdrawalRequests() ([]*consensuselectra.
 		if v.Fulu == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionRequests == nil {
 			return nil, errors.New("no data execution requests")
 		}
@@ -1222,11 +1342,13 @@ func (v *VersionedSubmitBlockRequest) ConsolidationRequests() ([]*consensuselect
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionElectra:
 		if v.Electra == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionRequests == nil {
 			return nil, errors.New("no data execution requests")
 		}
@@ -1236,6 +1358,7 @@ func (v *VersionedSubmitBlockRequest) ConsolidationRequests() ([]*consensuselect
 		if v.Fulu == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionRequests == nil {
 			return nil, errors.New("no data execution requests")
 		}
@@ -1251,6 +1374,7 @@ func (v *VersionedSubmitBlockRequest) String() string {
 	if v == nil {
 		return ""
 	}
+
 	data, err := json.Marshal(v)
 	if err != nil {
 		return fmt.Sprintf("ERR: %v", err)

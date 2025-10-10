@@ -61,26 +61,6 @@ func (s *SignedBuilderBid) UnmarshalJSON(input []byte) error {
 	return s.unpack(&data)
 }
 
-func (s *SignedBuilderBid) unpack(data *signedBuilderBidJSON) error {
-	if data.Message == nil {
-		return errors.New("message missing")
-	}
-	s.Message = data.Message
-	if data.Signature == "" {
-		return errors.New("signature missing")
-	}
-	signature, err := hex.DecodeString(strings.TrimPrefix(data.Signature, "0x"))
-	if err != nil {
-		return errors.Wrap(err, "invalid value for signature")
-	}
-	if len(signature) != phase0.SignatureLength {
-		return errors.New("incorrect length for signature")
-	}
-	copy(s.Signature[:], signature)
-
-	return nil
-}
-
 // MarshalYAML implements yaml.Marshaler.
 func (s *SignedBuilderBid) MarshalYAML() ([]byte, error) {
 	yamlBytes, err := yaml.MarshalWithOptions(&signedBuilderBidYAML{
@@ -113,4 +93,28 @@ func (s *SignedBuilderBid) String() string {
 	}
 
 	return string(data)
+}
+
+func (s *SignedBuilderBid) unpack(data *signedBuilderBidJSON) error {
+	if data.Message == nil {
+		return errors.New("message missing")
+	}
+
+	s.Message = data.Message
+	if data.Signature == "" {
+		return errors.New("signature missing")
+	}
+
+	signature, err := hex.DecodeString(strings.TrimPrefix(data.Signature, "0x"))
+	if err != nil {
+		return errors.Wrap(err, "invalid value for signature")
+	}
+
+	if len(signature) != phase0.SignatureLength {
+		return errors.New("incorrect length for signature")
+	}
+
+	copy(s.Signature[:], signature)
+
+	return nil
 }

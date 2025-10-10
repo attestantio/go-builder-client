@@ -48,11 +48,13 @@ func (e *ExecutionPayloadAndBlobsBundle) unpack(data *executionPayloadAndBlobsBu
 	if data.ExecutionPayload == nil {
 		return errors.New("execution payload missing")
 	}
+
 	e.ExecutionPayload = data.ExecutionPayload
 
 	if data.BlobsBundle == nil {
 		return errors.New("blobs bundle missing")
 	}
+
 	e.BlobsBundle = data.BlobsBundle
 
 	return nil

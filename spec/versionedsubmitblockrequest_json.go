@@ -56,6 +56,7 @@ func (v *VersionedSubmitBlockRequest) MarshalJSON() ([]byte, error) {
 		if v.Bellatrix == nil {
 			return nil, errors.New("no bellatrix data")
 		}
+
 		data := &bellatrixVersionedSubmitBlockRequestJSON{
 			Data: v.Bellatrix,
 		}
@@ -69,6 +70,7 @@ func (v *VersionedSubmitBlockRequest) MarshalJSON() ([]byte, error) {
 		if v.Capella == nil {
 			return nil, errors.New("no capella data")
 		}
+
 		data := &capellaVersionedSubmitBlockRequestJSON{
 			Data: v.Capella,
 		}
@@ -82,6 +84,7 @@ func (v *VersionedSubmitBlockRequest) MarshalJSON() ([]byte, error) {
 		if v.Deneb == nil {
 			return nil, errors.New("no deneb data")
 		}
+
 		data := &denebVersionedSubmitBlockRequestJSON{
 			Data: v.Deneb,
 		}
@@ -95,6 +98,7 @@ func (v *VersionedSubmitBlockRequest) MarshalJSON() ([]byte, error) {
 		if v.Electra == nil {
 			return nil, errors.New("no electra data")
 		}
+
 		data := &electraVersionedSubmitBlockRequestJSON{
 			Data: v.Electra,
 		}
@@ -108,6 +112,7 @@ func (v *VersionedSubmitBlockRequest) MarshalJSON() ([]byte, error) {
 		if v.Fulu == nil {
 			return nil, errors.New("no fulu data")
 		}
+
 		data := &fuluVersionedSubmitBlockRequestJSON{
 			Data: v.Fulu,
 		}
@@ -128,6 +133,7 @@ func (v *VersionedSubmitBlockRequest) UnmarshalJSON(input []byte) error {
 	if err := json.Unmarshal(input, &metadata); err != nil {
 		return errors.Wrap(err, "invalid JSON")
 	}
+
 	v.Version = metadata.Version
 	switch metadata.Version {
 	case spec.DataVersionBellatrix:
@@ -135,30 +141,35 @@ func (v *VersionedSubmitBlockRequest) UnmarshalJSON(input []byte) error {
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}
+
 		v.Bellatrix = data.Data
 	case spec.DataVersionCapella:
 		var data capellaVersionedSubmitBlockRequestJSON
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}
+
 		v.Capella = data.Data
 	case spec.DataVersionDeneb:
 		var data denebVersionedSubmitBlockRequestJSON
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}
+
 		v.Deneb = data.Data
 	case spec.DataVersionElectra:
 		var data electraVersionedSubmitBlockRequestJSON
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}
+
 		v.Electra = data.Data
 	case spec.DataVersionFulu:
 		var data fuluVersionedSubmitBlockRequestJSON
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}
+
 		v.Fulu = data.Data
 	default:
 		return fmt.Errorf("unsupported data version %v", metadata.Version)

@@ -50,6 +50,7 @@ func (v *VersionedExecutionPayload) MarshalJSON() ([]byte, error) {
 		if v.Bellatrix == nil {
 			return nil, errors.New("no bellatrix data")
 		}
+
 		data := &bellatrixVersionedExecutionPayloadJSON{
 			Data: v.Bellatrix,
 		}
@@ -63,6 +64,7 @@ func (v *VersionedExecutionPayload) MarshalJSON() ([]byte, error) {
 		if v.Capella == nil {
 			return nil, errors.New("no capella data")
 		}
+
 		data := &capellaVersionedExecutionPayloadJSON{
 			Data: v.Capella,
 		}
@@ -76,6 +78,7 @@ func (v *VersionedExecutionPayload) MarshalJSON() ([]byte, error) {
 		if v.Deneb == nil {
 			return nil, errors.New("no deneb data")
 		}
+
 		data := &denebVersionedExecutionPayloadJSON{
 			Data: v.Deneb,
 		}
@@ -89,6 +92,7 @@ func (v *VersionedExecutionPayload) MarshalJSON() ([]byte, error) {
 		if v.Electra == nil {
 			return nil, errors.New("no electra data")
 		}
+
 		data := &denebVersionedExecutionPayloadJSON{
 			Data: v.Electra,
 		}
@@ -102,6 +106,7 @@ func (v *VersionedExecutionPayload) MarshalJSON() ([]byte, error) {
 		if v.Fulu == nil {
 			return nil, errors.New("no fulu data")
 		}
+
 		data := &denebVersionedExecutionPayloadJSON{
 			Data: v.Fulu,
 		}
@@ -122,6 +127,7 @@ func (v *VersionedExecutionPayload) UnmarshalJSON(input []byte) error {
 	if err := json.Unmarshal(input, &metadata); err != nil {
 		return errors.Wrap(err, "invalid JSON")
 	}
+
 	v.Version = metadata.Version
 	switch v.Version {
 	case spec.DataVersionBellatrix:
@@ -129,30 +135,35 @@ func (v *VersionedExecutionPayload) UnmarshalJSON(input []byte) error {
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}
+
 		v.Bellatrix = data.Data
 	case spec.DataVersionCapella:
 		var data capellaVersionedExecutionPayloadJSON
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}
+
 		v.Capella = data.Data
 	case spec.DataVersionDeneb:
 		var data denebVersionedExecutionPayloadJSON
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}
+
 		v.Deneb = data.Data
 	case spec.DataVersionElectra:
 		var data denebVersionedExecutionPayloadJSON
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}
+
 		v.Electra = data.Data
 	case spec.DataVersionFulu:
 		var data denebVersionedExecutionPayloadJSON
 		if err := json.Unmarshal(input, &data); err != nil {
 			return errors.Wrap(err, "invalid JSON")
 		}
+
 		v.Fulu = data.Data
 	default:
 		return fmt.Errorf("unsupported data version %v", metadata.Version)

@@ -77,6 +77,7 @@ func (s *Service) post(ctx context.Context,
 			if err != nil {
 				return nil, errors.New("failed to read request body")
 			}
+
 			body = bytes.NewReader(bodyBytes)
 
 			e.RawJSON("body", bodyBytes).Msg("POST request")
@@ -96,16 +97,20 @@ func (s *Service) post(ctx context.Context,
 
 	opCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
+
 	req, err := http.NewRequestWithContext(opCtx, http.MethodPost, callURL.String(), body)
 	if err != nil {
 		return nil, errors.Join(errors.New("failed to create POST request"), err)
 	}
 
 	s.addExtraHeaders(req)
+
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
+
 	req.Header.Set("Content-Type", contentType.MediaType())
+
 	if s.enforceJSON || !supportsSSZ {
 		// JSON only.
 		req.Header.Set("Accept", "application/json")
@@ -113,11 +118,13 @@ func (s *Service) post(ctx context.Context,
 		// Prefer SSZ, JSON if not.
 		req.Header.Set("Accept", "application/octet-stream;q=1,application/json;q=0.9")
 	}
+
 	if req.Header.Get("User-Agent") == "" {
 		req.Header.Set("User-Agent", defaultUserAgent)
 	}
 
 	started := time.Now()
+
 	resp, err := s.client.Do(req)
 	if err != nil {
 		span.SetStatus(codes.Error, err.Error())
@@ -126,6 +133,7 @@ func (s *Service) post(ctx context.Context,
 		return nil, errors.Join(errors.New("failed to call POST endpoint"), err)
 	}
 	defer resp.Body.Close()
+
 	log = log.With().Int("status_code", resp.StatusCode).Logger()
 
 	res := &httpResponse{
@@ -162,8 +170,10 @@ func (s *Service) post(ctx context.Context,
 	if err := populateContentType(res, resp); err != nil {
 		// For now, assume that unknown type is JSON.
 		log.Debug().Err(err).Msg("Failed to obtain content type; assuming JSON")
+
 		res.contentType = ContentTypeJSON
 	}
+
 	span.AddEvent("Received response", trace.WithAttributes(
 		attribute.Int("size", len(res.body)),
 		attribute.String("content-type", res.contentType.String()),
@@ -232,6 +242,7 @@ func (s *Service) get(ctx context.Context,
 
 	opCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
+
 	req, err := http.NewRequestWithContext(opCtx, http.MethodGet, callURL.String(), nil)
 	if err != nil {
 		span.SetStatus(codes.Error, "Failed to create request")
@@ -240,9 +251,11 @@ func (s *Service) get(ctx context.Context,
 	}
 
 	s.addExtraHeaders(req)
+
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
+
 	if s.enforceJSON || !supportsSSZ {
 		// JSON only.
 		req.Header.Set("Accept", "application/json")
@@ -252,6 +265,7 @@ func (s *Service) get(ctx context.Context,
 	}
 
 	started := time.Now()
+
 	resp, err := s.client.Do(req)
 	if err != nil {
 		span.SetStatus(codes.Error, err.Error())
@@ -260,6 +274,7 @@ func (s *Service) get(ctx context.Context,
 		return nil, errors.Join(errors.New("failed to call GET endpoint"), err)
 	}
 	defer resp.Body.Close()
+
 	log = log.With().Int("status_code", resp.StatusCode).Logger()
 
 	res := &httpResponse{
@@ -300,8 +315,10 @@ func (s *Service) get(ctx context.Context,
 	if err := populateContentType(res, resp); err != nil {
 		// For now, assume that unknown type is JSON.
 		log.Debug().Err(err).Msg("Failed to obtain content type; assuming JSON")
+
 		res.contentType = ContentTypeJSON
 	}
+
 	span.AddEvent("Received response", trace.WithAttributes(
 		attribute.Int("size", len(res.body)),
 		attribute.String("content-type", res.contentType.String()),
@@ -341,6 +358,7 @@ func (s *Service) get(ctx context.Context,
 
 func populateConsensusVersion(res *httpResponse, resp *http.Response) error {
 	res.consensusVersion = spec.DataVersionUnknown
+
 	respConsensusVersions, exists := resp.Header["Eth-Consensus-Version"]
 	if !exists {
 		// No consensus version supplied in response; obtain it from the body if possible.
@@ -349,17 +367,21 @@ func populateConsensusVersion(res *httpResponse, resp *http.Response) error {
 			// this is one of them.
 			return nil
 		}
+
 		var metadata responseMetadata
 		if err := json.Unmarshal(res.body, &metadata); err != nil {
 			return errors.Join(errors.New("no consensus version header and failed to parse response"), err)
 		}
+
 		res.consensusVersion = metadata.Version
 
 		return nil
 	}
+
 	if len(respConsensusVersions) != 1 {
 		return fmt.Errorf("malformed consensus version (%d entries)", len(respConsensusVersions))
 	}
+
 	if err := res.consensusVersion.UnmarshalJSON([]byte(fmt.Sprintf("%q", respConsensusVersions[0]))); err != nil {
 		return errors.Join(errors.New("failed to parse consensus version"), err)
 	}
@@ -393,11 +415,13 @@ func populateContentType(res *httpResponse, resp *http.Response) error {
 	if !exists {
 		return errors.New("no content type supplied in response")
 	}
+
 	if len(respContentTypes) != 1 {
 		return fmt.Errorf("malformed content type (%d entries)", len(respContentTypes))
 	}
 
 	var err error
+
 	res.contentType, err = ParseFromMediaType(respContentTypes[0])
 	if err != nil {
 		return err
@@ -421,6 +445,7 @@ func urlForCall(base *url.URL,
 	query string,
 ) *url.URL {
 	callURL := *base
+
 	callURL.Path += endpoint
 	if callURL.RawQuery == "" {
 		callURL.RawQuery = query

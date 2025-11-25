@@ -84,6 +84,7 @@ func New(ctx context.Context, params ...Parameter) (builderclient.Service, error
 
 	// Obtain the public key from the URL's user.
 	var pubkey *phase0.BLSPubKey
+
 	if base.User != nil && base.User.Username() != "" {
 		key := phase0.BLSPubKey{}
 

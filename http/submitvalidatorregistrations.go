@@ -120,10 +120,7 @@ func (s *Service) submitChunkedValidatorRegistrations(ctx context.Context,
 	for i := 0; i < len(opts.Registrations); i += chunkSize {
 		chunkStart := i
 
-		chunkEnd := i + chunkSize
-		if len(opts.Registrations) < chunkEnd {
-			chunkEnd = len(opts.Registrations)
-		}
+		chunkEnd := min(i+chunkSize, len(opts.Registrations))
 
 		err := s.submitValidatorRegistrations(ctx, &api.SubmitValidatorRegistrationsOpts{
 			Common:        opts.Common,

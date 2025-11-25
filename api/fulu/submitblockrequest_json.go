@@ -60,33 +60,40 @@ func (s *SubmitBlockRequest) unpack(data *submitBlockRequestJSON) error {
 	if data.Message == nil {
 		return errors.New("message missing")
 	}
+
 	s.Message = data.Message
 
 	if data.Signature == "" {
 		return errors.New("signature missing")
 	}
+
 	signature, err := hex.DecodeString(strings.TrimPrefix(data.Signature, "0x"))
 	if err != nil {
 		return errors.Wrap(err, "invalid signature")
 	}
+
 	if len(signature) != phase0.SignatureLength {
 		return errors.New("incorrect length for signature")
 	}
+
 	copy(s.Signature[:], signature)
 
 	if data.ExecutionPayload == nil {
 		return errors.New("execution payload missing")
 	}
+
 	s.ExecutionPayload = data.ExecutionPayload
 
 	if data.BlobsBundle == nil {
 		return errors.New("blobs bundle missing")
 	}
+
 	s.BlobsBundle = data.BlobsBundle
 
 	if data.ExecutionRequests == nil {
 		return errors.New("execution requests missing")
 	}
+
 	s.ExecutionRequests = data.ExecutionRequests
 
 	return nil

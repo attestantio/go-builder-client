@@ -54,6 +54,7 @@ func (s *Service) UnblindProposal(ctx context.Context,
 	if opts == nil {
 		return nil, client.ErrNoOptions
 	}
+
 	if opts.Proposal == nil {
 		return nil, errors.Join(errors.New("no proposal specified"), client.ErrInvalidOptions)
 	}
@@ -160,10 +161,12 @@ func (s *Service) unblindBellatrixProposal(ctx context.Context,
 		if err != nil {
 			return nil, errors.Join(errors.New("failed to generate hash tree root for our execution payload header"), err)
 		}
+
 		receivedExecutionPayloadHash, err := res.Bellatrix.Message.Body.ExecutionPayload.HashTreeRoot()
 		if err != nil {
 			return nil, errors.Join(errors.New("failed to generate hash tree root for the received execution payload"), err)
 		}
+
 		if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
 			return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x",
 				receivedExecutionPayloadHash[:],
@@ -247,10 +250,12 @@ func (s *Service) unblindCapellaProposal(ctx context.Context,
 		if err != nil {
 			return nil, errors.Join(errors.New("failed to generate hash tree root for our execution payload header"), err)
 		}
+
 		receivedExecutionPayloadHash, err := res.Capella.Message.Body.ExecutionPayload.HashTreeRoot()
 		if err != nil {
 			return nil, errors.Join(errors.New("failed to generate hash tree root for the received execution payload"), err)
 		}
+
 		if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
 			return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:],
 				ourExecutionPayloadHash[:],
@@ -325,6 +330,7 @@ func (s *Service) unblindDenebProposal(ctx context.Context,
 	}
 
 	var bundle *apideneb.ExecutionPayloadAndBlobsBundle
+
 	switch httpResponse.contentType {
 	case ContentTypeJSON:
 		bundle, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &apideneb.ExecutionPayloadAndBlobsBundle{})
@@ -342,19 +348,23 @@ func (s *Service) unblindDenebProposal(ctx context.Context,
 	if err != nil {
 		return nil, errors.Join(errors.New("failed to generate hash tree root for our execution payload header"), err)
 	}
+
 	receivedExecutionPayloadHash, err := bundle.ExecutionPayload.HashTreeRoot()
 	if err != nil {
 		return nil, errors.Join(errors.New("failed to generate hash tree root for the received execution payload"), err)
 	}
+
 	if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
 		return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:],
 			ourExecutionPayloadHash[:],
 		)
 	}
+
 	res.Deneb.SignedBlock.Message.Body.ExecutionPayload = bundle.ExecutionPayload
 
 	// Reconstruct blobs.
 	res.Deneb.KZGProofs = make([]deneb.KZGProof, len(bundle.BlobsBundle.Proofs))
+
 	res.Deneb.Blobs = make([]deneb.Blob, len(bundle.BlobsBundle.Blobs))
 	for i := range bundle.BlobsBundle.Blobs {
 		if !bytes.Equal(bundle.BlobsBundle.Commitments[i][:], res.Deneb.SignedBlock.Message.Body.BlobKZGCommitments[i][:]) {
@@ -445,6 +455,7 @@ func (s *Service) unblindElectraProposal(ctx context.Context,
 	}
 
 	var bundle *apideneb.ExecutionPayloadAndBlobsBundle
+
 	switch httpResponse.contentType {
 	case ContentTypeJSON:
 		bundle, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &apideneb.ExecutionPayloadAndBlobsBundle{})
@@ -453,6 +464,7 @@ func (s *Service) unblindElectraProposal(ctx context.Context,
 	default:
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
 	}
+
 	if err != nil {
 		return nil, errors.Join(errors.New("failed to parse electra response"), err)
 	}
@@ -461,19 +473,23 @@ func (s *Service) unblindElectraProposal(ctx context.Context,
 	if err != nil {
 		return nil, errors.Join(errors.New("failed to generate hash tree root for our execution payload header"), err)
 	}
+
 	receivedExecutionPayloadHash, err := bundle.ExecutionPayload.HashTreeRoot()
 	if err != nil {
 		return nil, errors.Join(errors.New("failed to generate hash tree root for the received execution payload header"), err)
 	}
+
 	if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
 		return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:],
 			ourExecutionPayloadHash[:],
 		)
 	}
+
 	res.Electra.SignedBlock.Message.Body.ExecutionPayload = bundle.ExecutionPayload
 
 	// Reconstruct blobs.
 	res.Electra.KZGProofs = make([]deneb.KZGProof, len(bundle.BlobsBundle.Proofs))
+
 	res.Electra.Blobs = make([]deneb.Blob, len(bundle.BlobsBundle.Blobs))
 	for i := range bundle.BlobsBundle.Blobs {
 		if !bytes.Equal(bundle.BlobsBundle.Commitments[i][:], res.Electra.SignedBlock.Message.Body.BlobKZGCommitments[i][:]) {
@@ -550,6 +566,7 @@ func (s *Service) unblindFuluProposal(ctx context.Context,
 	}
 
 	var bundle *apifulu.ExecutionPayloadAndBlobsBundle
+
 	switch httpResponse.contentType {
 	case ContentTypeJSON:
 		bundle, _, err = decodeJSONResponse(bytes.NewReader(httpResponse.body), &apifulu.ExecutionPayloadAndBlobsBundle{})
@@ -558,6 +575,7 @@ func (s *Service) unblindFuluProposal(ctx context.Context,
 	default:
 		return nil, fmt.Errorf("unsupported content type %v", httpResponse.contentType)
 	}
+
 	if err != nil {
 		return nil, errors.Join(errors.New("failed to parse fulu response"), err)
 	}
@@ -566,19 +584,23 @@ func (s *Service) unblindFuluProposal(ctx context.Context,
 	if err != nil {
 		return nil, errors.Join(errors.New("failed to generate hash tree root for our execution payload header"), err)
 	}
+
 	receivedExecutionPayloadHash, err := bundle.ExecutionPayload.HashTreeRoot()
 	if err != nil {
 		return nil, errors.Join(errors.New("failed to generate hash tree root for the received execution payload header"), err)
 	}
+
 	if !bytes.Equal(ourExecutionPayloadHash[:], receivedExecutionPayloadHash[:]) {
 		return nil, fmt.Errorf("execution payload hash mismatch: %#x != %#x", receivedExecutionPayloadHash[:],
 			ourExecutionPayloadHash[:],
 		)
 	}
+
 	res.Fulu.SignedBlock.Message.Body.ExecutionPayload = bundle.ExecutionPayload
 
 	// Reconstruct blobs.
 	res.Fulu.KZGProofs = make([]deneb.KZGProof, len(bundle.BlobsBundle.Proofs))
+
 	res.Fulu.Blobs = make([]deneb.Blob, len(bundle.BlobsBundle.Blobs))
 	for i := range bundle.BlobsBundle.Blobs {
 		if !bytes.Equal(bundle.BlobsBundle.Commitments[i][:], res.Fulu.SignedBlock.Message.Body.BlobKZGCommitments[i][:]) {

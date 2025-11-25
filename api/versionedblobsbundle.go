@@ -33,6 +33,7 @@ func (v *VersionedBlobsBundle) Commitments() ([]consensusdeneb.KZGCommitment, er
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
@@ -61,6 +62,7 @@ func (v *VersionedBlobsBundle) Proofs() ([]consensusdeneb.KZGProof, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
@@ -89,6 +91,7 @@ func (v *VersionedBlobsBundle) Blobs() ([]consensusdeneb.Blob, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {

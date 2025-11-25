@@ -32,10 +32,12 @@ func registerMetrics(ctx context.Context, monitor metrics.Service) error {
 		// Already registered.
 		return nil
 	}
+
 	if monitor == nil {
 		// No monitor.
 		return nil
 	}
+
 	if monitor.Presenter() == "prometheus" {
 		return registerPrometheusMetrics(ctx)
 	}
@@ -53,6 +55,7 @@ func registerPrometheusMetrics(_ context.Context) error {
 	if err := prometheus.Register(requestsCounter); err != nil {
 		return err
 	}
+
 	requestsTimer = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: "builderclient",
 		Subsystem: "http",
@@ -76,6 +79,7 @@ func (s *Service) monitorGetComplete(_ context.Context, endpoint string, result 
 
 	endpoint = reduceEndpoint(endpoint)
 	requestsCounter.WithLabelValues(s.address, "GET", endpoint, result).Inc()
+
 	if result == "succeeded" {
 		requestsTimer.WithLabelValues(s.address, "GET", endpoint).Observe(duration.Seconds())
 	}
@@ -88,6 +92,7 @@ func (s *Service) monitorPostComplete(_ context.Context, endpoint string, result
 
 	endpoint = reduceEndpoint(endpoint)
 	requestsCounter.WithLabelValues(s.address, "POST", endpoint, result).Inc()
+
 	if result == "succeeded" {
 		requestsTimer.WithLabelValues(s.address, "POST", endpoint).Observe(duration.Seconds())
 	}

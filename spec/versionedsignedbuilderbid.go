@@ -61,11 +61,13 @@ func (v *VersionedSignedBuilderBid) Builder() (phase0.BLSPubKey, error) {
 	if v == nil {
 		return phase0.BLSPubKey{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return phase0.BLSPubKey{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
@@ -75,6 +77,7 @@ func (v *VersionedSignedBuilderBid) Builder() (phase0.BLSPubKey, error) {
 		if v.Capella == nil {
 			return phase0.BLSPubKey{}, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
@@ -84,6 +87,7 @@ func (v *VersionedSignedBuilderBid) Builder() (phase0.BLSPubKey, error) {
 		if v.Deneb == nil {
 			return phase0.BLSPubKey{}, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
@@ -93,6 +97,7 @@ func (v *VersionedSignedBuilderBid) Builder() (phase0.BLSPubKey, error) {
 		if v.Electra == nil {
 			return phase0.BLSPubKey{}, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
@@ -102,6 +107,7 @@ func (v *VersionedSignedBuilderBid) Builder() (phase0.BLSPubKey, error) {
 		if v.Fulu == nil {
 			return phase0.BLSPubKey{}, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return phase0.BLSPubKey{}, errors.New("no data message")
 		}
@@ -117,11 +123,13 @@ func (v *VersionedSignedBuilderBid) Value() (*uint256.Int, error) {
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return nil, errors.New("no data message")
 		}
@@ -131,6 +139,7 @@ func (v *VersionedSignedBuilderBid) Value() (*uint256.Int, error) {
 		if v.Capella == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return nil, errors.New("no data message")
 		}
@@ -140,6 +149,7 @@ func (v *VersionedSignedBuilderBid) Value() (*uint256.Int, error) {
 		if v.Deneb == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return nil, errors.New("no data message")
 		}
@@ -149,6 +159,7 @@ func (v *VersionedSignedBuilderBid) Value() (*uint256.Int, error) {
 		if v.Electra == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return nil, errors.New("no data message")
 		}
@@ -158,6 +169,7 @@ func (v *VersionedSignedBuilderBid) Value() (*uint256.Int, error) {
 		if v.Fulu == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return nil, errors.New("no data message")
 		}
@@ -173,14 +185,17 @@ func (v *VersionedSignedBuilderBid) BlockNumber() (uint64, error) {
 	if v == nil {
 		return 0, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return 0, errors.New("no data message")
 		}
+
 		if v.Bellatrix.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
@@ -190,9 +205,11 @@ func (v *VersionedSignedBuilderBid) BlockNumber() (uint64, error) {
 		if v.Capella == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return 0, errors.New("no data message")
 		}
+
 		if v.Capella.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
@@ -202,9 +219,11 @@ func (v *VersionedSignedBuilderBid) BlockNumber() (uint64, error) {
 		if v.Deneb == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return 0, errors.New("no data message")
 		}
+
 		if v.Deneb.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
@@ -214,9 +233,11 @@ func (v *VersionedSignedBuilderBid) BlockNumber() (uint64, error) {
 		if v.Electra == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return 0, errors.New("no data message")
 		}
+
 		if v.Electra.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
@@ -226,9 +247,11 @@ func (v *VersionedSignedBuilderBid) BlockNumber() (uint64, error) {
 		if v.Fulu == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return 0, errors.New("no data message")
 		}
+
 		if v.Fulu.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
@@ -244,14 +267,17 @@ func (v *VersionedSignedBuilderBid) BlockHash() (phase0.Hash32, error) {
 	if v == nil {
 		return phase0.Hash32{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
+
 		if v.Bellatrix.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
@@ -261,9 +287,11 @@ func (v *VersionedSignedBuilderBid) BlockHash() (phase0.Hash32, error) {
 		if v.Capella == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
+
 		if v.Capella.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
@@ -273,9 +301,11 @@ func (v *VersionedSignedBuilderBid) BlockHash() (phase0.Hash32, error) {
 		if v.Deneb == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
+
 		if v.Deneb.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
@@ -285,9 +315,11 @@ func (v *VersionedSignedBuilderBid) BlockHash() (phase0.Hash32, error) {
 		if v.Electra == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
+
 		if v.Electra.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
@@ -297,9 +329,11 @@ func (v *VersionedSignedBuilderBid) BlockHash() (phase0.Hash32, error) {
 		if v.Fulu == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
+
 		if v.Fulu.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
@@ -315,14 +349,17 @@ func (v *VersionedSignedBuilderBid) ParentHash() (phase0.Hash32, error) {
 	if v == nil {
 		return phase0.Hash32{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
+
 		if v.Bellatrix.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
@@ -332,9 +369,11 @@ func (v *VersionedSignedBuilderBid) ParentHash() (phase0.Hash32, error) {
 		if v.Capella == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
+
 		if v.Capella.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
@@ -344,9 +383,11 @@ func (v *VersionedSignedBuilderBid) ParentHash() (phase0.Hash32, error) {
 		if v.Deneb == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
+
 		if v.Deneb.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
@@ -356,9 +397,11 @@ func (v *VersionedSignedBuilderBid) ParentHash() (phase0.Hash32, error) {
 		if v.Electra == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
+
 		if v.Electra.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
@@ -368,9 +411,11 @@ func (v *VersionedSignedBuilderBid) ParentHash() (phase0.Hash32, error) {
 		if v.Fulu == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return phase0.Hash32{}, errors.New("no data message")
 		}
+
 		if v.Fulu.Message.Header == nil {
 			return phase0.Hash32{}, errors.New("no data message header")
 		}
@@ -386,14 +431,17 @@ func (v *VersionedSignedBuilderBid) StateRoot() (phase0.Root, error) {
 	if v == nil {
 		return phase0.Root{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		if v.Bellatrix.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
@@ -403,9 +451,11 @@ func (v *VersionedSignedBuilderBid) StateRoot() (phase0.Root, error) {
 		if v.Capella == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		if v.Capella.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
@@ -415,9 +465,11 @@ func (v *VersionedSignedBuilderBid) StateRoot() (phase0.Root, error) {
 		if v.Deneb == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		if v.Deneb.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
@@ -427,9 +479,11 @@ func (v *VersionedSignedBuilderBid) StateRoot() (phase0.Root, error) {
 		if v.Electra == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		if v.Electra.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
@@ -439,9 +493,11 @@ func (v *VersionedSignedBuilderBid) StateRoot() (phase0.Root, error) {
 		if v.Fulu == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		if v.Fulu.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
@@ -457,14 +513,17 @@ func (v *VersionedSignedBuilderBid) FeeRecipient() (consensusbellatrix.Execution
 	if v == nil {
 		return consensusbellatrix.ExecutionAddress{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message")
 		}
+
 		if v.Bellatrix.Message.Header == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message header")
 		}
@@ -474,9 +533,11 @@ func (v *VersionedSignedBuilderBid) FeeRecipient() (consensusbellatrix.Execution
 		if v.Capella == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message")
 		}
+
 		if v.Capella.Message.Header == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message header")
 		}
@@ -486,9 +547,11 @@ func (v *VersionedSignedBuilderBid) FeeRecipient() (consensusbellatrix.Execution
 		if v.Deneb == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message")
 		}
+
 		if v.Deneb.Message.Header == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message header")
 		}
@@ -498,9 +561,11 @@ func (v *VersionedSignedBuilderBid) FeeRecipient() (consensusbellatrix.Execution
 		if v.Electra == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message")
 		}
+
 		if v.Electra.Message.Header == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message header")
 		}
@@ -510,9 +575,11 @@ func (v *VersionedSignedBuilderBid) FeeRecipient() (consensusbellatrix.Execution
 		if v.Fulu == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message")
 		}
+
 		if v.Fulu.Message.Header == nil {
 			return consensusbellatrix.ExecutionAddress{}, errors.New("no data message header")
 		}
@@ -528,14 +595,17 @@ func (v *VersionedSignedBuilderBid) Timestamp() (uint64, error) {
 	if v == nil {
 		return 0, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return 0, errors.New("no data message")
 		}
+
 		if v.Bellatrix.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
@@ -545,9 +615,11 @@ func (v *VersionedSignedBuilderBid) Timestamp() (uint64, error) {
 		if v.Capella == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return 0, errors.New("no data message")
 		}
+
 		if v.Capella.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
@@ -557,9 +629,11 @@ func (v *VersionedSignedBuilderBid) Timestamp() (uint64, error) {
 		if v.Deneb == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return 0, errors.New("no data message")
 		}
+
 		if v.Deneb.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
@@ -569,9 +643,11 @@ func (v *VersionedSignedBuilderBid) Timestamp() (uint64, error) {
 		if v.Electra == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return 0, errors.New("no data message")
 		}
+
 		if v.Electra.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
@@ -581,9 +657,11 @@ func (v *VersionedSignedBuilderBid) Timestamp() (uint64, error) {
 		if v.Fulu == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return 0, errors.New("no data message")
 		}
+
 		if v.Fulu.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
@@ -599,14 +677,17 @@ func (v *VersionedSignedBuilderBid) TransactionsRoot() (phase0.Root, error) {
 	if v == nil {
 		return phase0.Root{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		if v.Bellatrix.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
@@ -616,9 +697,11 @@ func (v *VersionedSignedBuilderBid) TransactionsRoot() (phase0.Root, error) {
 		if v.Capella == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		if v.Capella.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
@@ -628,9 +711,11 @@ func (v *VersionedSignedBuilderBid) TransactionsRoot() (phase0.Root, error) {
 		if v.Deneb == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		if v.Deneb.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
@@ -640,9 +725,11 @@ func (v *VersionedSignedBuilderBid) TransactionsRoot() (phase0.Root, error) {
 		if v.Electra == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		if v.Electra.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
@@ -652,9 +739,11 @@ func (v *VersionedSignedBuilderBid) TransactionsRoot() (phase0.Root, error) {
 		if v.Fulu == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		if v.Fulu.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
@@ -670,11 +759,13 @@ func (v *VersionedSignedBuilderBid) MessageHashTreeRoot() (phase0.Root, error) {
 	if v == nil {
 		return phase0.Root{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
@@ -684,6 +775,7 @@ func (v *VersionedSignedBuilderBid) MessageHashTreeRoot() (phase0.Root, error) {
 		if v.Capella == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
@@ -693,6 +785,7 @@ func (v *VersionedSignedBuilderBid) MessageHashTreeRoot() (phase0.Root, error) {
 		if v.Deneb == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
@@ -702,6 +795,7 @@ func (v *VersionedSignedBuilderBid) MessageHashTreeRoot() (phase0.Root, error) {
 		if v.Electra == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
@@ -711,6 +805,7 @@ func (v *VersionedSignedBuilderBid) MessageHashTreeRoot() (phase0.Root, error) {
 		if v.Fulu == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
@@ -726,14 +821,17 @@ func (v *VersionedSignedBuilderBid) HeaderHashTreeRoot() (phase0.Root, error) {
 	if v == nil {
 		return phase0.Root{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		if v.Bellatrix.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
@@ -743,9 +841,11 @@ func (v *VersionedSignedBuilderBid) HeaderHashTreeRoot() (phase0.Root, error) {
 		if v.Capella == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		if v.Capella.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
@@ -755,9 +855,11 @@ func (v *VersionedSignedBuilderBid) HeaderHashTreeRoot() (phase0.Root, error) {
 		if v.Deneb == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		if v.Deneb.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
@@ -767,9 +869,11 @@ func (v *VersionedSignedBuilderBid) HeaderHashTreeRoot() (phase0.Root, error) {
 		if v.Electra == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		if v.Electra.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
@@ -779,9 +883,11 @@ func (v *VersionedSignedBuilderBid) HeaderHashTreeRoot() (phase0.Root, error) {
 		if v.Fulu == nil {
 			return phase0.Root{}, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return phase0.Root{}, errors.New("no data message")
 		}
+
 		if v.Fulu.Message.Header == nil {
 			return phase0.Root{}, errors.New("no data message header")
 		}
@@ -797,14 +903,17 @@ func (v *VersionedSignedBuilderBid) BlockGasLimit() (uint64, error) {
 	if v == nil {
 		return 0, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Bellatrix.Message == nil {
 			return 0, errors.New("no data message")
 		}
+
 		if v.Bellatrix.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
@@ -814,9 +923,11 @@ func (v *VersionedSignedBuilderBid) BlockGasLimit() (uint64, error) {
 		if v.Capella == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Capella.Message == nil {
 			return 0, errors.New("no data message")
 		}
+
 		if v.Capella.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
@@ -826,9 +937,11 @@ func (v *VersionedSignedBuilderBid) BlockGasLimit() (uint64, error) {
 		if v.Deneb == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Deneb.Message == nil {
 			return 0, errors.New("no data message")
 		}
+
 		if v.Deneb.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
@@ -838,9 +951,11 @@ func (v *VersionedSignedBuilderBid) BlockGasLimit() (uint64, error) {
 		if v.Electra == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Electra.Message == nil {
 			return 0, errors.New("no data message")
 		}
+
 		if v.Electra.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
@@ -850,9 +965,11 @@ func (v *VersionedSignedBuilderBid) BlockGasLimit() (uint64, error) {
 		if v.Fulu == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Fulu.Message == nil {
 			return 0, errors.New("no data message")
 		}
+
 		if v.Fulu.Message.Header == nil {
 			return 0, errors.New("no data message header")
 		}
@@ -868,6 +985,7 @@ func (v *VersionedSignedBuilderBid) Signature() (phase0.BLSSignature, error) {
 	if v == nil {
 		return phase0.BLSSignature{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
@@ -909,6 +1027,7 @@ func (v *VersionedSignedBuilderBid) String() string {
 	if v == nil {
 		return ""
 	}
+
 	data, err := json.Marshal(v)
 	if err != nil {
 		return fmt.Sprintf("ERR: %v", err)

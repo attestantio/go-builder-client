@@ -65,6 +65,7 @@ func (b *BlobsBundle) UnmarshalYAML(input []byte) error {
 	if err := yaml.Unmarshal(input, &data); err != nil {
 		return errors.Wrap(err, "failed to unmarshal YAML")
 	}
+
 	jsonBytes, err := json.Marshal(data)
 	if err != nil {
 		return errors.Wrap(err, "failed to marshal JSON")

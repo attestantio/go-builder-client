@@ -84,18 +84,22 @@ func New(ctx context.Context, params ...Parameter) (builderclient.Service, error
 
 	// Obtain the public key from the URL's user.
 	var pubkey *phase0.BLSPubKey
+
 	if base.User != nil && base.User.Username() != "" {
 		key := phase0.BLSPubKey{}
+
 		data, err := hex.DecodeString(strings.TrimPrefix(base.User.Username(), "0x"))
 		if err != nil {
 			return nil, errors.Join(fmt.Errorf("failed to parse public key %s", base.User.Username()), err)
 		}
+
 		copy(key[:], data)
 		pubkey = &key
 
 		// Remove the user from the URL.
 		base.User = nil
 	}
+
 	s := &Service{
 		log:          log,
 		base:         base,
@@ -127,19 +131,20 @@ func (s *Service) Address() string {
 	return s.address
 }
 
-// close closes the service, freeing up resources.
-func (*Service) close() {}
-
 // Pubkey returns the public key of the builder (if any).
 func (s *Service) Pubkey() *phase0.BLSPubKey {
 	return s.pubkey
 }
+
+// close closes the service, freeing up resources.
+func (*Service) close() {}
 
 //nolint:revive
 func parseAddress(address string) (*url.URL, *url.URL, error) {
 	if !strings.HasPrefix(address, "http") {
 		address = fmt.Sprintf("http://%s", address)
 	}
+
 	base, err := url.Parse(address)
 	if err != nil {
 		return nil, nil, errors.Join(errors.New("invalid URL"), err)
@@ -154,10 +159,12 @@ func parseAddress(address string) (*url.URL, *url.URL, error) {
 		user := baseAddress.User.Username()
 		baseAddress.User = url.UserPassword(user, "xxxxx")
 	}
+
 	if baseAddress.Path != "" {
 		// Mask the path.
 		baseAddress.Path = "xxxxx"
 	}
+
 	if baseAddress.RawQuery != "" {
 		// Mask all query values.
 		sensitiveRegex := regexp.MustCompile("=([^&]*)(&)?")

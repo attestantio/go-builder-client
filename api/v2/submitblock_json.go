@@ -1,3 +1,16 @@
+// Copyright © 2024 Attestant Limited.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package v2
 
 import (
@@ -53,48 +66,58 @@ func (s *SubmitBlockRequest) unpack(data *submitBlockRequestJSON) error {
 	if data.Message == nil {
 		return errors.New("message missing")
 	}
+
 	s.Message = data.Message
 
 	// field: ExecutionPayloadHeader
 	if data.ExecutionPayloadHeader == nil {
 		return errors.New("execution payload header missing")
 	}
+
 	s.ExecutionPayloadHeader = data.ExecutionPayloadHeader
 
 	// field: Signature
 	if data.Signature == "" {
 		return errors.New("signature missing")
 	}
+
 	signature, err := hex.DecodeString(strings.TrimPrefix(data.Signature, "0x"))
 	if err != nil {
 		return errors.Wrap(err, "invalid signature")
 	}
+
 	if len(signature) != phase0.SignatureLength {
 		return errors.New("incorrect length for signature")
 	}
+
 	copy(s.Signature[:], signature)
 
 	// field: Transactions
 	if data.Transactions == nil {
 		return errors.New("transactions missing")
 	}
+
 	transactions := make([]bellatrix.Transaction, len(data.Transactions))
 	for i := range data.Transactions {
 		if data.Transactions[i] == "" {
 			return errors.New("transaction missing")
 		}
+
 		tmp, err := hex.DecodeString(strings.TrimPrefix(data.Transactions[i], "0x"))
 		if err != nil {
 			return errors.Wrap(err, "invalid value for transaction")
 		}
+
 		transactions[i] = bellatrix.Transaction(tmp)
 	}
+
 	s.Transactions = transactions
 
 	// field: Withdrawals
 	if data.Withdrawals == nil {
 		return errors.New("withdrawals missing")
 	}
+
 	s.Withdrawals = data.Withdrawals
 
 	return nil

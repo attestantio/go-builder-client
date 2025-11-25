@@ -61,29 +61,36 @@ func (b *BuilderBid) unpack(data *builderBidJSON) error {
 	if data.Header == nil {
 		return errors.New("header missing")
 	}
+
 	b.Header = data.Header
 
 	if data.BlobKZGCommitments == nil {
 		return errors.New("blob KZG commitments missing")
 	}
+
 	b.BlobKZGCommitments = data.BlobKZGCommitments
 
 	if data.ExecutionRequests == nil {
 		return errors.New("execution requests missing")
 	}
+
 	b.ExecutionRequests = data.ExecutionRequests
 
 	if data.Value == "" {
 		return errors.New("value missing")
 	}
+
 	value, success := new(big.Int).SetString(data.Value, 10)
 	if !success {
 		return errors.New("invalid value for value")
 	}
+
 	if value.Sign() == -1 {
 		return errors.New("value cannot be negative")
 	}
+
 	var overflow bool
+
 	b.Value, overflow = uint256.FromBig(value)
 	if overflow {
 		return errors.New("value overflow")
@@ -92,13 +99,16 @@ func (b *BuilderBid) unpack(data *builderBidJSON) error {
 	if data.Pubkey == "" {
 		return errors.New("public key missing")
 	}
+
 	pubKey, err := hex.DecodeString(strings.TrimPrefix(data.Pubkey, "0x"))
 	if err != nil {
 		return errors.Wrap(err, "invalid value for public key")
 	}
+
 	if len(pubKey) != phase0.PublicKeyLength {
 		return errors.New("incorrect length for public key")
 	}
+
 	copy(b.Pubkey[:], pubKey)
 
 	return nil

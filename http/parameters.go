@@ -90,6 +90,7 @@ func parseAndCheckParameters(params ...Parameter) (*parameters, error) {
 		timeout:      2 * time.Second,
 		extraHeaders: make(map[string]string),
 	}
+
 	for _, p := range params {
 		if params != nil {
 			p.apply(&parameters)
@@ -99,6 +100,7 @@ func parseAndCheckParameters(params ...Parameter) (*parameters, error) {
 	if parameters.address == "" {
 		return nil, errors.New("no address specified")
 	}
+
 	if parameters.timeout == 0 {
 		return nil, errors.New("no timeout specified")
 	}

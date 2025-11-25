@@ -38,7 +38,6 @@ type VersionedSubmitBlindedBlockResponse struct {
 func (v *VersionedSubmitBlindedBlockResponse) IsEmpty() bool {
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
-
 		return v.Bellatrix == nil
 	case consensusspec.DataVersionCapella:
 		return v.Capella == nil
@@ -57,6 +56,7 @@ func (v *VersionedSubmitBlindedBlockResponse) BlockHash() (phase0.Hash32, error)
 	if v == nil {
 		return phase0.Hash32{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
@@ -74,6 +74,7 @@ func (v *VersionedSubmitBlindedBlockResponse) BlockHash() (phase0.Hash32, error)
 		if v.Deneb == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Deneb.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no execution payload")
 		}
@@ -83,6 +84,7 @@ func (v *VersionedSubmitBlindedBlockResponse) BlockHash() (phase0.Hash32, error)
 		if v.Electra == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no execution payload")
 		}
@@ -92,6 +94,7 @@ func (v *VersionedSubmitBlindedBlockResponse) BlockHash() (phase0.Hash32, error)
 		if v.Fulu == nil {
 			return phase0.Hash32{}, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionPayload == nil {
 			return phase0.Hash32{}, errors.New("no execution payload")
 		}
@@ -107,6 +110,7 @@ func (v *VersionedSubmitBlindedBlockResponse) Transactions() ([]bellatrix.Transa
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
@@ -124,6 +128,7 @@ func (v *VersionedSubmitBlindedBlockResponse) Transactions() ([]bellatrix.Transa
 		if v.Deneb == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Deneb.ExecutionPayload == nil {
 			return nil, errors.New("no execution payload")
 		}
@@ -133,6 +138,7 @@ func (v *VersionedSubmitBlindedBlockResponse) Transactions() ([]bellatrix.Transa
 		if v.Electra == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionPayload == nil {
 			return nil, errors.New("no execution payload")
 		}
@@ -142,6 +148,7 @@ func (v *VersionedSubmitBlindedBlockResponse) Transactions() ([]bellatrix.Transa
 		if v.Fulu == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionPayload == nil {
 			return nil, errors.New("no execution payload")
 		}
@@ -157,11 +164,13 @@ func (v *VersionedSubmitBlindedBlockResponse) Blobs() ([]consensusdeneb.Blob, er
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Deneb.BlobsBundle == nil {
 			return nil, errors.New("no data blobs bundle")
 		}
@@ -171,6 +180,7 @@ func (v *VersionedSubmitBlindedBlockResponse) Blobs() ([]consensusdeneb.Blob, er
 		if v.Electra == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Electra.BlobsBundle == nil {
 			return nil, errors.New("no data blobs bundle")
 		}
@@ -180,6 +190,7 @@ func (v *VersionedSubmitBlindedBlockResponse) Blobs() ([]consensusdeneb.Blob, er
 		if v.Fulu == nil {
 			return nil, errors.New("no data")
 		}
+
 		if v.Fulu.BlobsBundle == nil {
 			return nil, errors.New("no data blobs bundle")
 		}
@@ -195,11 +206,13 @@ func (v *VersionedSubmitBlindedBlockResponse) BlobGasUsed() (uint64, error) {
 	if v == nil {
 		return 0, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Deneb.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -209,6 +222,7 @@ func (v *VersionedSubmitBlindedBlockResponse) BlobGasUsed() (uint64, error) {
 		if v.Electra == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -218,6 +232,7 @@ func (v *VersionedSubmitBlindedBlockResponse) BlobGasUsed() (uint64, error) {
 		if v.Fulu == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -233,11 +248,13 @@ func (v *VersionedSubmitBlindedBlockResponse) ExcessBlobGas() (uint64, error) {
 	if v == nil {
 		return 0, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Deneb.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -247,6 +264,7 @@ func (v *VersionedSubmitBlindedBlockResponse) ExcessBlobGas() (uint64, error) {
 		if v.Electra == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Electra.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -256,6 +274,7 @@ func (v *VersionedSubmitBlindedBlockResponse) ExcessBlobGas() (uint64, error) {
 		if v.Fulu == nil {
 			return 0, errors.New("no data")
 		}
+
 		if v.Fulu.ExecutionPayload == nil {
 			return 0, errors.New("no data execution payload")
 		}
@@ -271,6 +290,7 @@ func (v *VersionedSubmitBlindedBlockResponse) BlobsBundle() (*VersionedBlobsBund
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionDeneb:
 		if v.Deneb == nil {

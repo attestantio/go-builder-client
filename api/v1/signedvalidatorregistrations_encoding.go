@@ -30,11 +30,13 @@ func (s *SignedValidatorRegistrations) MarshalSSZ() ([]byte, error) {
 // See https://eth2book.info/capella/part2/building_blocks/ssz/#lists for details.
 func (s *SignedValidatorRegistrations) MarshalSSZTo(buf []byte) ([]byte, error) {
 	dst := buf
+
 	var err error
 
 	if size := len(s.Registrations); size > 1099511627776 {
 		return nil, ssz.ErrListTooBigFn("SignedValidatorRegistrations.Registrations", size, 1099511627776)
 	}
+
 	for ii := range s.Registrations {
 		if dst, err = s.Registrations[ii].MarshalSSZTo(dst); err != nil {
 			return nil, err
@@ -52,25 +54,30 @@ func (s *SignedValidatorRegistrations) MarshalSSZTo(buf []byte) ([]byte, error) 
 // See https://eth2book.info/capella/part2/building_blocks/ssz/#lists for details.
 func (s *SignedValidatorRegistrations) UnmarshalSSZ(buf []byte) error {
 	var err error
+
 	size := uint64(len(buf))
 	if size < 4 {
 		return ssz.ErrSize
 	}
 
 	tail := buf
+
 	var o0 uint64
 
 	{
 		buf = tail[o0:]
+
 		num, err := ssz.DivideInt2(len(buf), 180, 1099511627776)
 		if err != nil {
 			return err
 		}
+
 		s.Registrations = make([]*SignedValidatorRegistration, num)
 		for ii := range num {
 			if s.Registrations[ii] == nil {
 				s.Registrations[ii] = new(SignedValidatorRegistration)
 			}
+
 			if err = s.Registrations[ii].UnmarshalSSZ(buf[ii*180 : (ii+1)*180]); err != nil {
 				return err
 			}
@@ -96,15 +103,18 @@ func (s *SignedValidatorRegistrations) HashTreeRootWith(hh ssz.HashWalker) error
 
 	{
 		subIndx := hh.Index()
+
 		num := uint64(len(s.Registrations))
 		if num > 1099511627776 {
 			return ssz.ErrIncorrectListSize
 		}
+
 		for _, elem := range s.Registrations {
 			if err := elem.HashTreeRootWith(hh); err != nil {
 				return err
 			}
 		}
+
 		hh.MerkleizeWithMixin(subIndx, num, 1099511627776)
 	}
 

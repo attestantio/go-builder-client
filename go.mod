@@ -1,8 +1,8 @@
 module github.com/attestantio/go-builder-client
 
-go 1.22
+go 1.25
 
-toolchain go1.23.2
+toolchain go1.25.2
 
 require (
 	github.com/attestantio/go-eth2-client v0.27.1

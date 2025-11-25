@@ -34,12 +34,13 @@ var responseBuilderVersionStrings = [...]string{
 
 // MarshalJSON implements json.Marshaler.
 func (d *BuilderVersion) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", responseBuilderVersionStrings[*d])), nil
+	return fmt.Appendf(nil, "%q", responseBuilderVersionStrings[*d]), nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (d *BuilderVersion) UnmarshalJSON(input []byte) error {
 	var err error
+
 	switch strings.ToUpper(string(input)) {
 	case `"V1"`:
 		*d = BuilderVersionV1

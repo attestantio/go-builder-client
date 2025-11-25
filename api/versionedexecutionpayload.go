@@ -54,6 +54,7 @@ func (v *VersionedExecutionPayload) BlockHash() (phase0.Hash32, error) {
 	if v == nil {
 		return phase0.Hash32{}, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {
@@ -95,6 +96,7 @@ func (v *VersionedExecutionPayload) Transactions() ([]bellatrix.Transaction, err
 	if v == nil {
 		return nil, errors.New("nil struct")
 	}
+
 	switch v.Version {
 	case consensusspec.DataVersionBellatrix:
 		if v.Bellatrix == nil {

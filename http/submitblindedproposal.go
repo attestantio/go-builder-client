@@ -30,11 +30,11 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-// SubmitBlindedProposalV2 submits a blinded proposal.
-func (s *Service) SubmitBlindedProposalV2(ctx context.Context,
+// SubmitBlindedProposal submits a blinded proposal.
+func (s *Service) SubmitBlindedProposal(ctx context.Context,
 	opts *api.SubmitBlindedProposalOpts,
 ) error {
-	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "SubmitBlindedProposalV2", trace.WithAttributes(
+	ctx, span := otel.Tracer("attestantio.go-builder-client.http").Start(ctx, "SubmitBlindedProposal", trace.WithAttributes(
 		attribute.String("relay", s.Address()),
 	))
 	defer span.End()
@@ -53,37 +53,37 @@ func (s *Service) SubmitBlindedProposalV2(ctx context.Context,
 			return errors.New("bellatrix proposal without payload")
 		}
 
-		return s.submitBellatrixProposalV2(ctx, opts)
+		return s.submitBellatrixProposal(ctx, opts)
 	case consensusspec.DataVersionCapella:
 		if opts.Proposal.Capella == nil {
 			return errors.New("capella proposal without payload")
 		}
 
-		return s.submitCapellaProposalV2(ctx, opts)
+		return s.submitCapellaProposal(ctx, opts)
 	case consensusspec.DataVersionDeneb:
 		if opts.Proposal.Deneb == nil {
 			return errors.New("deneb proposal without payload")
 		}
 
-		return s.submitDenebProposalV2(ctx, opts)
+		return s.submitDenebProposal(ctx, opts)
 	case consensusspec.DataVersionElectra:
 		if opts.Proposal.Electra == nil {
 			return errors.New("electra proposal without payload")
 		}
 
-		return s.submitElectraProposalV2(ctx, opts)
+		return s.submitElectraProposal(ctx, opts)
 	case consensusspec.DataVersionFulu:
 		if opts.Proposal.Fulu == nil {
 			return errors.New("fulu proposal without payload")
 		}
 
-		return s.submitFuluProposalV2(ctx, opts)
+		return s.submitFuluProposal(ctx, opts)
 	default:
 		return fmt.Errorf("unhandled data version %v", opts.Proposal.Version)
 	}
 }
 
-func (s *Service) submitBellatrixProposalV2(ctx context.Context,
+func (s *Service) submitBellatrixProposal(ctx context.Context,
 	opts *api.SubmitBlindedProposalOpts,
 ) error {
 	proposal := opts.Proposal.Bellatrix
@@ -120,7 +120,7 @@ func (s *Service) submitBellatrixProposalV2(ctx context.Context,
 	}
 }
 
-func (s *Service) submitCapellaProposalV2(ctx context.Context,
+func (s *Service) submitCapellaProposal(ctx context.Context,
 	opts *api.SubmitBlindedProposalOpts,
 ) error {
 	proposal := opts.Proposal.Capella
@@ -157,7 +157,7 @@ func (s *Service) submitCapellaProposalV2(ctx context.Context,
 	}
 }
 
-func (s *Service) submitDenebProposalV2(ctx context.Context,
+func (s *Service) submitDenebProposal(ctx context.Context,
 	opts *api.SubmitBlindedProposalOpts,
 ) error {
 	proposal := opts.Proposal.Deneb
@@ -194,7 +194,7 @@ func (s *Service) submitDenebProposalV2(ctx context.Context,
 	}
 }
 
-func (s *Service) submitElectraProposalV2(ctx context.Context,
+func (s *Service) submitElectraProposal(ctx context.Context,
 	opts *api.SubmitBlindedProposalOpts,
 ) error {
 	proposal := opts.Proposal.Electra
@@ -231,7 +231,7 @@ func (s *Service) submitElectraProposalV2(ctx context.Context,
 	}
 }
 
-func (s *Service) submitFuluProposalV2(ctx context.Context,
+func (s *Service) submitFuluProposal(ctx context.Context,
 	opts *api.SubmitBlindedProposalOpts,
 ) error {
 	proposal := opts.Proposal.Fulu

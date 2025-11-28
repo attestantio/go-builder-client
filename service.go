@@ -71,11 +71,11 @@ type UnblindedProposalProvider interface {
 	)
 }
 
-type SubmitBlindedProposalProviderV2 interface {
+type SubmitBlindedProposalProvider interface {
 	Service
 
-	// SubmitBlindedProposalv2 submits a blinded proposal.
-	SubmitBlindedProposalv2(ctx context.Context,
+	// SubmitBlindedProposal submits a blinded proposal.
+	SubmitBlindedProposal(ctx context.Context,
 		opts *api.SubmitBlindedProposalOpts,
 	) error
 }

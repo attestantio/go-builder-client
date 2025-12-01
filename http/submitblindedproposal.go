@@ -106,18 +106,20 @@ func (s *Service) submitBellatrixProposal(ctx context.Context,
 		bytes.NewBuffer(specJSON),
 		ContentTypeJSON,
 		headers,
-		true,
+		false,
 	)
 	if err != nil {
-		return errors.Join(errors.New("failed to submit unblind proposal request"), err)
+		return errors.Join(errors.New("failed to submit blinded proposal"), err)
 	}
 
-	switch httpResponse.statusCode {
-	case http.StatusAccepted:
-		return nil
-	default:
-		return fmt.Errorf("unexpected status code %v", httpResponse.statusCode)
+	if httpResponse.statusCode != http.StatusAccepted {
+		s.log.Debug().
+			Int("status_code", httpResponse.statusCode).
+			Str("body", string(httpResponse.body)).
+			Msg("Should have received 202 status code from Relay")
 	}
+
+	return nil
 }
 
 func (s *Service) submitCapellaProposal(ctx context.Context,
@@ -143,18 +145,20 @@ func (s *Service) submitCapellaProposal(ctx context.Context,
 		bytes.NewBuffer(specJSON),
 		ContentTypeJSON,
 		headers,
-		true,
+		false,
 	)
 	if err != nil {
-		return errors.Join(errors.New("failed to submit unblind proposal request"), err)
+		return errors.Join(errors.New("failed to submit blinded proposal"), err)
 	}
 
-	switch httpResponse.statusCode {
-	case http.StatusAccepted:
-		return nil
-	default:
-		return fmt.Errorf("unexpected status code %v", httpResponse.statusCode)
+	if httpResponse.statusCode != http.StatusAccepted {
+		s.log.Debug().
+			Int("status_code", httpResponse.statusCode).
+			Str("body", string(httpResponse.body)).
+			Msg("Should have received 202 status code from Relay")
 	}
+
+	return nil
 }
 
 func (s *Service) submitDenebProposal(ctx context.Context,
@@ -183,15 +187,17 @@ func (s *Service) submitDenebProposal(ctx context.Context,
 		true,
 	)
 	if err != nil {
-		return errors.Join(errors.New("failed to submit unblind proposal request"), err)
+		return errors.Join(errors.New("failed to submit blinded proposal"), err)
 	}
 
-	switch httpResponse.statusCode {
-	case http.StatusAccepted:
-		return nil
-	default:
-		return fmt.Errorf("unexpected status code %v", httpResponse.statusCode)
+	if httpResponse.statusCode != http.StatusAccepted {
+		s.log.Debug().
+			Int("status_code", httpResponse.statusCode).
+			Str("body", string(httpResponse.body)).
+			Msg("Should have received 202 status code from Relay")
 	}
+
+	return nil
 }
 
 func (s *Service) submitElectraProposal(ctx context.Context,
@@ -220,15 +226,17 @@ func (s *Service) submitElectraProposal(ctx context.Context,
 		true,
 	)
 	if err != nil {
-		return errors.Join(errors.New("failed to submit unblind proposal request"), err)
+		return errors.Join(errors.New("failed to submit blinded proposal"), err)
 	}
 
-	switch httpResponse.statusCode {
-	case http.StatusAccepted:
-		return nil
-	default:
-		return fmt.Errorf("unexpected status code %v", httpResponse.statusCode)
+	if httpResponse.statusCode != http.StatusAccepted {
+		s.log.Debug().
+			Int("status_code", httpResponse.statusCode).
+			Str("body", string(httpResponse.body)).
+			Msg("Should have received 202 status code from Relay")
 	}
+
+	return nil
 }
 
 func (s *Service) submitFuluProposal(ctx context.Context,
@@ -257,13 +265,15 @@ func (s *Service) submitFuluProposal(ctx context.Context,
 		true,
 	)
 	if err != nil {
-		return errors.Join(errors.New("failed to submit unblind proposal request"), err)
+		return errors.Join(errors.New("failed to submit blinded proposal"), err)
 	}
 
-	switch httpResponse.statusCode {
-	case http.StatusAccepted:
-		return nil
-	default:
-		return fmt.Errorf("unexpected status code %v", httpResponse.statusCode)
+	if httpResponse.statusCode != http.StatusAccepted {
+		s.log.Debug().
+			Int("status_code", httpResponse.statusCode).
+			Str("body", string(httpResponse.body)).
+			Msg("Should have received 202 status code from Relay")
 	}
+
+	return nil
 }

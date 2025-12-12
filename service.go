@@ -62,11 +62,20 @@ type ValidatorRegistrationsSubmitter interface {
 type UnblindedProposalProvider interface {
 	Service
 
-	// UnblindProposal unblinds a proposal.
+	// UnblindProposal submits a blinded proposal and returns it unblinded.
 	UnblindProposal(ctx context.Context,
 		opts *api.UnblindProposalOpts,
 	) (
 		*api.Response[*consensusapi.VersionedSignedProposal],
 		error,
 	)
+}
+
+type SubmitBlindedProposalProvider interface {
+	Service
+
+	// SubmitBlindedProposal submits a blinded proposal.
+	SubmitBlindedProposal(ctx context.Context,
+		opts *api.SubmitBlindedProposalOpts,
+	) error
 }

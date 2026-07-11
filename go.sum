@@ -1,7 +1,7 @@
 github.com/OffchainLabs/go-bitfield v0.0.0-20251031151322-f427d04d8506 h1:d/SJkN8/9Ca+1YmuDiUJxAiV4w/a9S8NcsG7GMQSrVI=
 github.com/OffchainLabs/go-bitfield v0.0.0-20251031151322-f427d04d8506/go.mod h1:6TZI4FU6zT8x6ZfWa1J8YQ2NgW0wLV/W3fHRca8ISBo=
-github.com/attestantio/go-eth2-client v0.28.1-0.20260415081624-a9e972865ca3 h1:BnDENzKFMBWjb3YqOcIYtmjv/ol00MJ7UV6Vf7xG3w0=
-github.com/attestantio/go-eth2-client v0.28.1-0.20260415081624-a9e972865ca3/go.mod h1:cmccJOSI3vYd1LKyU7jo8tR71vGaLmcWzK4xfefei0I=
+github.com/attestantio/go-eth2-client v0.28.1 h1:sDntLnHtlWZ6KK4zybPXMLE20hy0WgM1eDfYzlCciG4=
+github.com/attestantio/go-eth2-client v0.28.1/go.mod h1:1MBvz1DVe6jZduHJDJuJ/1S4LzYmDmvx+r5alo4pyrM=
 github.com/attestantio/go-eth2-client v0.28.2-0.20260711074852-3f451da4d744 h1:gqftar4fPznTbaIqRhvW/gvSQ24Ovlmcg5IM8WHwZIY=
 github.com/attestantio/go-eth2-client v0.28.2-0.20260711074852-3f451da4d744/go.mod h1:cmccJOSI3vYd1LKyU7jo8tR71vGaLmcWzK4xfefei0I=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=

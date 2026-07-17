@@ -1,4 +1,4 @@
-// Copyright © 2025 Attestant Limited.
+// Copyright © 2026 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -11,9 +11,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package fulu
+package deneb
 
 //nolint:revive
 // Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@latest` for this to work.
-//go:generate rm -f blobsbundle_ssz.go executionpayloadandblobsbundle_ssz.go submitblockrequest_ssz.go
-//go:generate dynssz-gen -package . -legacy -without-dynamic-expressions -types BlobsBundle:blobsbundle_ssz.go,ExecutionPayloadAndBlobsBundle:executionpayloadandblobsbundle_ssz.go,SubmitBlockRequest:submitblockrequest_ssz.go
+//go:generate rm -f signedbuilderbid_ssz.go submitblockrequest_ssz.go builderbid_ssz.go blobsbundle_ssz.go executionpayloadandblobsbundle_ssz.go
+//go:generate dynssz-gen -package . -legacy -without-dynamic-expressions -types BuilderBid:builderbid_ssz.go,SignedBuilderBid:signedbuilderbid_ssz.go,SubmitBlockRequest:submitblockrequest_ssz.go,BlobsBundle:blobsbundle_ssz.go,ExecutionPayloadAndBlobsBundle:executionpayloadandblobsbundle_ssz.go

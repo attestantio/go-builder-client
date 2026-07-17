@@ -13,8 +13,7 @@
 
 package capella
 
-// Need to `go install github.com/ferranbt/fastssz/sszgen@latest` for this to work.
+// Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@latest` for this to work.
 //go:generate rm -f builderbid_ssz.go signedbuilderbid_ssz.go submitblockrequest_ssz.go
 //nolint:revive
-//go:generate sszgen --suffix ssz --include ../../../go-eth2-client/spec/capella,../../../go-eth2-client/spec/bellatrix,../../../go-eth2-client/spec/phase0,../v1 --path . --objs BuilderBid,SignedBuilderBid,SubmitBlockRequest
-//go:generate goimports -w builderbid_ssz.go signedbuilderbid_ssz.go submitblockrequest_ssz.go
+//go:generate dynssz-gen -package . -legacy -without-dynamic-expressions -types BuilderBid:builderbid_ssz.go,SignedBuilderBid:signedbuilderbid_ssz.go,SubmitBlockRequest:submitblockrequest_ssz.go

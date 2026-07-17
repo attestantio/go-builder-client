@@ -13,8 +13,7 @@
 
 package v1
 
-// Need to `go install github.com/ferranbt/fastssz/sszgen@latest` for this to work.
+// Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@latest` for this to work.
 //go:generate rm -f signedvalidatorregistrations_encoding.go signedvalidatorregistration_encoding.go validatorregistration_encoding.go
 //nolint:revive
-//go:generate sszgen -include ../../../go-eth2-client/spec/bellatrix,../../../go-eth2-client/spec/phase0 --path . --objs SignedValidatorRegistrations,SignedValidatorRegistration,ValidatorRegistration
-//go:generate goimports -w signedvalidatorregistrations_encoding.go signedvalidatorregistration_encoding.go validatorregistration_encoding.go
+//go:generate dynssz-gen -package . -legacy -without-dynamic-expressions -types SignedValidatorRegistrations:signedvalidatorregistrations_encoding.go,SignedValidatorRegistration:signedvalidatorregistration_encoding.go,ValidatorRegistration:validatorregistration_encoding.go

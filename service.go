@@ -11,7 +11,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//nolint:revive // package name differs from directory due to module hyphen; keep public API.
 package client
 
 import (

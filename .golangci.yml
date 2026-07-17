@@ -1,70 +1,71 @@
-# golangci-lint Configuration
-# 
-# This configuration file defines linting rules and settings for the go-builder-client project.
-# It uses golangci-lint v2 configuration format for maximum compatibility.
-# 
-# Official documentation: https://golangci-lint.run/usage/configuration/
-# Migration guide: https://golangci-lint.run/docs/product/migration-guide
-#
-# Configuration sections:
-# - run: Analysis execution settings (timeout, concurrency, etc.)
-# - linters: Linter selection and configuration
-# - settings: Individual linter settings and rules
-# - exclusions: Files and patterns to exclude from linting
-# - formatters: Code formatting tools and their settings
+# golangci-lint configuration file
+# Documentation: https://golangci-lint.run/usage/configuration/
+# Version: 2 (latest configuration format)
 
-# Configuration version - must be "2" for golangci-lint v2 format
+# Configuration version - must be "2" for latest golangci-lint
 version: "2"
-
-# Analysis execution settings
+# Options for analysis running
 run:
-  # Module download mode for dependency resolution
+  # Module download mode for go list command
   # Options: readonly, vendor, mod, sum
-  # readonly: Prevents automatic go.mod updates (recommended for CI)
+  # readonly: prevents automatic go.mod updates (recommended for CI)
   modules-download-mode: readonly
-  
-  # Include test files in analysis
-  # Disabled to focus on production code quality
+
+  # Include test files in linting analysis
+  # Default: true, but disabled for this project to focus on main code
   tests: false
-  
-  # Allow multiple parallel golangci-lint instances
+
+  # Allow multiple parallel golangci-lint instances running
   # Useful for CI environments with multiple jobs
   allow-parallel-runners: true
-
+# Output configuration
+output:
+  formats:
+    # Text format output to stderr with colors
+    text:
+      path: stderr
 # Linter configuration
 linters:
   # Enable all available linters by default
-  # This provides comprehensive code quality checks
   default: all
-  
-  # Disabled linters with explanations
+
+  # Disable specific linters that are too strict or generate false positives
   disable:
-    - cyclop          # Disabled: Too strict cyclomatic complexity checks
-    - depguard        # Disabled: Dependency management handled by go.mod
-    - dupl            # Disabled: Duplicate code detection too noisy
-    - err113          # Disabled: Error wrapping not always applicable
-    - exhaustive      # Disabled: Enum exhaustiveness too strict
-    - exhaustruct     # Disabled: Struct field initialization too strict
-    - funlen          # Disabled: Function length limits too restrictive
-    - gochecknoglobals # Disabled: Global variables sometimes necessary
-    - gocognit        # Disabled: Cognitive complexity too strict
-    - ireturn         # Disabled: Interface return types too restrictive
-    - mnd             # Disabled: Magic number detection too noisy
-    - perfsprint      # Disabled: Performance optimizations not always needed
-    - varnamelen      # Disabled: Variable name length too strict
-    - wrapcheck       # Disabled: Error wrapping not always applicable
-    - wsl             # Disabled: Whitespace linting too strict (replaced with wsl_v5)
-    - noinlineerr     # Disabled: Inline error wrapping not always applicable
-  
-  # Individual linter settings and rule configurations
+    - cyclop           # Disable cyclomatic complexity check
+    - depguard         # Disable dependency guard check
+    - dupl             # Disable duplicate code check
+    - err113           # Disable error 113 check
+    - exhaustive       # Disable exhaustive check
+    - exhaustruct      # Disable exhaustruct check
+    - forcetypeassert  # Disable force type assert check
+    - funlen           # Disable function length check
+    - gochecknoglobals # Disable global variable check
+    - gochecknoinits   # Disable global variable check
+    - gocognit         # Disable cognitive complexity check
+    - goconst          # Disable constant check
+    - intrange         # Disable integer range check
+    - ireturn          # Disable return check
+    - lll              # Disable line length check
+    - maintidx         # Disable maintainability index check
+    - mnd              # Disable magic number check
+    - musttag          # Disable must tag check
+    - perfsprint       # Disable performance sprint check
+    - recvcheck        # Disable receive check
+    - varnamelen       # Disable variable name length check
+    - wrapcheck        # Disable wrap check
+    - wsl              # Disable whitespace check for line length
+    - wsl_v5           # Disable whitespace check for line length
+    - noinlineerr      # Disable inline error check
+    - funcorder        # Disable function order check
+  # Linter-specific settings and configurations
   settings:
-    # Header comment enforcement
+    # goheader: License header validation
     goheader:
       values:
         regexp:
-          # Pattern to match copyright years (supports ranges and single years)
+          # Regex pattern for matching copyright years
           YEARS: (20\d\d - 20\d\d|20\d\d, 20\d\d|20\d\d)
-      # Template for required file headers
+      # Template for required license header
       template: |-
         Copyright © {{ YEARS }} Attestant Limited.
         Licensed under the Apache License, Version 2.0 (the "License");
@@ -78,99 +79,97 @@ linters:
         WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
         See the License for the specific language governing permissions and
         limitations under the License.
-    
-    # Security vulnerability detection
+    # gosec: Security vulnerability scanning
     gosec:
       excludes:
-        # G115: Deferring unsafe method on type returned from unsafe call
-        # Disabled due to false positives in crypto operations
+        # Exclude G115: Use of ReadAll is discouraged (false positives)
         - G115
-    
-    # Line length limit configuration
+    # lll: Line length linter (disabled but configured for reference)
     lll:
-      # Maximum line length (132 characters)
-      # Allows for longer lines while maintaining readability
       line-length: 132
-    
-    # Revive linter configuration (Go linter framework)
+
+    # revive: Advanced Go linter with extensive rules
     revive:
-      # Minimum confidence level for rule violations (0.0-1.0)
+      # Minimum confidence level for reporting issues
       confidence: 0.8
       # Severity level for violations
       severity: error
       # Enable all available rules
       enable-all-rules: true
-      # Custom rule configurations
       rules:
+        # Disable specific revive rules
         - name: add-constant
-          disabled: true  # Disabled: Constant extraction not always beneficial
+          disabled: true
         - name: cyclomatic
-          disabled: true  # Disabled: Cyclomatic complexity handled by other linters
+          disabled: true
         - name: cognitive-complexity
-          disabled: true  # Disabled: Cognitive complexity too strict
-        - name: confusing-results
-          # Enabled: Helps identify confusing function return patterns
+          disabled: true
         - name: function-length
-          disabled: true  # Disabled: Function length limits too restrictive
+          disabled: true
+        - name: max-public-structs
+          disabled: true
+        - name: package-comments
+          disabled: true
+        - name: package-directory-mismatch
+          disabled: true
+        - name: var-naming
+          disabled: true
+        # Configure specific rules
+        - name: confusing-results
         - name: line-length-limit
           arguments:
-            - 132  # Maximum line length
-        - name: max-public-structs
-          disabled: true  # Disabled: Public struct count limits too strict
-        - name: package-comments
-          disabled: true  # Disabled: Package comments not always necessary
+            - 132
         - name: struct-tag
           arguments:
-            - json,allowempty  # Required struct tags for JSON serialization
+            - json,allowempty
         - name: unhandled-error
           arguments:
-            - fmt.Fprint   # Functions that should have error handling
-            - fmt.Fprintf  # Functions that should have error handling
-    
-    # Static analysis checks
+            - fmt.Fprint
+            - fmt.Fprintf
+    # staticcheck: Advanced static analysis
     staticcheck:
       checks:
-        - all      # Enable all staticcheck checks
-        - -ST1000  # Disable: Package naming convention (too strict)
-    
-    # Struct tag case enforcement
+        # Enable all checks except ST1000 (package comment style)
+        - all
+        - -ST1000
+
+    # tagliatelle: Struct tag naming conventions
     tagliatelle:
       case:
         rules:
-          json: snake  # JSON tags must use snake_case
-          yaml: snake  # YAML tags must use snake_case
-  
-  # File and pattern exclusions
+          # Use snake_case for JSON and YAML tags
+          json: snake
+          yaml: snake
+
+  # Exclusions: Files and patterns to exclude from linting
   exclusions:
     # Exclude generated files with lax matching
     generated: lax
-    # Exclude common false positive patterns
+    # Exclude common false positive presets
     presets:
-      - comments                    # Comment-related false positives
-      - common-false-positives     # Common false positive patterns
-      - legacy                     # Legacy code patterns
-      - std-error-handling        # Standard error handling patterns
-    # Specific file patterns to exclude
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    # Exclude specific file patterns
     paths:
-      - .*_ssz\.go$    # SSZ (Simple Serialize) generated files
-      - third_party$   # Third-party code directories
-      - builtin$       # Built-in Go code
-      - examples$      # Example code directories
-
-# Code formatting tools
+      - .*_ssz\.go$ # Exclude SSZ generated files
+      - third_party$ # Exclude third party code
+      - builtin$ # Exclude builtin code
+      - examples$ # Exclude example code
+# Formatters: Code formatting tools
 formatters:
-  # Enabled formatters (applied in order)
   enable:
-    - gofmt      # Standard Go formatter
-    - gofumpt    # Stricter Go formatter with additional rules
-    - goimports  # Import organization and formatting
-  # Formatter exclusions
+    - gofmt # Standard Go formatter
+    - gofumpt # Stricter Go formatter
+    - goimports # Import organization and formatting
+    - gci # Go import grouping and sorting formatter
   exclusions:
     # Exclude generated files from formatting
     generated: lax
-    # Specific file patterns to exclude from formatting
+    # Exclude specific file patterns from formatting
     paths:
-      - .*_ssz\.go$    # SSZ generated files
-      - third_party$   # Third-party code
-      - builtin$       # Built-in Go code
-      - examples$      # Example code
+      - .*_ssz\.go$ # Exclude SSZ generated files
+      - third_party$ # Exclude third party code
+      - builtin$ # Exclude builtin code
+      - examples$ # Exclude example code

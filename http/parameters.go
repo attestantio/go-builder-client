@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//nolint:revive,nolintlint // package name is the same as std lib; keep public API.
 package http
 
 import (

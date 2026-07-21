@@ -57,6 +57,11 @@ func (t *SignedValidatorRegistrations) MarshalSSZTo(buf []byte) (dst []byte, err
 // UnmarshalSSZ unmarshals the *SignedValidatorRegistrations from SSZ-encoded bytes.
 // Note that this expects the encoded bytes to be a bare list, without a leading offset (see the file header for details).
 func (t *SignedValidatorRegistrations) UnmarshalSSZ(buf []byte) (err error) {
+	// Preserve master behaviour: reject buffers shorter than the minimum encoded size.
+	// See https://github.com/attestantio/go-builder-client/pull/61#discussion_r3613029158
+	if buflen := len(buf); buflen < 4 {
+		return sszutils.ErrFixedFieldsEOFFn(buflen, 4)
+	}
 	{ // Field #0 'Registrations' (dynamic)
 		val1 := t.Registrations
 		itemCount := len(buf) / 180

@@ -18,8 +18,11 @@ import (
 	"fmt"
 
 	"github.com/goccy/go-yaml"
+	"github.com/pk910/dynamic-ssz/sszutils"
 	"github.com/pkg/errors"
 )
+
+var _ = sszutils.Annotate[SignedValidatorRegistrations](`ssz-type:"wrapper"`)
 
 // SignedValidatorRegistrations represents a list of SignedValidatorRegistration.
 type SignedValidatorRegistrations struct {

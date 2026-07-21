@@ -1,4 +1,4 @@
-// Copyright © 2024 Attestant Limited.
+// Copyright © 2024 - 2026 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,8 +18,11 @@ import (
 	"fmt"
 
 	"github.com/goccy/go-yaml"
+	"github.com/pk910/dynamic-ssz/sszutils"
 	"github.com/pkg/errors"
 )
+
+var _ = sszutils.Annotate[SignedValidatorRegistrations](`ssz-type:"wrapper"`)
 
 // SignedValidatorRegistrations represents a list of SignedValidatorRegistration.
 type SignedValidatorRegistrations struct {

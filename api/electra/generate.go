@@ -1,4 +1,4 @@
-// Copyright © 2024 Attestant Limited.
+// Copyright © 2026 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -14,7 +14,6 @@
 package electra
 
 //nolint:revive,line-length-limit
-// Need to `go install github.com/ferranbt/fastssz/sszgen@latest` for this to work.
+// Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@latest` for this to work.
 //go:generate rm -f builderbid_ssz.go signedbuilderbid_ssz.go submitblockrequest_ssz.go
-//go:generate sszgen --suffix ssz --include ../../../go-eth2-client/spec/electra,../../../go-eth2-client/spec/deneb,../../../go-eth2-client/spec/capella,../../../go-eth2-client/spec/bellatrix,../../../go-eth2-client/spec/phase0,../v1,../deneb --path . --objs BuilderBid,SignedBuilderBid,SubmitBlockRequest
-//go:generate goimports -w builderbid_ssz.go signedbuilderbid_ssz.go submitblockrequest_ssz.go
+//go:generate dynssz-gen -package . -legacy -without-dynamic-expressions -types BuilderBid:builderbid_ssz.go,SignedBuilderBid:signedbuilderbid_ssz.go,SubmitBlockRequest:submitblockrequest_ssz.go

@@ -1,4 +1,4 @@
-// Copyright © 2025 Attestant Limited.
+// Copyright © 2026 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -14,7 +14,6 @@
 package fulu
 
 //nolint:revive
-// Need to `go install github.com/ferranbt/fastssz/sszgen@latest` for this to work.
+// Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@latest` for this to work.
 //go:generate rm -f blobsbundle_ssz.go executionpayloadandblobsbundle_ssz.go submitblockrequest_ssz.go
-//go:generate sszgen --suffix ssz --include ../../../go-eth2-client/spec/electra,../../../go-eth2-client/spec/deneb,../../../go-eth2-client/spec/capella,../../../go-eth2-client/spec/bellatrix,../../../go-eth2-client/spec/phase0,../v1,../deneb --path . --objs BlobsBundle,ExecutionPayloadAndBlobsBundle,SubmitBlockRequest
-//go:generate goimports -w blobsbundle_ssz.go executionpayloadandblobsbundle_ssz.go submitblockrequest_ssz.go
+//go:generate dynssz-gen -package . -legacy -without-dynamic-expressions -types BlobsBundle:blobsbundle_ssz.go,ExecutionPayloadAndBlobsBundle:executionpayloadandblobsbundle_ssz.go,SubmitBlockRequest:submitblockrequest_ssz.go

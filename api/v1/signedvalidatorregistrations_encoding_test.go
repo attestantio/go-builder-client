@@ -1,4 +1,4 @@
-// Copyright © 2025 Attestant Limited.
+// Copyright © 2025 - 2026 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -41,6 +41,11 @@ func TestSignedValidatorRegistrationsSSZ(t *testing.T) {
 		{
 			name:  "GoodSingle",
 			input: byteStr("0x000102030405060708090a0b0c0d0e0f1011121364000000000000006400000000000000000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebf"),
+		},
+		{
+			name:  "Short",
+			input: byteStr("0x000102"),
+			err:   "unexpected end of SSZ: list length 3 is not a multiple of element size 180",
 		},
 		{
 			name:  "GoodMultiple",

@@ -1,4 +1,4 @@
-// Copyright © 2020 Attestant Limited.
+// Copyright © 2026 Attestant Limited.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -13,8 +13,12 @@
 
 package v1
 
-// Need to `go install github.com/ferranbt/fastssz/sszgen@latest` for this to work.
-//go:generate rm -f signedvalidatorregistrations_encoding.go signedvalidatorregistration_encoding.go validatorregistration_encoding.go
+// Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@latest` for this to work.
+//
+// Note: SignedValidatorRegistrations is intentionally excluded from generation. It has a
+// non-standard SSZ encoding (a bare list without a leading offset) required for conformance
+// with https://ethereum.github.io/builder-specs/#/Builder/registerValidator, so its encoding
+// file is hand-maintained. See the header of signedvalidatorregistrations_encoding.go.
+//go:generate rm -f signedvalidatorregistration_encoding.go validatorregistration_encoding.go signedvalidatorregistrations_encoding.go
 //nolint:revive
-//go:generate sszgen -include ../../../go-eth2-client/spec/bellatrix,../../../go-eth2-client/spec/phase0 --path . --objs SignedValidatorRegistrations,SignedValidatorRegistration,ValidatorRegistration
-//go:generate goimports -w signedvalidatorregistrations_encoding.go signedvalidatorregistration_encoding.go validatorregistration_encoding.go
+//go:generate dynssz-gen -package . -legacy -without-dynamic-expressions -types SignedValidatorRegistration:signedvalidatorregistration_encoding.go,ValidatorRegistration:validatorregistration_encoding.go,SignedValidatorRegistrations:signedvalidatorregistrations_encoding.go

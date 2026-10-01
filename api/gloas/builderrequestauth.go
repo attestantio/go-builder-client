@@ -1,0 +1,42 @@
+// Copyright © 2026 Attestant Limited.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Package gloas contains the Gloas (ePBS) builder API types defined in
+// https://github.com/ethereum/builder-specs/blob/main/specs/gloas/validator.md.
+package gloas
+
+import (
+	"fmt"
+
+	"github.com/attestantio/go-eth2-client/spec/phase0"
+	"github.com/goccy/go-yaml"
+)
+
+// MaxBuilderAuthDataSize is the maximum length of BuilderRequestAuth.Data.
+const MaxBuilderAuthDataSize = 4096
+
+// BuilderRequestAuth authenticates a proposers request to a builder.
+type BuilderRequestAuth struct {
+	Data []byte `ssz-max:"4096"`
+	Slot phase0.Slot
+}
+
+// String returns a string version of the structure.
+func (b *BuilderRequestAuth) String() string {
+	data, err := yaml.Marshal(b)
+	if err != nil {
+		return fmt.Sprintf("ERR: %v", err)
+	}
+
+	return string(data)
+}

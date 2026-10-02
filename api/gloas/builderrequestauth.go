@@ -11,8 +11,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package gloas contains the Gloas (ePBS) builder API types defined in
-// https://github.com/ethereum/builder-specs/blob/main/specs/gloas/validator.md.
 package gloas
 
 import (

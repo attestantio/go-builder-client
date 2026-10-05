@@ -1,3 +1,6 @@
+0.9.0:
+  - import gloas changes from go-eth2-client
+
 0.8.0:
   - breaking changes to ssz; migrating from fastssz to dynssz 
 

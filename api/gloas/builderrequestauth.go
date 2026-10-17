@@ -23,7 +23,11 @@ import (
 // MaxBuilderAuthDataSize is the maximum length of BuilderRequestAuth.Data.
 const MaxBuilderAuthDataSize = 4096
 
-// BuilderRequestAuth authenticates a proposers request to a builder.
+// BuilderRequestAuth authenticates a proposer's request to a builder.
+//
+// The spec requires Data to be non-empty. JSON and YAML encoding and decoding
+// enforce this, but SSZ does not, so callers must check that Data is non-empty
+// after UnmarshalSSZ.
 type BuilderRequestAuth struct {
 	Data []byte `ssz-max:"4096"`
 	Slot phase0.Slot

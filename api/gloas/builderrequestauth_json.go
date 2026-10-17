@@ -32,6 +32,10 @@ type builderRequestAuthJSON struct {
 
 // MarshalJSON implements json.Marshaler.
 func (b *BuilderRequestAuth) MarshalJSON() ([]byte, error) {
+	if len(b.Data) == 0 {
+		return nil, errors.New("data missing")
+	}
+
 	return json.Marshal(&builderRequestAuthJSON{
 		Data: fmt.Sprintf("%#x", b.Data),
 		Slot: strconv.FormatUint(uint64(b.Slot), 10),

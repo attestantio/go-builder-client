@@ -20,7 +20,7 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
-// BuilderPreferences are a proposers per builder preferences.
+// BuilderPreferences are a proposer's per builder preferences.
 type BuilderPreferences struct {
 	MaxExecutionPayment phase0.Gwei
 }

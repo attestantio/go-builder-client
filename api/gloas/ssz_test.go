@@ -120,7 +120,10 @@ func TestBuilderRequestAuthSSZMaxData(t *testing.T) {
 	require.NoError(t, new(gloas.BuilderRequestAuth).UnmarshalSSZ(enc))
 
 	tooLong := &gloas.BuilderRequestAuth{Data: make([]byte, gloas.MaxBuilderAuthDataSize+1), Slot: 1}
-	if enc, err = tooLong.MarshalSSZ(); err == nil {
-		require.Error(t, new(gloas.BuilderRequestAuth).UnmarshalSSZ(enc))
-	}
+	_, err = tooLong.MarshalSSZ()
+	require.Error(t, err)
+
+	buf := make([]byte, 12+gloas.MaxBuilderAuthDataSize+1)
+	buf[0] = 12 // offset to data
+	require.Error(t, new(gloas.BuilderRequestAuth).UnmarshalSSZ(buf))
 }

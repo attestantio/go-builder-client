@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/goccy/go-yaml"
+	"github.com/pkg/errors"
 )
 
 // builderRequestAuthYAML is the spec representation of the struct.
@@ -28,6 +29,10 @@ type builderRequestAuthYAML struct {
 
 // MarshalYAML implements yaml.Marshaler.
 func (b *BuilderRequestAuth) MarshalYAML() ([]byte, error) {
+	if len(b.Data) == 0 {
+		return nil, errors.New("data missing")
+	}
+
 	yamlBytes, err := yaml.MarshalWithOptions(&builderRequestAuthYAML{
 		Data: fmt.Sprintf("%#x", b.Data),
 		Slot: uint64(b.Slot),

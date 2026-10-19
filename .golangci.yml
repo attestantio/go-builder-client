@@ -37,6 +37,7 @@ linters:
     - err113           # Disable error 113 check
     - exhaustive       # Disable exhaustive check
     - exhaustruct      # Disable exhaustruct check
+    - exhaustruct_v5   # Disable exhaustruct check (replaces exhaustruct)
     - forcetypeassert  # Disable force type assert check
     - funlen           # Disable function length check
     - gochecknoglobals # Disable global variable check
@@ -105,6 +106,8 @@ linters:
         - name: cognitive-complexity
           disabled: true
         - name: function-length
+          disabled: true
+        - name: marshal-receiver
           disabled: true
         - name: max-public-structs
           disabled: true

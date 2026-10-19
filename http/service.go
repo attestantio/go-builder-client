@@ -69,7 +69,6 @@ func New(ctx context.Context, params ...Parameter) (builderclient.Service, error
 			DialContext: (&net.Dialer{
 				Timeout:   parameters.timeout,
 				KeepAlive: 30 * time.Second,
-				DualStack: true,
 			}).DialContext,
 			MaxIdleConns:        64,
 			MaxConnsPerHost:     64,

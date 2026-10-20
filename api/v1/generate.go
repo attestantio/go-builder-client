@@ -13,12 +13,12 @@
 
 package v1
 
-// Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@latest` for this to work.
+// Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@v1.4.0` for this to work.
 //
-// Note: SignedValidatorRegistrations is intentionally excluded from generation. It has a
-// non-standard SSZ encoding (a bare list without a leading offset) required for conformance
-// with https://ethereum.github.io/builder-specs/#/Builder/registerValidator, so its encoding
-// file is hand-maintained. See the header of signedvalidatorregistrations_encoding.go.
+// Note: SignedValidatorRegistrations has a non-standard SSZ encoding (a bare list without a
+// leading offset) required for conformance with
+// https://ethereum.github.io/builder-specs/#/Builder/registerValidator. The generator produces
+// it from the `ssz-type:"wrapper"` annotation in signedvalidatorregistrations.go.
 //go:generate rm -f signedvalidatorregistration_encoding.go validatorregistration_encoding.go signedvalidatorregistrations_encoding.go
 //nolint:revive
 //go:generate dynssz-gen -package . -legacy -without-dynamic-expressions -types SignedValidatorRegistration:signedvalidatorregistration_encoding.go,ValidatorRegistration:validatorregistration_encoding.go,SignedValidatorRegistrations:signedvalidatorregistrations_encoding.go

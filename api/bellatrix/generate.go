@@ -13,7 +13,7 @@
 
 package bellatrix
 
-// Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@latest` for this to work.
+// Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@v1.4.0` for this to work.
 //go:generate rm -f builderbid_encoding.go signedbuilderbid_encoding.go submitblock_encoding.go
 //nolint:revive
 //go:generate dynssz-gen -package . -legacy -without-dynamic-expressions -types BuilderBid:builderbid_encoding.go,SignedBuilderBid:signedbuilderbid_encoding.go,SubmitBlockRequest:submitblock_encoding.go

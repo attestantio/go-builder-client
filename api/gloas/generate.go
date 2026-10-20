@@ -14,6 +14,6 @@
 package gloas
 
 //nolint:revive,line-length-limit
-// Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@latest` for this to work.
+// Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@v1.4.0` for this to work.
 //go:generate rm -f builderrequestauth_ssz.go signedbuilderrequestauth_ssz.go builderpreferences_ssz.go builderpreferencesrequest_ssz.go
 //go:generate dynssz-gen -package . -legacy -without-dynamic-expressions -types BuilderRequestAuth:builderrequestauth_ssz.go,SignedBuilderRequestAuth:signedbuilderrequestauth_ssz.go,BuilderPreferences:builderpreferences_ssz.go,BuilderPreferencesRequest:builderpreferencesrequest_ssz.go

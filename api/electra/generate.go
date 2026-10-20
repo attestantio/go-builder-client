@@ -14,6 +14,6 @@
 package electra
 
 //nolint:revive,line-length-limit
-// Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@latest` for this to work.
+// Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@v1.4.0` for this to work.
 //go:generate rm -f builderbid_ssz.go signedbuilderbid_ssz.go submitblockrequest_ssz.go
 //go:generate dynssz-gen -package . -legacy -without-dynamic-expressions -types BuilderBid:builderbid_ssz.go,SignedBuilderBid:signedbuilderbid_ssz.go,SubmitBlockRequest:submitblockrequest_ssz.go

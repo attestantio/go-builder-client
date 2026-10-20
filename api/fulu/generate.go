@@ -14,6 +14,6 @@
 package fulu
 
 //nolint:revive
-// Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@latest` for this to work.
+// Need to `go install github.com/pk910/dynamic-ssz/dynssz-gen@v1.4.0` for this to work.
 //go:generate rm -f blobsbundle_ssz.go executionpayloadandblobsbundle_ssz.go submitblockrequest_ssz.go
 //go:generate dynssz-gen -package . -legacy -without-dynamic-expressions -types BlobsBundle:blobsbundle_ssz.go,ExecutionPayloadAndBlobsBundle:executionpayloadandblobsbundle_ssz.go,SubmitBlockRequest:submitblockrequest_ssz.go

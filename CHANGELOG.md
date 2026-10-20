@@ -1,3 +1,6 @@
+0.9.1:
+  - regenerate ssz code with dynamic-ssz v1.4.0, matching the version required by go-eth2-client v0.30.2
+
 0.9.0:
   - import gloas changes from go-eth2-client
   - add gloas api support for builderpreferences, builderrequest and signed builderrequest

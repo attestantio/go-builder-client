@@ -4,6 +4,8 @@ github.com/attestantio/go-eth2-client v0.29.0 h1:nOVPR6boXuGn5yg94pVOKcaoiO9yyja
 github.com/attestantio/go-eth2-client v0.29.0/go.mod h1:yhVnKAzIsFhtawbq6k/rA/Dy4vsPpu2Z2cGdQVrIjd0=
 github.com/attestantio/go-eth2-client v0.30.0 h1:SbEhbmuL5U+GoCjiG6pyfjknkBeW1Q/LJ2KF/niyt2U=
 github.com/attestantio/go-eth2-client v0.30.0/go.mod h1:yhVnKAzIsFhtawbq6k/rA/Dy4vsPpu2Z2cGdQVrIjd0=
+github.com/attestantio/go-eth2-client v0.30.2 h1:8LWN86Dh5PjXTwcrRR+SXcatcocFw7j08KO7NFqEcNo=
+github.com/attestantio/go-eth2-client v0.30.2/go.mod h1:IcbypY5iD/c/T5OLWVuZyWS8kM8HXkGc0ZW12uikfys=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
 github.com/casbin/govaluate v1.10.0 h1:ffGw51/hYH3w3rZcxO/KcaUIDOLP84w7nsidMVgaDG0=
@@ -75,8 +77,12 @@ github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 h1:C3w9PqII01/Oq
 github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822/go.mod h1:+n7T8mK8HuQTcFwEeznm/DIxMOiR9yIdICNftLE1DvQ=
 github.com/pk910/dynamic-ssz v1.3.2 h1:65UR/O+ss+U2Dn86Rdl7LwehHo3u2ElutduS/pcuUXE=
 github.com/pk910/dynamic-ssz v1.3.2/go.mod h1:lqmnou2bjr2UWQ3C/L3082TGW0SFl/SwT7ionwM0+FU=
+github.com/pk910/dynamic-ssz v1.4.0 h1:uwDOiBR/gmbC08gGo1TA/SLD17ArJyLKi0PHaQmuZEM=
+github.com/pk910/dynamic-ssz v1.4.0/go.mod h1:mnRbhjX+4YMyP4jYMncTUA3aDpMzBLqAbjcvfCyOyRI=
 github.com/pk910/hashtree-bindings v0.2.2 h1:gkczxxekBW2NeMK9N3OLj7Jepe7zPmJGVwr8LyofGsA=
 github.com/pk910/hashtree-bindings v0.2.2/go.mod h1:zrWt88783JmhBfcgni6kkIMYRdXTZi/FL//OyI5T/l4=
+github.com/pk910/hashtree-bindings v0.2.6 h1:BjRQho04nWzGrXwBCLVTyQRNV30O59iPcvQRcidFt2o=
+github.com/pk910/hashtree-bindings v0.2.6/go.mod h1:zrWt88783JmhBfcgni6kkIMYRdXTZi/FL//OyI5T/l4=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

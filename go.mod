@@ -5,7 +5,7 @@ go 1.25.0
 toolchain go1.25.2
 
 require (
-	github.com/attestantio/go-eth2-client v0.29.0
+	github.com/attestantio/go-eth2-client v0.30.2
 	github.com/ferranbt/fastssz v0.1.4
 	// go-yaml after 1.9.2 has memory issues due to https://github.com/goccy/go-yaml/issues/325; avoid.
 	github.com/goccy/go-yaml v1.9.2
@@ -20,7 +20,7 @@ require (
 	gotest.tools v2.2.0+incompatible
 )
 
-require github.com/pk910/dynamic-ssz v1.3.2
+require github.com/pk910/dynamic-ssz v1.4.0
 
 require (
 	github.com/OffchainLabs/go-bitfield v0.0.0-20251031151322-f427d04d8506 // indirect
@@ -39,7 +39,7 @@ require (
 	github.com/minio/sha256-simd v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/pk910/hashtree-bindings v0.2.2 // indirect
+	github.com/pk910/hashtree-bindings v0.2.6 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.55.0 // indirect

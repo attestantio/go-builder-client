@@ -45,7 +45,7 @@ func TestSignedValidatorRegistrationsSSZ(t *testing.T) {
 		{
 			name:  "Short",
 			input: byteStr("0x000102"),
-			err:   "unexpected end of SSZ: list length 3 is not a multiple of element size 180",
+			err:   "invalid value range: list length 3 is not a multiple of element size 180",
 		},
 		{
 			name:  "GoodMultiple",
